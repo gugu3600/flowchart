@@ -13,6 +13,9 @@
 - [x] Create RoleAndPermissionSeeder: super-admin (all perms), free, silver, gold, platinum tier roles.
 - [x] Seed default Super Admin user (admin@flowchart.dev / password).
 - [x] Refactor to Repository/Service pattern: Form Requests, Repositories, Services, DI bindings.
+- [x] API Resources (UserResource, FlowResource, FlowNodeResource, FlowEdgeResource) for clean responses.
+- [x] JWT moved to HTTP-only Secure SameSite=Strict cookie (XSS-safe). Removed `Auth::guard('api')` redundancy.
+- [x] BaseController response wrapper fixed (`success`/`status`/`message`/`data` keys).
 - [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.

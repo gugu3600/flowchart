@@ -36,7 +36,7 @@ class FlowService
 
     public function update(int $id, int $userId, array $data)
     {
-        $flow = $this->flowRepository->findForUser($id, $userId);
+        $this->flowRepository->findForUser($id, $userId);
         return $this->flowRepository->update($id, $data);
     }
 

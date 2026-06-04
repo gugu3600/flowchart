@@ -8,13 +8,13 @@ class AuthService
 {
     public function login(array $credentials): ?array
     {
-        $token = Auth::guard('api')->attempt($credentials);
+        $token = Auth::attempt($credentials);
 
         if (!$token) {
             return null;
         }
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         return [
             'user' => $user,
@@ -26,7 +26,7 @@ class AuthService
 
     public function me(): array
     {
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         return [
             'user' => $user,
@@ -37,6 +37,6 @@ class AuthService
 
     public function logout(): void
     {
-        Auth::guard('api')->logout();
+        Auth::logout();
     }
 }

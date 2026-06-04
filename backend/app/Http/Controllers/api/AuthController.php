@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Services\Auth\AuthService;
 use App\Services\Auth\RegisterService;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,11 @@ class AuthController extends BaseController
     {
         $result = $this->registerService->register($request->validated());
 
-        return $this->success($result, 'User registered successfully', 201);
+        return $this->success(
+            ['user' => new UserResource($result['user'])],
+            'User registered successfully',
+            201,
+        )->cookie('jwt_token', $result['token'], 43200, '/', null, true, true, false, 'Strict');
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -30,13 +35,16 @@ class AuthController extends BaseController
             return $this->error(null, 'Invalid credentials', 401);
         }
 
-        return $this->success($result, 'Login successful');
+        return $this->success(
+            ['user' => new UserResource($result['user'])],
+            'Login successful',
+        )->cookie('jwt_token', $result['token'], 43200, '/', null, true, true, false, 'Strict');
     }
 
     public function me(): JsonResponse
     {
         return $this->success(
-            $this->authService->me(),
+            new UserResource($this->authService->me()['user']),
             'Authenticated user retrieved',
         );
     }
@@ -45,6 +53,7 @@ class AuthController extends BaseController
     {
         $this->authService->logout();
 
-        return $this->success([], 'Logged out successfully');
+        return $this->success([], 'Logged out successfully')
+            ->cookie('jwt_token', '', -1, '/');
     }
 }

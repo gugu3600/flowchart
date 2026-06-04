@@ -6,6 +6,9 @@
 - [x] Super-admin role seeded with all permissions for development access.
 - [x] Controllers refactored: validation → FormRequest, business logic → Service, DB → Repository.
 - [x] RepositoryServiceProvider binds all interfaces → implementations.
+- [x] API response shape standardized via Resources + BaseController wrapper.
+- [x] JWT delivered via HTTP-only Secure SameSite=Strict cookie (no token in JSON body).
+- [x] `Auth::guard('api')` removed — default `api` guard used everywhere.
 - [ ] **Client-Side Separation:** Inspect frontend imports and build bundles. Ensure absolutely zero database connections or raw SQL queries are linked into the Vue client bundle to prevent client-side bypasses.
 - [ ] **Input Sanitization:** Check Laravel controller validation arrays. Ensure all custom node identifiers, route configurations, folder names, and database layout parameters are fully validated and sanitized to protect against payload manipulation.
 

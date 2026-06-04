@@ -113,6 +113,53 @@
 
 ---
 
+## Log-2026-06-04-005 — Auth Simplification, API Resources, Cookie-Based JWT
+
+### Summary
+- **Removed all explicit `Auth::guard('api')`** calls — default guard is already `api` (set via `AUTH_GUARD=api` in `.env`). Now uses plain `Auth::user()`, `Auth::id()`, `auth()->attempt()`.
+- **Created API Resources:** `UserResource`, `FlowResource`, `FlowNodeResource`, `FlowEdgeResource` — clean, consistent JSON response shapes.
+- **Cookie-based JWT:** Token stored in HTTP-only, Secure, SameSite=Strict cookie (`jwt_token`). Removed token from JSON response body for XSS protection.
+- **Created `JwtCookieMiddleware`** — reads `jwt_token` cookie and injects it into `Authorization: Bearer` header, so `auth:api` middleware picks it up transparently.
+- **Registered middleware** prepended to `api` group in `bootstrap/app.php`.
+- **Fixed `BaseController::success`** — was returning `$data` instead of the wrapped `$response` array.
+
+### Response Shape (before → after)
+```
+// BEFORE (buggy — no wrapper)
+{ "user": {...}, "token": "..." }
+
+// AFTER (proper wrapper, no token in body)
+{
+  "success": true,
+  "status": 200,
+  "message": "Login successful",
+  "data": { "user": { "id": 1, "name": "...", "roles": [...], "permissions": [...] } }
+}
+// Token delivered via Set-Cookie: jwt_token=...; httponly; secure; samesite=strict
+```
+
+### Added Files
+| File | Layer | Purpose |
+|------|-------|---------|
+| `app/Http/Middleware/JwtCookieMiddleware.php` | Middleware | Reads JWT from cookie → sets `Authorization` header |
+| `app/Http/Resources/UserResource.php` | Resource | Clean user shape with roles/permissions |
+| `app/Http/Resources/FlowResource.php` | Resource | Flow shape with lazy-loaded nodes/edges |
+| `app/Http/Resources/FlowNodeResource.php` | Resource | Node shape |
+| `app/Http/Resources/FlowEdgeResource.php` | Resource | Edge shape |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Http/Controllers/api/AuthController.php` | Uses `UserResource`, sets `jwt_token` cookie, token removed from body |
+| `backend/app/Http/Controllers/api/FlowController.php` | Uses `FlowResource`/`FlowNodeResource`, all `Auth::guard('api')` → `Auth::` |
+| `backend/app/Http/Controllers/api/BaseController.php` | Fixed `success()` → returns wrapped `$response` |
+| `backend/app/Services/Auth/AuthService.php` | Removed all `->guard('api')` calls |
+| `backend/app/Services/Auth/RegisterService.php` | Removed `->guard('api')` call |
+| `backend/bootstrap/app.php` | Registered `JwtCookieMiddleware` prepended to `api` group |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+---
+
 ## Log-2026-06-04-004 — Refactor to Repository/Service Pattern + Form Requests
 
 ### Summary

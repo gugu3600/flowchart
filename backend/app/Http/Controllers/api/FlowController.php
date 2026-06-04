@@ -6,6 +6,8 @@ use App\Http\Requests\Flow\SaveEdgesRequest;
 use App\Http\Requests\Flow\SaveNodesRequest;
 use App\Http\Requests\Flow\StoreFlowRequest;
 use App\Http\Requests\Flow\UpdateFlowRequest;
+use App\Http\Resources\FlowNodeResource;
+use App\Http\Resources\FlowResource;
 use App\Models\Flow;
 use App\Services\Flow\FlowService;
 use Illuminate\Http\JsonResponse;
@@ -19,65 +21,69 @@ class FlowController extends BaseController
 
     public function index(): JsonResponse
     {
-        $flows = $this->flowService->allForUser(Auth::guard('api')->id());
+        $flows = $this->flowService->allForUser(Auth::id());
 
-        return $this->success(['flows' => $flows], 'Flows retrieved');
+        return $this->success(
+            ['flows' => FlowResource::collection($flows)],
+            'Flows retrieved',
+        );
     }
 
     public function store(StoreFlowRequest $request): JsonResponse
     {
-        $flow = $this->flowService->create(
-            Auth::guard('api')->id(),
-            $request->validated(),
-        );
+        $flow = $this->flowService->create(Auth::id(), $request->validated());
 
-        return $this->success(['flow' => $flow], 'Flow created', 201);
+        return $this->success(
+            ['flow' => new FlowResource($flow)],
+            'Flow created',
+            201,
+        );
     }
 
     public function show(Flow $flow): JsonResponse
     {
-        $flow = $this->flowService->findForUser($flow->id, Auth::guard('api')->id());
+        $flow = $this->flowService->findForUser($flow->id, Auth::id());
 
-        return $this->success(['flow' => $flow], 'Flow retrieved');
+        return $this->success(
+            ['flow' => new FlowResource($flow)],
+            'Flow retrieved',
+        );
     }
 
     public function update(UpdateFlowRequest $request, Flow $flow): JsonResponse
     {
-        $flow = $this->flowService->update(
-            $flow->id,
-            Auth::guard('api')->id(),
-            $request->validated(),
-        );
+        $flow = $this->flowService->update($flow->id, Auth::id(), $request->validated());
 
-        return $this->success(['flow' => $flow], 'Flow updated');
+        return $this->success(
+            ['flow' => new FlowResource($flow)],
+            'Flow updated',
+        );
     }
 
     public function destroy(Flow $flow): JsonResponse
     {
-        $this->flowService->delete($flow->id, Auth::guard('api')->id());
+        $this->flowService->delete($flow->id, Auth::id());
 
         return $this->success([], 'Flow deleted');
     }
 
     public function saveNodes(SaveNodesRequest $request, Flow $flow): JsonResponse
     {
-        $nodes = $this->flowService->saveNodes(
-            $flow->id,
-            Auth::guard('api')->id(),
-            $request->validated('nodes'),
-        );
+        $nodes = $this->flowService->saveNodes($flow->id, Auth::id(), $request->validated('nodes'));
 
-        return $this->success(['nodes' => $nodes], 'Nodes saved');
+        return $this->success(
+            ['nodes' => FlowNodeResource::collection($nodes)],
+            'Nodes saved',
+        );
     }
 
     public function saveEdges(SaveEdgesRequest $request, Flow $flow): JsonResponse
     {
-        $edges = $this->flowService->saveEdges(
-            $flow->id,
-            Auth::guard('api')->id(),
-            $request->validated('edges'),
-        );
+        $edges = $this->flowService->saveEdges($flow->id, Auth::id(), $request->validated('edges'));
 
-        return $this->success(['edges' => $edges], 'Edges saved');
+        return $this->success(
+            ['edges' => FlowNodeResource::collection($edges)],
+            'Edges saved',
+        );
     }
 }

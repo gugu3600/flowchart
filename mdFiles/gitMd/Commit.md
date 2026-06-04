@@ -19,3 +19,8 @@
 - 3NF verification PASSED
 - Refactored to Repository/Service pattern: Form Requests for validation, Repositories for DB, Services for logic
 - RepositoryServiceProvider with interface→implementation bindings
+- Removed Auth::guard('api') — default guard is already api
+- API Resources (UserResource, FlowResource, FlowNodeResource, FlowEdgeResource)
+- JWT stored in HTTP-only Secure cookie (XSS-safe), removed from response body
+- JwtCookieMiddleware reads cookie and injects Authorization header
+- Fixed BaseController response wrapper

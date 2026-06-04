@@ -19,7 +19,7 @@ class RegisterService
             'password' => Hash::make($data['password']),
         ]);
 
-        $token = auth()->guard('api')->attempt([
+        $token = auth()->attempt([
             'email' => $data['email'],
             'password' => $data['password'],
         ]);
