@@ -122,6 +122,24 @@ These are independent because one flow can have multiple nodes each with differe
 | `App\Models\FlowNode` | `flow_nodes` | flow_id, type, label, position_x, position_y, data, config | belongsTo Flow |
 | `App\Models\FlowEdge` | `flow_edges` | flow_id, source_node_id, target_node_id, label, config | belongsTo Flow, belongsTo sourceNode/targetNode |
 
+### Architecture Layers
+
+```
+┌─────────────┐
+│  FormRequest │  ← validation (app/Http/Requests/)
+├─────────────┤
+│  Controller  │  ← thin — wires request → service → response
+├─────────────┤
+│   Service    │  ← business logic (app/Services/)
+├─────────────┤
+│  Repository  │  ← DB queries (app/Repositories/)
+├─────────────┤
+│    Model     │  ← Eloquent (app/Models/)
+└─────────────┘
+```
+
+All repository interfaces are bound to implementations in `App\Providers\RepositoryServiceProvider`.
+
 ---
 
 ## Migration Order

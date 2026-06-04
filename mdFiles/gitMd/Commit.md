@@ -17,3 +17,5 @@
 - Created AuthController (JWT register/login/me/logout) + FlowController (CRUD)
 - Created RoleAndPermissionSeeder with super-admin + free/silver/gold/platinum tier roles
 - 3NF verification PASSED
+- Refactored to Repository/Service pattern: Form Requests for validation, Repositories for DB, Services for logic
+- RepositoryServiceProvider with interface→implementation bindings

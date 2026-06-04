@@ -21,9 +21,9 @@ class MakeRepositoryCommand extends Command
         $interfaceName = $className . 'RepositoryInterface';
         $repositoryName = $className . 'Repository';
 
-        $folderName = Str::kebab($className);
+        $folderName = Str::snake($className);
         if (!empty($parts)) {
-            $subFolders = implode('/', array_map(fn ($p) => Str::kebab($p), $parts));
+            $subFolders = implode('/', array_map(fn ($p) => Str::snake($p), $parts));
             $folderName = $subFolders . '/' . $folderName;
         }
 

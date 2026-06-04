@@ -2,150 +2,82 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Http\Requests\Flow\SaveEdgesRequest;
+use App\Http\Requests\Flow\SaveNodesRequest;
+use App\Http\Requests\Flow\StoreFlowRequest;
+use App\Http\Requests\Flow\UpdateFlowRequest;
 use App\Models\Flow;
-use App\Models\FlowEdge;
-use App\Models\FlowNode;
+use App\Services\Flow\FlowService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class FlowController extends BaseController
 {
+    public function __construct(
+        private readonly FlowService $flowService,
+    ) {}
+
     public function index(): JsonResponse
     {
-        $flows = Flow::where('user_id', Auth::guard('api')->id())->get();
+        $flows = $this->flowService->allForUser(Auth::guard('api')->id());
 
         return $this->success(['flows' => $flows], 'Flows retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreFlowRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'config' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors(), 'Validation failed', 422);
-        }
-
-        $flow = Flow::create([
-            'user_id' => Auth::guard('api')->id(),
-            'name' => $request->name,
-            'description' => $request->description,
-            'config' => $request->config,
-        ]);
+        $flow = $this->flowService->create(
+            Auth::guard('api')->id(),
+            $request->validated(),
+        );
 
         return $this->success(['flow' => $flow], 'Flow created', 201);
     }
 
     public function show(Flow $flow): JsonResponse
     {
-        if ($flow->user_id !== Auth::guard('api')->id()) {
-            return $this->error(null, 'Forbidden', 403);
-        }
-
-        $flow->load(['nodes', 'edges']);
+        $flow = $this->flowService->findForUser($flow->id, Auth::guard('api')->id());
 
         return $this->success(['flow' => $flow], 'Flow retrieved');
     }
 
-    public function update(Request $request, Flow $flow): JsonResponse
+    public function update(UpdateFlowRequest $request, Flow $flow): JsonResponse
     {
-        if ($flow->user_id !== Auth::guard('api')->id()) {
-            return $this->error(null, 'Forbidden', 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'config' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors(), 'Validation failed', 422);
-        }
-
-        $flow->update($request->only('name', 'description', 'config'));
+        $flow = $this->flowService->update(
+            $flow->id,
+            Auth::guard('api')->id(),
+            $request->validated(),
+        );
 
         return $this->success(['flow' => $flow], 'Flow updated');
     }
 
     public function destroy(Flow $flow): JsonResponse
     {
-        if ($flow->user_id !== Auth::guard('api')->id()) {
-            return $this->error(null, 'Forbidden', 403);
-        }
-
-        $flow->delete();
+        $this->flowService->delete($flow->id, Auth::guard('api')->id());
 
         return $this->success([], 'Flow deleted');
     }
 
-    public function saveNodes(Request $request, Flow $flow): JsonResponse
+    public function saveNodes(SaveNodesRequest $request, Flow $flow): JsonResponse
     {
-        if ($flow->user_id !== Auth::guard('api')->id()) {
-            return $this->error(null, 'Forbidden', 403);
-        }
+        $nodes = $this->flowService->saveNodes(
+            $flow->id,
+            Auth::guard('api')->id(),
+            $request->validated('nodes'),
+        );
 
-        $validator = Validator::make($request->all(), [
-            'nodes' => 'required|array',
-            'nodes.*.id' => 'nullable|string',
-            'nodes.*.type' => 'required|string',
-            'nodes.*.label' => 'required|string',
-            'nodes.*.position_x' => 'required|numeric',
-            'nodes.*.position_y' => 'required|numeric',
-            'nodes.*.data' => 'nullable|array',
-            'nodes.*.config' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors(), 'Validation failed', 422);
-        }
-
-        $flow->nodes()->delete();
-        $nodes = collect($request->nodes)->map(fn ($n) => new FlowNode([
-            'type' => $n['type'],
-            'label' => $n['label'],
-            'position_x' => $n['position_x'],
-            'position_y' => $n['position_y'],
-            'data' => $n['data'] ?? null,
-            'config' => $n['config'] ?? null,
-        ]));
-        $flow->nodes()->saveMany($nodes);
-
-        return $this->success(['nodes' => $flow->nodes()->fresh()->get()], 'Nodes saved');
+        return $this->success(['nodes' => $nodes], 'Nodes saved');
     }
 
-    public function saveEdges(Request $request, Flow $flow): JsonResponse
+    public function saveEdges(SaveEdgesRequest $request, Flow $flow): JsonResponse
     {
-        if ($flow->user_id !== Auth::guard('api')->id()) {
-            return $this->error(null, 'Forbidden', 403);
-        }
+        $edges = $this->flowService->saveEdges(
+            $flow->id,
+            Auth::guard('api')->id(),
+            $request->validated('edges'),
+        );
 
-        $validator = Validator::make($request->all(), [
-            'edges' => 'required|array',
-            'edges.*.source_node_id' => 'required|integer|exists:flow_nodes,id',
-            'edges.*.target_node_id' => 'required|integer|exists:flow_nodes,id',
-            'edges.*.label' => 'nullable|string',
-            'edges.*.config' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors(), 'Validation failed', 422);
-        }
-
-        $flow->edges()->delete();
-        $edges = collect($request->edges)->map(fn ($e) => new FlowEdge([
-            'source_node_id' => $e['source_node_id'],
-            'target_node_id' => $e['target_node_id'],
-            'label' => $e['label'] ?? null,
-            'config' => $e['config'] ?? null,
-        ]));
-        $flow->edges()->saveMany($edges);
-
-        return $this->success(['edges' => $flow->edges()->fresh()->get()], 'Edges saved');
+        return $this->success(['edges' => $edges], 'Edges saved');
     }
 }

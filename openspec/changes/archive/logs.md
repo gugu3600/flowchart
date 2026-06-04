@@ -113,3 +113,57 @@
 
 ---
 
+## Log-2026-06-04-004 — Refactor to Repository/Service Pattern + Form Requests
+
+### Summary
+- Refactored all controllers to **zero inline validation/business logic**:
+  - **Form Requests** handle validation (6 classes)
+  - **Repositories** handle DB queries (4 interfaces + 4 implementations)
+  - **Services** handle business logic (3 classes)
+- Created `RepositoryServiceProvider` to bind interfaces → implementations
+- Fixed `MakeRepositoryCommand`: changed `Str::kebab()` → `Str::snake()` for valid PHP namespace identifiers
+- All 11 API endpoints tested and working
+
+### Added Files
+| File | Layer | Purpose |
+|------|-------|---------|
+| `app/Http/Requests/Auth/RegisterRequest.php` | Request | Register validation |
+| `app/Http/Requests/Auth/LoginRequest.php` | Request | Login validation |
+| `app/Http/Requests/Flow/StoreFlowRequest.php` | Request | Store flow validation |
+| `app/Http/Requests/Flow/UpdateFlowRequest.php` | Request | Update flow validation |
+| `app/Http/Requests/Flow/SaveNodesRequest.php` | Request | Save nodes validation |
+| `app/Http/Requests/Flow/SaveEdgesRequest.php` | Request | Save edges validation |
+| `app/Repositories/user/UserRepositoryInterface.php` | Interface | User repository contract |
+| `app/Repositories/user/UserRepository.php` | Repository | User DB queries |
+| `app/Repositories/flow/FlowRepositoryInterface.php` | Interface | Flow repository contract |
+| `app/Repositories/flow/FlowRepository.php` | Repository | Flow DB queries |
+| `app/Repositories/flow_node/FlowNodeRepositoryInterface.php` | Interface | FlowNode repository contract |
+| `app/Repositories/flow_node/FlowNodeRepository.php` | Repository | FlowNode DB bulk ops |
+| `app/Repositories/flow_edge/FlowEdgeRepositoryInterface.php` | Interface | FlowEdge repository contract |
+| `app/Repositories/flow_edge/FlowEdgeRepository.php` | Repository | FlowEdge DB bulk ops |
+| `app/Services/Auth/RegisterService.php` | Service | User registration logic |
+| `app/Services/Auth/AuthService.php` | Service | Login, me, logout logic |
+| `app/Services/Flow/FlowService.php` | Service | Flow CRUD + saveNodes/saveEdges |
+| `app/Providers/RepositoryServiceProvider.php` | Provider | DI bindings for all repository interfaces |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Http/Controllers/api/AuthController.php` | Removed all `Request`/`Validator`/`User` imports; uses `RegisterRequest`, `LoginRequest`, `RegisterService`, `AuthService` |
+| `backend/app/Http/Controllers/api/FlowController.php` | Removed all `Request`/`Validator`/`Flow` imports; uses `StoreFlowRequest`/etc + `FlowService` |
+| `backend/app/Console/Commands/MakeRepositoryCommand.php` | `Str::kebab()` → `Str::snake()` for valid PHP namespace identifiers |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+### Architecture Layer Diagram
+```
+HTTP Request
+  → FormRequest (validation)
+    → Controller (thin — wires request→service→response)
+      → Service (business logic, orchestrates repositories)
+        → RepositoryInterface ← bound via RepositoryServiceProvider
+          → Repository (Eloquent queries)
+            → Model
+```
+
+---
+
