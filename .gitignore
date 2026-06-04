@@ -6,3 +6,18 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Docs & specs
+/mdFiles/
+/openspec/
+
+# Tests
+/tests/
+/playwright.config.js
+
+# Root config
+/package.json
+/package-lock.json
+
+# CI
+/.github/
