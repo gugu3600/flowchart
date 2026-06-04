@@ -22,6 +22,7 @@
 - [x] `playwright.config.js` configured with webServer (array: backend + frontend servers).
 - [x] `tests/setup.spec.js` created — app mount, title check, console error tracking, health check.
 - [x] `tests/login.spec.js` created — valid login + invalid credentials (2 tests, passing).
+- [x] Reusable flowchart node components created: BaseNode, TableNode, LogicNode, FolderFileNode.
 - [ ] Write E2E tests for Canvas.vue (node drag-drop, edge connection, node deletion).
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
 

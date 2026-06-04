@@ -274,5 +274,34 @@ HTTP Request
 
 ---
 
+## Log-2026-06-04-007 — Reusable Flowchart Node Components
+
+### Summary
+- Installed `@vue-flow/core` for Vue Flow canvas integration
+- Created `BaseNode.vue` — shared node wrapper with Handle ports (source/target), color theme variants (blue/green/purple/amber/slate), selected ring, label header with PrimeIcons
+- Created `TableNode.vue` — database table schema node: renders column list with type, PK/FK/UQ badges
+- Created `LogicNode.vue` — logic/function node: displays description, input list with purple badges, output with emerald badge
+- Created `FolderFileNode.vue` — folder/file mapping node: shows path, children tree preview with folder/file icons, amber for folders / slate for files
+- All node types support 5 color themes, drag preview, and connection handles via Vue Flow's Handle component
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `frontend/src/components/nodes/BaseNode.vue` | Shared node wrapper with handles, colors, selection ring |
+| `frontend/src/components/nodes/TableNode.vue` | DB table schema node |
+| `frontend/src/components/nodes/LogicNode.vue` | Logic/function node |
+| `frontend/src/components/nodes/FolderFileNode.vue` | Folder/file mapping node |
+| `frontend/src/components/nodes/index.js` | Barrel exports |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `mdFiles/Architecture.md` | Added nodes/ directory to frontend structure |
+| `mdFiles/Todo.md` | Marked @vue-flow/core + node components complete |
+| `mdFiles/Review.md` | Marked node components review item |
+| `mdFiles/gitMd/Commit.md` | Added node components entry |
+
+---
+
 
 

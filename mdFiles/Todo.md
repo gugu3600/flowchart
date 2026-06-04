@@ -21,7 +21,7 @@
 - [x] Create Login.vue page with reusable components.
 - [x] Playwright E2E tests for login flow (valid + invalid credentials) — 2/2 passing.
 - [x] Push main (clean), dev, test branches. Lock main branch with branch protection.
-- [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
+- [x] Install `@vue-flow/core` and create reusable flowchart node components (TableNode, LogicNode, FolderFileNode, BaseNode).
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

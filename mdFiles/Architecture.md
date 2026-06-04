@@ -22,7 +22,13 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
-│   └── index.js              — Barrel exports
+│   ├── index.js              — Barrel exports
+│   └── nodes/
+│       ├── BaseNode.vue       — Shared node wrapper (Handle ports, color themes, selected ring)
+│       ├── TableNode.vue      — DB table schema node (columns, PK/FK/UQ badges)
+│       ├── LogicNode.vue      — Logic/function node (inputs, outputs, description)
+│       ├── FolderFileNode.vue — Folder/file mapping node (path, children tree preview)
+│       └── index.js           — Barrel exports
 ├── views/
 │   └── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
 ├── router/

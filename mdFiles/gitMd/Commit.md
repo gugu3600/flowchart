@@ -33,3 +33,4 @@
 - Created reusable components: AppCard, AppButton, AppInput, AppNavbar (PrimeVue + Tailwind wrappers)
 - Added @theme surface palette + reusable utility classes (.form-input, .btn-primary, .btn-secondary, .card, .error-msg) in style.css
 - Playwright E2E login tests: valid credentials + invalid credentials (2 tests, passing)
+- Installed @vue-flow/core and created reusable node components: BaseNode, TableNode, LogicNode, FolderFileNode
