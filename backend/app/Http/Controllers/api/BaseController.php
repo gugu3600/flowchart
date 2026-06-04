@@ -20,7 +20,7 @@ class BaseController extends Controller
             "data" => $data,
         ];
 
-        return response()->json($data, $status);
+        return response()->json($response, $status);
     }
 
     public function error($error, $errorMsg, $status = 500)

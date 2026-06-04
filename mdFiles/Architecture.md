@@ -7,7 +7,8 @@
 - **Role-Based Access Control:** Role-based access control using Spatie Laravel Permissions.
 - **Caching:** Redis-based caching using Laravel's built-in caching system.
 - **Design Patterns:** Repository Pattern, Service Pattern.
-- **Database Schema:** use flowchart's 3nf normalization for database schema design use mongo db for storing workflow metadata.use MySQL for storing workflow data .
+- **Database Schema:** Use 3NF normalization for database schema design. Use MySQL for storing workflow data.
+- **Testing:** Playwright (E2E) for frontend, PHPUnit for backend API tests.
 
 ## Strategic Monetization Matrix (Value-Based Hierarchy)
 1. **Free Tier:** 

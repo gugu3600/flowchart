@@ -1,8 +1,22 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
-- [ ] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
-- [ ] Setup Laravel 13 backend structure with MySQL authentication (Sanctum).
+- [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
+- [x] Setup Laravel 13 backend structure with MySQL (JWT auth + Spatie RBAC).
+- [x] Create custom artisan commands (`make:service`, `make:repository`) for repository/service pattern.
+- [x] Configure openspec change logging (`openspec/changes/archive/logs.md`).
+- [x] Set up Playwright E2E test framework for frontend UI testing.
+- [x] Design and migrate `flowchart` database schema (3NF: flows, flow_nodes, flow_edges).
+- [x] Document DB schema in `mdFiles/schema.md` (3NF verification PASSED).
+- [x] Create Eloquent models: Flow, FlowNode, FlowEdge with all relationships.
+- [x] Create API controllers: AuthController, FlowController.
+- [x] Create RoleAndPermissionSeeder: super-admin (all perms), free, silver, gold, platinum tier roles.
+- [x] Seed default Super Admin user (admin@flowchart.dev / password).
+- [x] Refactor to Repository/Service pattern: Form Requests, Repositories, Services, DI bindings.
+- [x] API Resources (UserResource, FlowResource, FlowNodeResource, FlowEdgeResource) for clean responses.
+- [x] JWT moved to HTTP-only Secure SameSite=Strict cookie (XSS-safe). Removed `Auth::guard('api')` redundancy.
+- [x] BaseController response wrapper fixed (`success`/`status`/`message`/`data` keys).
+- [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 
