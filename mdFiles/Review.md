@@ -9,3 +9,11 @@
 - [ ] **State Integrity & Memory Leaks:** Verify that deleting nodes or edges inside the Vue Flow UI completely unmounts reactive parameters without leaving unreferenced leakage inside memory arrays.
 - [ ] **Edge Parsing Security:** Inspect the current visual mapping parser. Ensure that visual connections between logic nodes and folder/file nodes save exactly as an explicit JSON relational graph without executing runtime script code injection flaws.
 - [ ] **Idempotency Protection:** Verify that rapid duplicate transaction payloads or sync triggers from mobile network disconnects (via CapacitorJS) do not execute duplicate entry breaks inside the backend database.
+
+## [Phase 3: Playwright E2E Testing]
+- [x] Playwright v1.60.0 installed with Chromium project configured.
+- [x] `playwright.config.js` configured with `webServer` pointing to `localhost:3000`.
+- [x] `tests/setup.spec.js` created — app mount, title check, console error tracking, health check.
+- [ ] Write E2E tests for Canvas.vue (node drag-drop, edge connection, node deletion).
+- [ ] Write E2E tests for authentication flow (login, token storage, protected routes).
+- [ ] Write E2E tests for tier-gated features (403 paywall intercept).

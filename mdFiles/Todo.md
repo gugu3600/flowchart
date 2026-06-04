@@ -1,8 +1,14 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
-- [ ] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
-- [ ] Setup Laravel 13 backend structure with MySQL authentication (Sanctum).
+- [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
+- [x] Setup Laravel 13 backend structure with MySQL (JWT auth + Spatie RBAC).
+- [x] Create custom artisan commands (`make:service`, `make:repository`) for repository/service pattern.
+- [x] Configure openspec change logging (`openspec/changes/archive/logs.md`).
+- [x] Set up Playwright E2E test framework for frontend UI testing.
+- [x] Design and migrate `flowchart` database schema (3NF: flows, flow_nodes, flow_edges).
+- [x] Document DB schema in `mdFiles/schema.md`.
+- [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

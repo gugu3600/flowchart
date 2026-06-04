@@ -1,0 +1,73 @@
+# Change Log Archive
+
+## Log-2026-06-04-001 — Project Scaffolding & RBAC/JWT Setup
+
+### Summary
+- Scaffolded Laravel 13 backend in `backend/` with MySQL
+- Scaffolded Vue 3 + Vite frontend in `frontend/` (port 3000, open: true)
+- Installed `spatie/laravel-permission` (v8.0.0) — RBAC middleware aliases registered in `bootstrap/app.php`
+- Installed `tymon/jwt-auth` (v2.3.0) — `auth:api` guard configured, `JWT_SECRET` generated
+- User model updated: implements `JWTSubject`, uses `HasRoles` trait, `$auth_guard = 'api'`
+- Created custom artisan commands:
+  - `make:service Folder/Name` → `app/Services/{folder}/{Name}Service.php`
+  - `make:repository Name` → `app/Repositories/{name}/{Name}Repository.php` + Interface
+- Registered Spatie middleware aliases (`role`, `permission`, `role_or_permission`) in `bootstrap/app.php`
+- Created `routes/api.php` with `auth:api` middleware
+- Initialized git repo, pushed to `main`, created `dev` and `test` branches
+- Created `mdFiles/gitMd/Commit.md` for commit history tracking
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `backend/app/Console/Commands/MakeServiceCommand.php` | Artisan `make:service` command |
+| `backend/app/Console/Commands/MakeRepositoryCommand.php` | Artisan `make:repository` command |
+| `backend/routes/api.php` | API route definitions |
+| `mdFiles/gitMd/Commit.md` | Commit history log |
+| `openspec/changes/archive/logs.md` | This file |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Models/User.php` | Added `JWTSubject`, `HasRoles`, `$auth_guard = 'api'` |
+| `backend/bootstrap/app.php` | Registered `api` routes + Spatie middleware aliases |
+| `backend/config/auth.php` | Added `api` guard with `jwt` driver |
+| `backend/.env` | Set `AUTH_GUARD=api`, `JWT_TTL`, `JWT_SECRET`, `DB_PASSWORD` |
+| `frontend/vite.config.js` | Added `server.port=3000`, `server.open=true` |
+
+### Deleted Code
+*(None — initial scaffolding)*
+
+---
+
+## Log-2026-06-04-002 — Database Schema: `flowchart` DB + Domain Migrations
+
+### Summary
+- Switched database from `backend` to `flowchart` (`DB_DATABASE=flowchart`)
+- Designed and implemented 3NF schema for the flowchart domain
+- Created 3 migration files: `flows`, `flow_nodes`, `flow_edges`
+- Documented full schema in `mdFiles/schema.md`
+- Created `tests/setup.spec.js` for Playwright smoke tests
+- Deleted `tests/tests.md` (replaced by `setup.spec.js`)
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `mdFiles/schema.md` | Full DB schema documentation (3NF, ER, column types, migration order) |
+| `tests/setup.spec.js` | Playwright smoke test — app mount, title, console errors, / health |
+| `database/migrations/..._create_flows_table.php` | `flows` table with user FK, name, description, config JSON |
+| `database/migrations/..._create_flow_nodes_table.php` | `flow_nodes` table with flow FK, type, position, data/config JSON |
+| `database/migrations/..._create_flow_edges_table.php` | `flow_edges` table with flow FK, source/target node FKs, config JSON |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/.env` | `DB_DATABASE=backend` → `DB_DATABASE=flowchart` |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+### Deleted Code
+| File | Reason |
+|------|--------|
+| `tests/tests.md` | Replaced by `tests/setup.spec.js` |
+
+---
+

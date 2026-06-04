@@ -7,3 +7,9 @@
 - Installed tymon/jwt-auth for API authentication
 - Created custom artisan commands: make:service, make:repository
 - Configured API routes with spatie permission middleware
+- Set up openspec change logging system
+- Configured Playwright E2E test framework
+- Created dev and test branches
+- Switched DB to `flowchart`, designed 3NF schema (flows, flow_nodes, flow_edges)
+- Created `mdFiles/schema.md` documenting full DB schema
+- Created `tests/setup.spec.js` for Playwright smoke tests
