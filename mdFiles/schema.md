@@ -100,11 +100,27 @@ users (1) ──< flows (1) ──< flow_nodes
 
 ---
 
-## 3NF Justification
+## 3NF Verification (PASSED)
 
-1. **No repeating groups:** Each node/edge is a separate row, no JSON arrays of children.
-2. **Full PK dependency:** Every non-key column depends on the full primary key.
-3. **No transitive dependencies:** Node config does not depend on flow config; they are separate JSON columns because their schemas differ.
+| Form | Rule | Status |
+|------|------|--------|
+| **1NF** | Atomic columns, no repeating groups | ✅ PASS — each row is a single entity, JSON columns store single documents |
+| **2NF** | Non-key columns depend on the full PK | ✅ PASS — all tables have single-column PKs |
+| **3NF** | No transitive dependencies on non-key columns | ✅ PASS — `flow_nodes.config` and `flow_edges.config` describe their own rows, not inherited from `flows.config` |
+
+### Key 3NF Design Decisions
+- **`flows.config`** (JSON): stores *canvas-level* settings (background theme, default edge colors) — directly describes the flow.
+- **`flow_nodes.config`** (JSON): stores *node-level* overrides (background color, border style) — directly describes the node.
+- **`flow_edges.config`** (JSON): stores *edge-level* overrides (line color, dash pattern) — directly describes the edge.
+
+These are independent because one flow can have multiple nodes each with different styling, which is the definition of **no transitive dependency**.
+
+### Models
+| Model | Table | Fillable | Relations |
+|-------|-------|----------|-----------|
+| `App\Models\Flow` | `flows` | user_id, name, description, config | belongsTo User, hasMany FlowNode, hasMany FlowEdge |
+| `App\Models\FlowNode` | `flow_nodes` | flow_id, type, label, position_x, position_y, data, config | belongsTo Flow |
+| `App\Models\FlowEdge` | `flow_edges` | flow_id, source_node_id, target_node_id, label, config | belongsTo Flow, belongsTo sourceNode/targetNode |
 
 ---
 

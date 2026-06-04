@@ -71,3 +71,45 @@
 
 ---
 
+## Log-2026-06-04-003 — Models, Controllers, Role/Permission Seeders & 3NF Verification
+
+### Summary
+- Created Eloquent models: `Flow`, `FlowNode`, `FlowEdge` with all relationships (`belongsTo` / `hasMany`)
+- Created model factories for all three models
+- Created `AuthController` with JWT endpoints: register, login (with roles/permissions in response), me, logout
+- Created `FlowController` with full CRUD + `saveNodes` / `saveEdges` bulk operations
+- Updated `routes/api.php` with public + auth:api protected routes
+- Ran 3NF verification (PASSED — documented in `mdFiles/schema.md`)
+- Created `RoleAndPermissionSeeder`:
+  - 5 roles: `super-admin` (all perms), `free`, `silver`, `gold`, `platinum`
+  - 5 permissions: `save-flows`, `generate-schema`, `map-structure`, `manage-users`, `manage-roles`
+  - Seeded Super Admin user (`admin@flowchart.dev` / `password`) with super-admin role
+- Tested login endpoint — returns user + roles + permissions + JWT token
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `app/Models/Flow.php` | Flow model with user/nodes/edges relations |
+| `app/Models/FlowNode.php` | FlowNode model with flow/sourceEdges/targetEdges relations |
+| `app/Models/FlowEdge.php` | FlowEdge model with flow/sourceNode/targetNode relations |
+| `database/factories/FlowFactory.php` | Factory for Flow |
+| `database/factories/FlowNodeFactory.php` | Factory for FlowNode |
+| `database/factories/FlowEdgeFactory.php` | Factory for FlowEdge |
+| `app/Http/Controllers/api/AuthController.php` | JWT auth: register, login, me, logout |
+| `app/Http/Controllers/api/FlowController.php` | CRUD + saveNodes/saveEdges |
+| `database/seeders/RoleAndPermissionSeeder.php` | Roles, permissions, super-admin user seed |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/routes/api.php` | Added public auth routes + protected Flow routes |
+| `backend/database/seeders/DatabaseSeeder.php` | Calls `RoleAndPermissionSeeder` |
+| `mdFiles/schema.md` | Added 3NF verification table + model documentation |
+| `mdFiles/Todo.md` | Checked off models, controllers, seeders |
+| `mdFiles/Review.md` | Marked auth/role setup as verified |
+
+### Deleted Code
+*(None)*
+
+---
+

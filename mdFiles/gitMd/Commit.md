@@ -13,3 +13,7 @@
 - Switched DB to `flowchart`, designed 3NF schema (flows, flow_nodes, flow_edges)
 - Created `mdFiles/schema.md` documenting full DB schema
 - Created `tests/setup.spec.js` for Playwright smoke tests
+- Created Eloquent models (Flow, FlowNode, FlowEdge) with relationships
+- Created AuthController (JWT register/login/me/logout) + FlowController (CRUD)
+- Created RoleAndPermissionSeeder with super-admin + free/silver/gold/platinum tier roles
+- 3NF verification PASSED

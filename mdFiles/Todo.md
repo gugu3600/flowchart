@@ -7,7 +7,11 @@
 - [x] Configure openspec change logging (`openspec/changes/archive/logs.md`).
 - [x] Set up Playwright E2E test framework for frontend UI testing.
 - [x] Design and migrate `flowchart` database schema (3NF: flows, flow_nodes, flow_edges).
-- [x] Document DB schema in `mdFiles/schema.md`.
+- [x] Document DB schema in `mdFiles/schema.md` (3NF verification PASSED).
+- [x] Create Eloquent models: Flow, FlowNode, FlowEdge with all relationships.
+- [x] Create API controllers: AuthController (register/login/me/logout), FlowController (CRUD + saveNodes/saveEdges).
+- [x] Create RoleAndPermissionSeeder: super-admin (all perms), free, silver, gold, platinum tier roles.
+- [x] Seed default Super Admin user (admin@flowchart.dev / password).
 - [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
