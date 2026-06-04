@@ -62,3 +62,66 @@ body {
   @apply m-0 bg-surface-50 text-surface-900 antialiased
          dark:bg-surface-950 dark:text-surface-100;
 }
+
+/*
+ * ── Node component classes ───────────────────────────────────────
+ */
+
+.node-container {
+  @apply min-w-[180px] rounded-lg border-2 shadow-md transition-shadow;
+}
+.node-container.selected {
+  @apply ring-2 ring-blue-400 shadow-lg;
+}
+
+.node-handle {
+  @apply !h-3 !w-3 !border-2 !border-white !bg-blue-500;
+}
+
+.node-head {
+  @apply flex items-center gap-2 rounded-t-lg px-3 py-2 text-sm font-semibold;
+}
+
+.node-body {
+  @apply px-3 py-2 text-xs text-slate-700 dark:text-slate-300;
+}
+
+.node-blue    { @apply border-blue-500 bg-blue-50 dark:bg-blue-950/30; }
+.node-blue .node-head    { @apply bg-blue-600 text-white; }
+.node-green   { @apply border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30; }
+.node-green .node-head   { @apply bg-emerald-600 text-white; }
+.node-purple  { @apply border-purple-500 bg-purple-50 dark:bg-purple-950/30; }
+.node-purple .node-head  { @apply bg-purple-600 text-white; }
+.node-amber   { @apply border-amber-500 bg-amber-50 dark:bg-amber-950/30; }
+.node-amber .node-head   { @apply bg-amber-600 text-white; }
+.node-slate   { @apply border-slate-500 bg-slate-50 dark:bg-slate-950/30; }
+.node-slate .node-head   { @apply bg-slate-600 text-white; }
+
+/* TableNode */
+.node-table-list     { @apply flex flex-col gap-0.5; }
+.node-table-row      { @apply flex items-center justify-between gap-2 rounded px-1 py-0.5 hover:bg-black/5 dark:hover:bg-white/5; }
+.node-table-col-name { @apply font-mono font-medium; }
+.node-table-col-meta { @apply flex items-center gap-1.5; }
+.node-table-col-type { @apply font-mono text-[10px] text-slate-500 dark:text-slate-400; }
+
+.node-badge     { @apply rounded px-1 py-0.5 text-[10px] font-semibold leading-none; }
+.node-badge-pk  { @apply bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300; }
+.node-badge-fk  { @apply bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300; }
+.node-badge-uq  { @apply bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300; }
+
+/* LogicNode */
+.node-logic-desc      { @apply mb-2 text-[11px] italic text-slate-500 dark:text-slate-400; }
+.node-logic-body      { @apply flex flex-col gap-1; }
+.node-logic-row       { @apply flex items-center gap-1.5; }
+.node-logic-label     { @apply text-[11px] font-medium; }
+.node-logic-taglist   { @apply flex flex-wrap gap-1; }
+
+.node-tag        { @apply rounded px-1.5 py-0.5 text-[10px] font-mono; }
+.node-tag-purple { @apply bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300; }
+.node-tag-emerald{ @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300; }
+
+/* FolderFileNode */
+.node-folder-path       { @apply mb-1.5 font-mono text-[10px] text-slate-500 dark:text-slate-400; }
+.node-folder-children   { @apply flex flex-col gap-0.5; }
+.node-folder-row        { @apply flex items-center gap-1.5 rounded px-1.5 py-0.5 hover:bg-black/5 dark:hover:bg-white/5; }
+.node-folder-child-name { @apply text-[11px] font-mono; }

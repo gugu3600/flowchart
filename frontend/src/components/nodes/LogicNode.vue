@@ -24,27 +24,27 @@ const props = defineProps({
     icon="pi-code"
     color="purple"
   >
-    <p v-if="data.description" class="mb-2 text-[11px] italic text-slate-500 dark:text-slate-400">
+    <p v-if="data.description" class="node-logic-desc">
       {{ data.description }}
     </p>
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-1.5">
-        <i class="pi pi-arrow-right text-[10px] text-purple-500" />
-        <span class="text-[11px] font-medium">Inputs:</span>
-        <div class="flex flex-wrap gap-1">
+    <div class="node-logic-body">
+      <div class="node-logic-row">
+        <i class="pi pi-arrow-right" />
+        <span class="node-logic-label">Inputs:</span>
+        <div class="node-logic-taglist">
           <span
             v-for="(inp, i) in data.inputs"
             :key="i"
-            class="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-mono text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+            class="node-tag node-tag-purple"
           >
             {{ inp }}
           </span>
         </div>
       </div>
-      <div class="flex items-center gap-1.5">
-        <i class="pi pi-arrow-left text-[10px] text-emerald-500" />
-        <span class="text-[11px] font-medium">Output:</span>
-        <span class="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-mono text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+      <div class="node-logic-row">
+        <i class="pi pi-arrow-left" />
+        <span class="node-logic-label">Output:</span>
+        <span class="node-tag node-tag-emerald">
           {{ data.output }}
         </span>
       </div>

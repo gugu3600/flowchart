@@ -24,17 +24,21 @@ const props = defineProps({
     :icon="data.isFolder ? 'pi-folder' : 'pi-file'"
     :color="data.isFolder ? 'amber' : 'slate'"
   >
-    <p class="mb-1.5 font-mono text-[10px] text-slate-500 dark:text-slate-400">
-      {{ data.path }}
-    </p>
-    <div v-if="data.children?.length" class="flex flex-col gap-0.5">
+    <p class="node-folder-path">{{ data.path }}</p>
+    <div v-if="data.children?.length" class="node-folder-children">
       <div
         v-for="(child, i) in data.children"
         :key="i"
-        class="flex items-center gap-1.5 rounded px-1.5 py-0.5 hover:bg-black/5 dark:hover:bg-white/5"
+        class="node-folder-row"
       >
-        <i :class="['pi text-[10px]', child.endsWith('/') ? 'pi-folder text-amber-500' : 'pi-file text-slate-400']" />
-        <span class="text-[11px] font-mono">{{ child }}</span>
+        <i
+          :class="[
+            'pi',
+            child.endsWith('/') ? 'pi-folder' : 'pi-file',
+            child.endsWith('/') ? 'text-amber-500' : 'text-slate-400',
+          ]"
+        />
+        <span class="node-folder-child-name">{{ child }}</span>
       </div>
     </div>
   </BaseNode>

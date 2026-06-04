@@ -17,10 +17,10 @@ const props = defineProps({
   selected: { type: Boolean, default: false },
 })
 
-const columnBadge = (col) => {
-  if (col.pk) return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-  if (col.fk) return 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300'
-  if (col.unique) return 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300'
+const badgeClass = (col) => {
+  if (col.pk) return 'node-badge-pk'
+  if (col.fk) return 'node-badge-fk'
+  if (col.unique) return 'node-badge-uq'
   return ''
 }
 
@@ -40,18 +40,18 @@ const badgeLabel = (col) => {
     icon="pi-database"
     color="blue"
   >
-    <div class="flex flex-col gap-0.5">
+    <div class="node-table-list">
       <div
         v-for="(col, i) in data.columns"
         :key="i"
-        class="flex items-center justify-between gap-2 rounded px-1 py-0.5 hover:bg-black/5 dark:hover:bg-white/5"
+        class="node-table-row"
       >
-        <span class="font-mono font-medium">{{ col.name }}</span>
-        <div class="flex items-center gap-1.5">
-          <span class="font-mono text-[10px] text-slate-500 dark:text-slate-400">{{ col.type }}</span>
+        <span class="node-table-col-name">{{ col.name }}</span>
+        <div class="node-table-col-meta">
+          <span class="node-table-col-type">{{ col.type }}</span>
           <span
             v-if="badgeLabel(col)"
-            :class="['rounded px-1 py-0.5 text-[10px] font-semibold leading-none', columnBadge(col)]"
+            :class="['node-badge', badgeClass(col)]"
           >
             {{ badgeLabel(col) }}
           </span>
