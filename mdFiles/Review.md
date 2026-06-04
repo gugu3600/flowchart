@@ -19,8 +19,16 @@
 
 ## [Phase 3: Playwright E2E Testing]
 - [x] Playwright v1.60.0 installed with Chromium project configured.
-- [x] `playwright.config.js` configured with `webServer` pointing to `localhost:3000`.
+- [x] `playwright.config.js` configured with webServer (array: backend + frontend servers).
 - [x] `tests/setup.spec.js` created — app mount, title check, console error tracking, health check.
+- [x] `tests/login.spec.js` created — valid login + invalid credentials (2 tests, passing).
 - [ ] Write E2E tests for Canvas.vue (node drag-drop, edge connection, node deletion).
-- [ ] Write E2E tests for authentication flow (login, token storage, protected routes).
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
+
+## [Phase 4: Infrastructure & Configuration]
+- [x] `main` branch cleaned: docs/tests/root config removed from tracking.
+- [x] `main` branch locked on GitHub: PR review required, force-push disabled.
+- [x] `backend/config/cors.php` created — allows `localhost:3000` with credentials.
+- [x] `frontend/src/api/apiClient.js` — axios with `withCredentials: true`, response unwrapper.
+- [x] `frontend/src/views/Login.vue` — uses PrimeVue + Tailwind reusable components.
+- [x] Frontend build passes (130 modules, 334ms).

@@ -16,13 +16,22 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     },
   ],
 
-  webServer: {
-    command: 'cd frontend && npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: 'cd backend && php artisan serve --port=8000',
+      url: 'http://localhost:8000/',
+      reuseExistingServer: !process.env.CI,
+      timeout: 30000,
+    },
+    {
+      command: 'cd frontend && npm run dev',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 30000,
+    },
+  ],
 });

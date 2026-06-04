@@ -24,3 +24,12 @@
 - JWT stored in HTTP-only Secure cookie (XSS-safe), removed from response body
 - JwtCookieMiddleware reads cookie and injects Authorization header
 - Fixed BaseController response wrapper
+- Removed mdFiles/, tests/, openspec/, root configs from main tracking; locked main branch
+- Created backend/config/cors.php for frontend (localhost:3000) CORS with credentials
+- Installed axios + vue-router in frontend, created apiClient.js with response interceptor
+- Set up Vue Router with /login route
+- Created Login.vue with login form + apiClient integration
+- Installed Tailwind CSS v4 + PrimeVue 4 + primeicons
+- Created reusable components: AppCard, AppButton, AppInput, AppNavbar (PrimeVue + Tailwind wrappers)
+- Added @theme surface palette + reusable utility classes (.form-input, .btn-primary, .btn-secondary, .card, .error-msg) in style.css
+- Playwright E2E login tests: valid credentials + invalid credentials (2 tests, passing)

@@ -16,13 +16,18 @@
 - [x] API Resources (UserResource, FlowResource, FlowNodeResource, FlowEdgeResource) for clean responses.
 - [x] JWT moved to HTTP-only Secure SameSite=Strict cookie (XSS-safe). Removed `Auth::guard('api')` redundancy.
 - [x] BaseController response wrapper fixed (`success`/`status`/`message`/`data` keys).
+- [x] Install axios + vue-router + setup apiClient with response interceptor.
+- [x] Install Tailwind CSS v4 + PrimeVue 4 with reusable components (AppCard, AppButton, AppInput, AppNavbar).
+- [x] Create Login.vue page with reusable components.
+- [x] Playwright E2E tests for login flow (valid + invalid credentials) — 2/2 passing.
+- [x] Push main (clean), dev, test branches. Lock main branch with branch protection.
 - [ ] Install `@vue-flow/core` and build Canvas.vue with Tailwind.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 
 ## [Phase 2: Gold Tier Schema Compiler & Diagram View]
-- [ ] Develop database schema compiler translating custom table nodes into valid Prisma configurations.
-- [ ] Wire Laravel controllers to safely output SQL script dumps alongside compiled Prisma text patterns.
+- [ ] Develop database schema compiler translating custom table nodes into valid SQL DDL.
+- [ ] Wire Laravel controllers to safely output SQL script dumps alongside compiled schema patterns.
 - [ ] Add interactive diagram rendering support inside the frontend canvas for generated structures.
 
 ## [Phase 3: Platinum Visual Folder Architecture Layout]

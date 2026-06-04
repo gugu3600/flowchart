@@ -214,3 +214,65 @@ HTTP Request
 
 ---
 
+## Log-2026-06-04-006 — Frontend: Tailwind v4 + PrimeVue 4 + axios + Login Page + Playwright E2E
+
+### Summary
+- Installed `tailwindcss` + `@tailwindcss/vite` (Tailwind v4 plugin approach)
+- Installed `primevue` + `primeicons` (PrimeVue 4 components)
+- Installed `axios` + `vue-router@4`
+- Created `frontend/src/api/apiClient.js` — axios instance with `withCredentials: true`, response interceptor unwraps `{success, status, message, data}`.
+- Created `frontend/src/router/index.js` — Vue Router with `/login` route
+- Created `frontend/src/views/Login.vue` — login form, POST `/api/login`, redirects to `/dashboard`
+- Created reusable PrimeVue wrappers in `components/`:
+  - `AppButton.vue` — `btn-primary` / `btn-secondary` variants
+  - `AppInput.vue` — form input with label
+  - `AppCard.vue` — card container with title/subtitle
+  - `AppNavbar.vue` — navigation bar with PrimeVue Menubar
+- Configured Tailwind v4 in `vite.config.js` (added `tailwindcss()` plugin)
+- Rewrote `style.css` — `@import "tailwindcss"`, `@theme` surface palette, reusable utility classes (`.form-input`, `.btn-primary`, `.btn-secondary`, `.card`, `.error-msg`)
+- Created `backend/config/cors.php` — allows `localhost:3000` with `supports_credentials: true`
+- Updated `playwright.config.js` — array webServer (backend `php artisan serve` + frontend `npm run dev`), system Chrome channel
+- Created `tests/login.spec.js` — 2 E2E tests (valid login + invalid credentials)
+- All tests passing: `✓ 2 passed (4.1s)`
+- Cleaned `main` branch (removed mdFiles, tests, openspec, root configs from tracking)
+- Locked `main` branch on GitHub (branch protection: 1 review required, enforce admins, lock_branch, no force-push)
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `backend/config/cors.php` | CORS config: allows localhost:3000 with credentials |
+| `frontend/src/api/apiClient.js` | Axios instance with response unwrapper interceptor |
+| `frontend/src/router/index.js` | Vue Router with `/login` route |
+| `frontend/src/views/Login.vue` | Login page using PrimeVue + Tailwind components |
+| `frontend/src/components/AppButton.vue` | PrimeVue Button wrapper |
+| `frontend/src/components/AppInput.vue` | PrimeVue InputText wrapper |
+| `frontend/src/components/AppCard.vue` | PrimeVue Card wrapper |
+| `frontend/src/components/AppNavbar.vue` | PrimeVue Menubar wrapper |
+| `frontend/src/components/index.js` | Barrel exports |
+| `tests/login.spec.js` | Playwright E2E: valid + invalid login |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/vite.config.js` | Added `tailwindcss()` plugin |
+| `frontend/src/style.css` | Replaced Vite defaults with Tailwind import, @theme, utility classes |
+| `frontend/src/main.js` | Added router + PrimeVue plugin |
+| `frontend/src/App.vue` | Replaced HelloWorld with `<router-view />` |
+| `frontend/package.json` | Added axios, vue-router, tailwindcss, @tailwindcss/vite, primevue, primeicons |
+| `playwright.config.js` | Array webServer (back + front), system Chrome channel |
+| `mdFiles/Architecture.md` | Added frontend component architecture section |
+| `mdFiles/Todo.md` | Marked login, auth, PrimeVue, Tailwind items complete |
+| `mdFiles/Review.md` | Marked Playwright tests, CORS, branch protection items |
+| `mdFiles/Skills.md` | Added PrimeVue + component structure rules |
+| `mdFiles/gitMd/Commit.md` | Added all today's commit entries |
+
+### Deleted Code
+| File | Reason |
+|------|--------|
+| `.github/workflows/playwright.yml` | Removed from main tracking |
+| `frontend/src/components/HelloWorld.vue` | Replaced by login page + reusable components |
+
+---
+
+
+
