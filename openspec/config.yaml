@@ -1,0 +1,37 @@
+schema: spec-driven
+
+# Project context
+# This is shown to AI when creating artifacts.
+context: |
+       Tech stack: Vue 3 (Composition API, Vite, Tailwind CSS), Laravel 13, MySQL, Prisma ORM.
+       Authentication: JSON Web Tokens (JWT) using Tymon JWT-Auth package (Stateless Auth Guard: auth:api).
+       Authorization: Role-Based Access Control (RBAC) managed via Spatie Laravel-Permission.
+       Domain: Visual Application Planner & Flowchart Builder Canvas Web App.
+       Development Goal: Building a fast, high-margin 2-Feature MVP to monetize immediately and monitor user ratings.
+
+       Execution Guidelines & Rules:
+       - Refer to `.mdFiles/Skill.md` for specific AI persona roles and autonomous privileges.
+       - Refer to `.mdFiles/Architecture.md` for detailed 3-Tier access gatekeeping definitions and structural bounds.
+       - Refer to `.mdFiles/Todo.md` for the sequential steps required in the current 2-Feature MVP development stage.
+       - Refer to `.mdFiles/Review.md` for the validation criteria, security checks, and testing benchmarks before completion.
+
+# Per-artifact rules
+# Add custom rules for specific artifacts based on our 3-Tier System and Log Tracking.
+rules:
+       proposal:
+              - Focus heavily on UI/UX layout mapping for the frontend canvas via @vue-flow/core.
+              - Strictly ensure no automatic code generation compiler logic is built into the current MVP stage.
+
+       tasks:
+              - Break frontend canvas nodes creation into isolated, decoupled reactive Vue components.
+              - Always isolate Spatie Middleware role checks for individual tier routes ('role:silver|gold|platinum', 'role:gold|platinum', 'role:platinum').
+
+       code:
+              - NEVER write raw SQL queries or direct database connection controllers on the Vue 3 client view layer.
+              - All token attempts must use the strict JWT stateless approach: Auth::guard('api')->attempt($credentials).
+              - Ensure all response handling templates inject Spatie Active Role mappings back to the frontend payload upon successful verification.
+
+       # 🔄 ခင်ဗျာ အလိုရှိသော ပြောင်းလဲသွားသည့် ကုဒ်များကို Log ဖိုင်တွင် သိမ်းရန် စည်းကမ်းချက်
+       changes:
+              - Strictly store all modified codes, migration history, and architectural diff logs inside 'openspec/changes/archive/logs.md'.
+              - Append new logs systematically using chronological sequencing (e.g., Log
