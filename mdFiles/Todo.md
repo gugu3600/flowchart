@@ -22,6 +22,12 @@
 - [x] Playwright E2E tests for login flow (valid + invalid credentials) — 2/2 passing.
 - [x] Push main (clean), dev, test branches. Lock main branch with branch protection.
 - [x] Install `@vue-flow/core` and create reusable flowchart node components (TableNode, LogicNode, FolderFileNode, BaseNode).
+- [x] Build combined save endpoint (`POST /api/flows/{flow}/save`) with node→edge ID mapping.
+- [x] Create Sidebar.vue drag-and-drop palette (Table, Logic, Folder/File node types).
+- [x] Build Canvas.vue with flow selector, create/save flows, drag-drop, markRaw, onConnect.
+- [x] Create Table Designer page (`/tables`) — CRUD table schemas with column builder.
+- [x] Create Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder.
+- [x] Canvas auto-loads table/logic definitions as nodes with definitionId tracking.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

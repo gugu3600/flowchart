@@ -23,8 +23,9 @@
 - [x] `tests/setup.spec.js` created — app mount, title check, console error tracking, health check.
 - [x] `tests/login.spec.js` created — valid login + invalid credentials (2 tests, passing).
 - [x] Reusable flowchart node components created: BaseNode, TableNode, LogicNode, FolderFileNode.
-- [ ] Write E2E tests for Canvas.vue (node drag-drop, edge connection, node deletion).
+- [x] Canvas tests: flow selector, sidebar, create flow, save flow (2 tests, passing).
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
+- [ ] Write E2E tests for Table Designer and Logic Designer CRUD pages.
 
 ## [Phase 4: Infrastructure & Configuration]
 - [x] `main` branch cleaned: docs/tests/root config removed from tracking.
@@ -32,4 +33,4 @@
 - [x] `backend/config/cors.php` created — allows `localhost:3000` with credentials.
 - [x] `frontend/src/api/apiClient.js` — axios with `withCredentials: true`, response unwrapper.
 - [x] `frontend/src/views/Login.vue` — uses PrimeVue + Tailwind reusable components.
-- [x] Frontend build passes (130 modules, 334ms).
+- [x] Frontend build passes.

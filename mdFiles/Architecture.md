@@ -7,14 +7,25 @@
 - **Role-Based Access Control:** Spatie Laravel Permissions (free/silver/gold/platinum tiers + super-admin).
 - **Caching:** Laravel's built-in caching system.
 - **Design Patterns:** Repository Pattern, Service Pattern, Form Request validation, API Resources.
-- **Database Schema:** 3NF normalized MySQL schema for `flows`, `flow_nodes`, `flow_edges`.
+- **Database Schema:** 3NF normalized MySQL schema for `flows`, `flow_nodes`, `flow_edges`, `table_definitions`, `logic_definitions`.
 - **Testing:** Playwright (E2E) for frontend, PHPUnit for backend API tests.
+
+## Frontend Pages
+| Route | Page | Purpose |
+|-------|------|---------|
+| `/login` | Login.vue | JWT login form |
+| `/canvas` | Canvas.vue | Vue Flow canvas with drag-drop, save/load, live definitions |
+| `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
+| `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (inputs, output, description) |
 
 ## Frontend Component Architecture
 ```
 src/
 ├── api/
-│   └── apiClient.js          — Axios instance (withCredentials, response unwrapper)
+│   ├── apiClient.js          — Axios instance (withCredentials, response unwrapper)
+│   ├── flows.js              — Flows CRUD + save API
+│   ├── tables.js             — Table definitions CRUD API
+│   └── logics.js             — Logic definitions CRUD API
 ├── assets/
 │   └── style.css             — Tailwind import, @theme tokens, reusable utility classes
 ├── components/
@@ -22,6 +33,7 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
+│   ├── Sidebar.vue           — Drag-and-drop node palette
 │   ├── index.js              — Barrel exports
 │   └── nodes/
 │       ├── BaseNode.vue       — Shared node wrapper (Handle ports, color themes, selected ring)
@@ -30,12 +42,46 @@ src/
 │       ├── FolderFileNode.vue — Folder/file mapping node (path, children tree preview)
 │       └── index.js           — Barrel exports
 ├── views/
-│   └── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
+│   ├── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
+│   ├── Canvas.vue            — Vue Flow canvas with flow selector, sidebar, save/load
+│   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
+│   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
 ├── router/
-│   └── index.js              — Vue Router (/login route)
+│   └── index.js              — Vue Router (/login, /canvas, /tables, /logics routes)
 ├── App.vue                   — <router-view /> root
 └── main.js                   — createApp + router + PrimeVue plugin
 ```
+
+## Definition-to-Node Flow
+1. User creates a Table or Logic definition on `/tables` or `/logics`
+2. Canvas loads all definitions and creates nodes automatically (with `definitionId` tracking)
+3. Existing definition nodes in the flow keep their positions; new definitions appear in a grid
+4. User can reposition, connect, save — definitions persist as flow nodes
+5. Clicking the refresh (⟳) button reloads definitions without losing saved flow nodes
+6. Editing definitions on the designer pages updates the next canvas load
+
+## API Routes (22 total)
+
+### Public
+| Method | Route | Handler |
+|--------|-------|---------|
+| POST | `/api/register` | AuthController@register |
+| POST | `/api/login` | AuthController@login |
+
+### Authenticated (auth:api)
+| Method | Route | Handler |
+|--------|-------|---------|
+| GET | `/api/me` | AuthController@me |
+| POST | `/api/logout` | AuthController@logout |
+| GET/POST | `/api/flows` | FlowController@index/store |
+| GET/PUT/DELETE | `/api/flows/{flow}` | FlowController@show/update/destroy |
+| POST | `/api/flows/{flow}/nodes` | FlowController@saveNodes |
+| POST | `/api/flows/{flow}/edges` | FlowController@saveEdges |
+| POST | `/api/flows/{flow}/save` | FlowController@save (combined) |
+| GET/POST | `/api/tables` | TableDefinitionController@index/store |
+| GET/PUT/DELETE | `/api/tables/{table}` | TableDefinitionController@show/update/destroy |
+| GET/POST | `/api/logics` | LogicDefinitionController@index/store |
+| GET/PUT/DELETE | `/api/logics/{logic}` | LogicDefinitionController@show/update/destroy |
 
 ## Strategic Monetization Matrix (Value-Based Hierarchy)
 1. **Free Tier:**

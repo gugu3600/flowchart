@@ -303,5 +303,61 @@ HTTP Request
 
 ---
 
+## Log-2026-06-08-001 — Table Designer, Logic Designer & Interactive Canvas
 
+### Summary
+- **Table Designer page** (`/tables`): Full CRUD for database table schemas with modal form, column builder (name, type, PK/FK/UQ checkboxes), card list with preview badges.
+- **Logic Designer page** (`/logics`): Full CRUD for logic/function definitions with modal form, dynamic inputs list, output field, card list with input/output tag previews.
+- **Backend**: Created `table_definitions` and `logic_definitions` migrations, Eloquent models, repositories (with interfaces), services, FormRequests, API Resources, and RESTful controllers.
+- **Combined save endpoint** (`POST /api/flows/{flow}/save`): Accepts both nodes and edges in one request, recreates nodes with `bulkCreateWithReturn` (returns temp→DB ID map), remaps edge references, saves edges, returns updated flow + node ID map.
+- **Sidebar.vue**: Drag-and-drop palette with 3 node types (Table blue, Logic purple, Folder/File amber) using native HTML5 drag API.
+- **Canvas.vue**: Flow selector dropdown, "+ New Flow" inline creation, Save button, drag-drop from sidebar via `screenToFlowCoordinate`, `v-model:nodes/edges` for Vue Flow state, `markRaw` for nodeTypes, `onConnect` handler for edge creation.
+- **Definition-to-Node bridge**: Canvas loads all user's table/logic definitions via `Promise.all`, creates nodes with `definitionId` tracking, skips definitions already saved as flow nodes (preserving positions).
+- **Navigation**: Header links between Canvas, Tables, Logics pages; refresh (⟳) button to reload definitions.
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `backend/database/migrations/..._create_table_definitions_table.php` | `table_definitions` table |
+| `backend/database/migrations/..._create_logic_definitions_table.php` | `logic_definitions` table |
+| `backend/app/Models/TableDefinition.php` | TableDefinition Eloquent model |
+| `backend/app/Models/LogicDefinition.php` | LogicDefinition Eloquent model |
+| `backend/app/Repositories/table_definition/` | TableDefinition repo interface + implementation |
+| `backend/app/Repositories/logic_definition/` | LogicDefinition repo interface + implementation |
+| `backend/app/Services/TableDefinition/TableDefinitionService.php` | TableDefinition business logic |
+| `backend/app/Services/LogicDefinition/LogicDefinitionService.php` | LogicDefinition business logic |
+| `backend/app/Http/Requests/TableDefinition/` | Store + Update form requests |
+| `backend/app/Http/Requests/LogicDefinition/` | Store + Update form requests |
+| `backend/app/Http/Resources/TableDefinitionResource.php` | API resource |
+| `backend/app/Http/Resources/LogicDefinitionResource.php` | API resource |
+| `backend/app/Http/Controllers/api/TableDefinitionController.php` | RESTful controller |
+| `backend/app/Http/Controllers/api/LogicDefinitionController.php` | RESTful controller |
+| `frontend/src/api/tables.js` | Table definitions API layer |
+| `frontend/src/api/logics.js` | Logic definitions API layer |
+| `frontend/src/views/TableDesigner.vue` | Table CRUD page |
+| `frontend/src/views/LogicDesigner.vue` | Logic CRUD page |
+| `frontend/src/components/Sidebar.vue` | Drag-drop node palette |
+| `frontend/src/styles/sidebar.css` | Sidebar utility classes (in style.css) |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/routes/api.php` | Added `/api/tables` and `/api/logics` resource routes, `/api/flows/{flow}/save` |
+| `backend/app/Providers/RepositoryServiceProvider.php` | Bound TableDefinition + LogicDefinition repos |
+| `backend/app/Repositories/flow_node/FlowNodeRepository.php` | Added `bulkCreateWithReturn()` |
+| `backend/app/Repositories/flow_node/FlowNodeRepositoryInterface.php` | Added `bulkCreateWithReturn()` contract |
+| `backend/app/Http/Requests/Flow/SaveFlowRequest.php` | New combined save validation |
+| `backend/app/Services/Flow/FlowService.php` | Added `save()` method with node→edge mapping |
+| `backend/app/Http/Controllers/api/FlowController.php` | Added `save()` endpoint |
+| `frontend/src/router/index.js` | Added `/tables` and `/logics` routes |
+| `frontend/src/views/Canvas.vue` | Loads definitions, nav links, refresh, markRaw |
+| `frontend/src/style.css` | Added sidebar, btn-sm, btn-danger, modal utility classes |
+| `mdFiles/Architecture.md` | Added designer pages, definition flow, full route table |
+| `mdFiles/Todo.md` | Marked designer pages + canvas features complete |
+| `mdFiles/Review.md` | Marked canvas + definition tests |
+| `mdFiles/schema.md` | Added `table_definitions` and `logic_definitions` tables + migration order |
+| `mdFiles/gitMd/Commit.md` | Added 2026-06-08 commit entries |
+
+### Deleted Code
+*(None)*
 

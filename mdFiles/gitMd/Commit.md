@@ -1,5 +1,17 @@
 # Git Commits
 
+## 2026-06-08
+
+- Built Table Designer page (`/tables`) — CRUD table schemas with column builder (name, type, PK/FK/UQ)
+- Built Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder
+- Backend: `table_definitions` and `logic_definitions` migrations, models, repositories, services, controllers
+- Combined save endpoint (`POST /api/flows/{flow}/save`) with node→edge ID mapping
+- Sidebar.vue drag-and-drop palette (Table, Logic, Folder/File node types)
+- Canvas.vue: flow selector, create/save flows, drag-drop from sidebar, markRaw for nodeTypes
+- Canvas auto-loads table/logic definitions as nodes with definitionId tracking
+- Added tailwind utility base `btn-sm` and reused across designer pages
+- All 10 Playwright tests passing
+
 ## 2026-06-04
 
 - Initial project setup with backend (Laravel) and frontend (Vue + Vite)

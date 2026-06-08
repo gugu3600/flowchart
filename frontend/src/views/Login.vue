@@ -14,7 +14,7 @@ async function handleLogin() {
   try {
     const res = await apiClient.post('/login', form)
     if (res.success) {
-      window.location.href = '/dashboard'
+      window.location.href = '/canvas'
     }
   } catch (err) {
     error.value = err.message || 'Login failed'

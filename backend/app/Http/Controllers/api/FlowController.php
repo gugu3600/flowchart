@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Requests\Flow\SaveEdgesRequest;
+use App\Http\Requests\Flow\SaveFlowRequest;
 use App\Http\Requests\Flow\SaveNodesRequest;
 use App\Http\Requests\Flow\StoreFlowRequest;
 use App\Http\Requests\Flow\UpdateFlowRequest;
@@ -85,5 +86,12 @@ class FlowController extends BaseController
             ['edges' => FlowNodeResource::collection($edges)],
             'Edges saved',
         );
+    }
+
+    public function save(SaveFlowRequest $request, Flow $flow): JsonResponse
+    {
+        $result = $this->flowService->save($flow->id, Auth::id(), $request->validated());
+
+        return $this->success($result, 'Flow saved');
     }
 }

@@ -17,6 +17,42 @@ users (1) ──< flows (1) ──< flow_nodes
 
 ---
 
+## Definition Tables (User-Managed Node Templates)
+
+### `table_definitions`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | BIGINT PK | Auto-increment |
+| user_id | BIGINT FK | → `users.id` ON DELETE CASCADE |
+| name | VARCHAR(255) | Table name |
+| columns | JSON | Array of `{name, type, pk, fk, unique}` |
+| created_at | TIMESTAMP | |
+| updated_at | TIMESTAMP | |
+
+- **Relations:** Belongs to `user`.
+- **Canvas Integration:** Each definition auto-creates a `table`-type node on the canvas (tracked via `data.definitionId`).
+
+---
+
+### `logic_definitions`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | BIGINT PK | Auto-increment |
+| user_id | BIGINT FK | → `users.id` ON DELETE CASCADE |
+| name | VARCHAR(255) | Logic/function name |
+| description | TEXT | Nullable |
+| inputs | JSON | Array of input parameter names |
+| output | VARCHAR(255) | Nullable return type |
+| created_at | TIMESTAMP | |
+| updated_at | TIMESTAMP | |
+
+- **Relations:** Belongs to `user`.
+- **Canvas Integration:** Each definition auto-creates a `logic`-type node on the canvas (tracked via `data.definitionId`).
+
+---
+
 ## Core Tables
 
 ### `users` (Laravel default + Spatie RBAC)
@@ -153,3 +189,5 @@ All repository interfaces are bound to implementations in `App\Providers\Reposit
 | 5 | `create_flows_table` | Flowchart projects |
 | 6 | `create_flow_nodes_table` | Canvas nodes |
 | 7 | `create_flow_edges_table` | Canvas connections |
+| 8 | `create_table_definitions_table` | User-managed table schemas |
+| 9 | `create_logic_definitions_table` | User-managed logic definitions |
