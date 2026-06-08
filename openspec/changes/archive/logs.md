@@ -390,3 +390,22 @@ HTTP Request
 | `mdFiles/Review.md` | Marked connection validation item |
 | `mdFiles/gitMd/Commit.md` | Added mode separation entry |
 
+---
+
+## Log-2026-06-08-003 — Fix Route Model Binding for TableDefinition & LogicDefinition
+
+### Summary
+- **Bug**: Table definition and logic definition `update` endpoints were broken with `Argument #1 ($id) must be of type int, null given` because Laravel's implicit route model binding requires the controller parameter name to match the route parameter name.
+- **Root cause**: `Route::apiResource('tables', ...)` generates `{table}` param, but the controller used `TableDefinition $tableDefinition`. Same for `{logic}` vs `LogicDefinition $logicDefinition`.
+- **Fix**: Renamed `$tableDefinition` → `$table` and `$logicDefinition` → `$logic` in all controller methods (`show`, `update`, `destroy`).
+- **Impact**: Users can now update table definitions with any column type (including DATETIME, TIMESTAMP, DATE) and update logic definitions.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Http/Controllers/api/TableDefinitionController.php` | `$tableDefinition` → `$table` in show/update/destroy |
+| `backend/app/Http/Controllers/api/LogicDefinitionController.php` | `$logicDefinition` → `$logic` in show/update/destroy |
+| `mdFiles/Review.md` | Marked fix as complete |
+| `mdFiles/gitMd/Commit.md` | Added fix entry |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+

@@ -14,6 +14,8 @@
 - `isValidConnection` enforces domain boundaries — tables cannot connect to logics
 - Canvas auto-loads relevant definitions based on active mode
 - All 10 Playwright tests passing
+- Fixed route model binding bug: TableDefinition & LogicDefinition controller params renamed to match route params ($table, $logic)
+- Table designer now supports DATETIME, TIMESTAMP, DATE column types (free-text type field) with working create/update
 
 ## 2026-06-04
 

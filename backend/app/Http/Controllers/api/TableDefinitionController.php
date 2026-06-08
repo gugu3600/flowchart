@@ -37,9 +37,9 @@ class TableDefinitionController extends BaseController
         );
     }
 
-    public function show(TableDefinition $tableDefinition): JsonResponse
+    public function show(TableDefinition $table): JsonResponse
     {
-        $definition = $this->service->findForUser($tableDefinition->id, Auth::id());
+        $definition = $this->service->findForUser($table->id, Auth::id());
 
         return $this->success(
             ['table' => new TableDefinitionResource($definition)],
@@ -47,9 +47,9 @@ class TableDefinitionController extends BaseController
         );
     }
 
-    public function update(UpdateTableDefinitionRequest $request, TableDefinition $tableDefinition): JsonResponse
+    public function update(UpdateTableDefinitionRequest $request, TableDefinition $table): JsonResponse
     {
-        $definition = $this->service->update($tableDefinition->id, Auth::id(), $request->validated());
+        $definition = $this->service->update($table->id, Auth::id(), $request->validated());
 
         return $this->success(
             ['table' => new TableDefinitionResource($definition)],
@@ -57,9 +57,9 @@ class TableDefinitionController extends BaseController
         );
     }
 
-    public function destroy(TableDefinition $tableDefinition): JsonResponse
+    public function destroy(TableDefinition $table): JsonResponse
     {
-        $this->service->delete($tableDefinition->id, Auth::id());
+        $this->service->delete($table->id, Auth::id());
 
         return $this->success([], 'Table definition deleted');
     }

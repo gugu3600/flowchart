@@ -37,9 +37,9 @@ class LogicDefinitionController extends BaseController
         );
     }
 
-    public function show(LogicDefinition $logicDefinition): JsonResponse
+    public function show(LogicDefinition $logic): JsonResponse
     {
-        $definition = $this->service->findForUser($logicDefinition->id, Auth::id());
+        $definition = $this->service->findForUser($logic->id, Auth::id());
 
         return $this->success(
             ['logic' => new LogicDefinitionResource($definition)],
@@ -47,9 +47,9 @@ class LogicDefinitionController extends BaseController
         );
     }
 
-    public function update(UpdateLogicDefinitionRequest $request, LogicDefinition $logicDefinition): JsonResponse
+    public function update(UpdateLogicDefinitionRequest $request, LogicDefinition $logic): JsonResponse
     {
-        $definition = $this->service->update($logicDefinition->id, Auth::id(), $request->validated());
+        $definition = $this->service->update($logic->id, Auth::id(), $request->validated());
 
         return $this->success(
             ['logic' => new LogicDefinitionResource($definition)],
@@ -57,9 +57,9 @@ class LogicDefinitionController extends BaseController
         );
     }
 
-    public function destroy(LogicDefinition $logicDefinition): JsonResponse
+    public function destroy(LogicDefinition $logic): JsonResponse
     {
-        $this->service->delete($logicDefinition->id, Auth::id());
+        $this->service->delete($logic->id, Auth::id());
 
         return $this->success([], 'Logic definition deleted');
     }
