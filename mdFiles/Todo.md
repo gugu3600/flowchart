@@ -1,5 +1,7 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
+> Last updated: 2026-06-08 12:00 UTC
+
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
 - [x] Setup Laravel 13 backend structure with MySQL (JWT auth + Spatie RBAC).

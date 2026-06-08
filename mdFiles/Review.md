@@ -1,5 +1,7 @@
 # Autonomous Code Review & Validation Checklist
 
+> Last updated: 2026-06-08 12:00 UTC
+
 ## [Phase 1: Security & Route Protection]
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks (`role:silver|gold|platinum`, `role:gold|platinum`, `role:platinum`).
 - [x] JWT auth routes configured (`/api/login`, `/api/register`, `/api/me`, `/api/logout`).

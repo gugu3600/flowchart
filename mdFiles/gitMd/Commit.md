@@ -1,5 +1,7 @@
 # Git Commits
 
+> Last updated: 2026-06-08 12:00 UTC
+
 ## 2026-06-08
 
 - Built Table Designer page (`/tables`) — CRUD table schemas with column builder (name, type, PK/FK/UQ)

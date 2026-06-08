@@ -1,5 +1,7 @@
 # Database Schema — `flowchart`
 
+> Last updated: 2026-06-08 12:00 UTC
+
 ## Overview
 
 - **Engine:** MySQL 8.4

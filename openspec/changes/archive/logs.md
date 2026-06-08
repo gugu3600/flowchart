@@ -1,5 +1,7 @@
 # Change Log Archive
 
+> Last updated: 2026-06-08 12:00 UTC
+
 ## Log-2026-06-04-001 — Project Scaffolding & RBAC/JWT Setup
 
 ### Summary
