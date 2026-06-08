@@ -26,6 +26,7 @@
 - [x] `tests/login.spec.js` created — valid login + invalid credentials (2 tests, passing).
 - [x] Reusable flowchart node components created: BaseNode, TableNode, LogicNode, FolderFileNode.
 - [x] Canvas tests: flow selector, sidebar, create flow, save flow (2 tests, passing).
+- [x] Canvas modes (Flow/Schema tabs) with `isValidConnection` domain boundary enforcement.
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
 - [ ] Write E2E tests for Table Designer and Logic Designer CRUD pages.
 

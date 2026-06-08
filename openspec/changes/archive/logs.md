@@ -363,3 +363,30 @@ HTTP Request
 ### Deleted Code
 *(None)*
 
+---
+
+## Log-2026-06-08-002 — Canvas Tab Modes (Flow/Schema) with Domain Boundary Enforcement
+
+### Summary
+- **Canvas tabs**: Added mode switcher (`Flow` / `Schema`) to the canvas header — each mode registers only its relevant node types (`flowNodeTypes` for Logic+FolderFile, `schemaNodeTypes` for Table).
+- **Domain boundary enforcement**: `isValidConnection` prop on VueFlow prevents connecting across domains — Schema mode only allows table↔table edges (FK relationships), Flow mode only allows logic↔logic, logic↔folderFile, folderFile↔folderFile edges.
+- **Dual sidebars**: `Sidebar.vue` (Flow mode) shows Logic + Folder/File drag items; `SchemaSidebar.vue` (Schema mode) shows Table drag items only.
+- **Contextual loading**: Canvas loads only the relevant definitions for the active mode — logics for Flow, tables for Schema.
+- **Navigation**: Header shows contextual links — "Logics" link in Flow mode, "Tables" link in Schema mode.
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `frontend/src/components/SchemaSidebar.vue` | Schema-mode drag palette (Table only) |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/views/Canvas.vue` | Added mode tabs, `isValidConnection`, conditional node types, contextual loading |
+| `frontend/src/components/Sidebar.vue` | Removed Table item (now only in SchemaSidebar) |
+| `tests/canvas.spec.js` | Updated assertions for new sidebar content + mode tab checks |
+| `mdFiles/Architecture.md` | Added Canvas Modes table, updated component structure |
+| `mdFiles/Todo.md` | Marked mode separation complete |
+| `mdFiles/Review.md` | Marked connection validation item |
+| `mdFiles/gitMd/Commit.md` | Added mode separation entry |
+

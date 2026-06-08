@@ -1,25 +1,15 @@
 <script setup>
 const nodeTypes = [
   {
-    type: 'logic',
-    label: 'Logic',
-    icon: 'pi pi-cog',
-    color: 'purple',
+    type: 'table',
+    label: 'Table',
+    icon: 'pi pi-table',
+    color: 'blue',
     defaultData: {
-      description: 'Process logic step',
-      inputs: ['input'],
-      output: 'result',
-    },
-  },
-  {
-    type: 'folderFile',
-    label: 'Folder / File',
-    icon: 'pi pi-folder',
-    color: 'amber',
-    defaultData: {
-      path: '/path/to/item',
-      isFolder: true,
-      children: ['file1.php', 'file2.php'],
+      columns: [
+        { name: 'id', type: 'INT PK', pk: true },
+        { name: 'name', type: 'VARCHAR(255)' },
+      ],
     },
   },
 ]
@@ -32,8 +22,8 @@ function onDragStart(event, nodeType) {
 
 <template>
   <aside class="sidebar">
-    <h2 class="sidebar-title">Nodes</h2>
-    <p class="sidebar-subtitle">Drag onto canvas</p>
+    <h2 class="sidebar-title">Schema</h2>
+    <p class="sidebar-subtitle">Drag a table onto the canvas</p>
 
     <div
       v-for="nt in nodeTypes"

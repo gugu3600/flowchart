@@ -30,6 +30,7 @@
 - [x] Create Table Designer page (`/tables`) — CRUD table schemas with column builder.
 - [x] Create Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder.
 - [x] Canvas auto-loads table/logic definitions as nodes with definitionId tracking.
+- [x] Canvas has two modes (Flow/Schema tabs) — tables and logics cannot mix; `isValidConnection` enforces boundaries.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

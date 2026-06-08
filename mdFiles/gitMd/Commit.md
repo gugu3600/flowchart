@@ -8,10 +8,11 @@
 - Built Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder
 - Backend: `table_definitions` and `logic_definitions` migrations, models, repositories, services, controllers
 - Combined save endpoint (`POST /api/flows/{flow}/save`) with node→edge ID mapping
-- Sidebar.vue drag-and-drop palette (Table, Logic, Folder/File node types)
-- Canvas.vue: flow selector, create/save flows, drag-drop from sidebar, markRaw for nodeTypes
-- Canvas auto-loads table/logic definitions as nodes with definitionId tracking
-- Added tailwind utility base `btn-sm` and reused across designer pages
+- Sidebar.vue drag-and-drop palette (Logic, Folder/File node types)
+- SchemaSidebar.vue drag-and-drop palette (Table only)
+- Canvas.vue: two mode tabs (Flow/Schema) with separate node type registrations
+- `isValidConnection` enforces domain boundaries — tables cannot connect to logics
+- Canvas auto-loads relevant definitions based on active mode
 - All 10 Playwright tests passing
 
 ## 2026-06-04

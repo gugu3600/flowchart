@@ -16,9 +16,18 @@
 | Route | Page | Purpose |
 |-------|------|---------|
 | `/login` | Login.vue | JWT login form |
-| `/canvas` | Canvas.vue | Vue Flow canvas with drag-drop, save/load, live definitions |
+| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (inputs, output, description) |
+
+## Canvas Modes (Tab-Separated)
+
+| Mode | Tab | Node Types | Connection Rule | Sidebar |
+|------|-----|------------|-----------------|---------|
+| **Flow** | `Flow` | Logic, Folder/File | logic↔logic, logic↔folderFile, folderFile↔folderFile | Sidebar.vue (Logic + Folder/File) |
+| **Schema** | `Schema` | Table | table↔table only (FK relationships) | SchemaSidebar.vue (Table only) |
+
+The `isValidConnection` prop on VueFlow enforces domain boundaries: table nodes cannot connect to logic/folder nodes and vice versa.
 
 ## Frontend Component Architecture
 ```
@@ -35,7 +44,8 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
-│   ├── Sidebar.vue           — Drag-and-drop node palette
+│   ├── Sidebar.vue           — Drag-and-drop palette (Flow mode: Logic, Folder/File)
+│   ├── SchemaSidebar.vue     — Drag-and-drop palette (Schema mode: Table only)
 │   ├── index.js              — Barrel exports
 │   └── nodes/
 │       ├── BaseNode.vue       — Shared node wrapper (Handle ports, color themes, selected ring)
@@ -45,7 +55,7 @@ src/
 │       └── index.js           — Barrel exports
 ├── views/
 │   ├── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
-│   ├── Canvas.vue            — Vue Flow canvas with flow selector, sidebar, save/load
+│   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load
 │   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
 │   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
 ├── router/
@@ -55,12 +65,12 @@ src/
 ```
 
 ## Definition-to-Node Flow
-1. User creates a Table or Logic definition on `/tables` or `/logics`
-2. Canvas loads all definitions and creates nodes automatically (with `definitionId` tracking)
-3. Existing definition nodes in the flow keep their positions; new definitions appear in a grid
-4. User can reposition, connect, save — definitions persist as flow nodes
-5. Clicking the refresh (⟳) button reloads definitions without losing saved flow nodes
-6. Editing definitions on the designer pages updates the next canvas load
+1. User creates Table definitions on `/tables` or Logic definitions on `/logics`
+2. On `/canvas`, switch to **Flow** tab for logic/folder flowcharts or **Schema** tab for table relationship diagrams
+3. Canvas loads the relevant definitions for the active mode and creates nodes (with `definitionId` tracking)
+4. Existing saved nodes in the active mode keep their positions; new definitions appear in a grid
+5. `isValidConnection` enforces domain boundaries — table nodes cannot connect to logic nodes
+6. User can reposition, connect, save; clicking refresh (⟳) reloads definitions
 
 ## API Routes (22 total)
 
