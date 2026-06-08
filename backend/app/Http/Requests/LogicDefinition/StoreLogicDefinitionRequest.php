@@ -17,7 +17,8 @@ class StoreLogicDefinitionRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'inputs' => 'nullable|array',
-            'inputs.*' => 'string|max:255',
+            'inputs.*.name' => 'required_with:inputs|string|max:255',
+            'inputs.*.type' => 'required_with:inputs|string|max:255',
             'output' => 'nullable|string|max:255',
         ];
     }

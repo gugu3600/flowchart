@@ -7,7 +7,7 @@ const nodeTypes = [
     color: 'purple',
     defaultData: {
       description: 'Process logic step',
-      inputs: ['input'],
+      inputs: [{ name: 'input', type: 'any' }],
       output: 'result',
     },
   },

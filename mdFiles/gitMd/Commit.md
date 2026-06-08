@@ -16,6 +16,10 @@
 - All 10 Playwright tests passing
 - Fixed route model binding bug: TableDefinition & LogicDefinition controller params renamed to match route params ($table, $logic)
 - Table designer now supports DATETIME, TIMESTAMP, DATE column types (free-text type field) with working create/update
+- Logic inputs upgraded from flat strings to structured {name, type} objects (workflow-style CRUD)
+- Backend Store/UpdateLogicDefinitionRequest validates inputs.*.name + inputs.*.type
+- LogicNode.vue shows "name:type" badges, handles backward compat with old string inputs
+- LogicDesigner.vue has name+type input fields per row (like table column builder)
 
 ## 2026-06-04
 

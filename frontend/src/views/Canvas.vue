@@ -113,14 +113,15 @@ async function loadFlowData(flowId) {
             id: `def_logic_${l.id}`,
             type: 'logic',
             position: { x: 50 + defIndex++ * 350, y: 50 },
-            data: {
-              label: l.name,
-              definitionId: l.id,
-              definitionType: 'logic',
-              description: l.description,
-              inputs: l.inputs,
-              output: l.output,
-            },
+              data: {
+                label: l.name,
+                definitionId: l.id,
+                definitionType: 'logic',
+                description: l.description,
+                inputs: l.inputs,
+                output: l.output,
+                typeField: l.type,
+              },
           })
         }
       }

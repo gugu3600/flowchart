@@ -13,7 +13,7 @@ const showForm = ref(false)
 const emptyForm = () => ({
   name: '',
   description: '',
-  inputs: [''],
+  inputs: [{ name: '', type: '' }],
   output: '',
 })
 
@@ -43,7 +43,9 @@ function openEdit(logic) {
   form.value = {
     name: logic.name,
     description: logic.description || '',
-    inputs: logic.inputs && logic.inputs.length ? [...logic.inputs] : [''],
+    inputs: logic.inputs && logic.inputs.length
+      ? logic.inputs.map((i) => (typeof i === 'string' ? { name: i, type: '' } : { ...i }))
+      : [{ name: '', type: '' }],
     output: logic.output || '',
   }
   showForm.value = true
@@ -56,7 +58,7 @@ function cancelForm() {
 }
 
 function addInput() {
-  form.value.inputs.push('')
+  form.value.inputs.push({ name: '', type: '' })
 }
 
 function removeInput(idx) {
@@ -69,7 +71,7 @@ async function handleSave() {
   try {
     const payload = {
       ...form.value,
-      inputs: form.value.inputs.filter((i) => i.trim()),
+      inputs: form.value.inputs.filter((i) => i.name.trim() && i.type.trim()),
     }
     if (editing.value) {
       const res = await updateLogic(editing.value, payload)
@@ -136,7 +138,7 @@ async function handleDelete(id) {
               <h3 class="designer-card-title">{{ l.name }}</h3>
               <p v-if="l.description" class="designer-card-desc">{{ l.description }}</p>
               <div class="designer-card-tags">
-                <span v-for="inp in l.inputs" :key="inp" class="node-tag node-tag-purple">{{ inp }}</span>
+                <span v-for="(inp, i) in l.inputs" :key="i" class="node-tag node-tag-purple">{{ inp.name }}<span class="preview-type">:{{ inp.type }}</span></span>
                 <span v-if="l.output" class="node-tag node-tag-emerald">{{ l.output }}</span>
               </div>
             </div>
@@ -165,12 +167,13 @@ async function handleDelete(id) {
             </div>
 
             <div v-for="(inp, i) in form.inputs" :key="i" class="input-row">
-              <input v-model="form.inputs[i]" type="text" class="form-input" placeholder="input name" />
+              <input v-model="form.inputs[i].name" type="text" class="form-input" placeholder="name" style="flex:1" />
+              <input v-model="form.inputs[i].type" type="text" class="form-input" placeholder="string, int, User..." style="flex:1.5" />
               <button class="btn-sm btn-danger" @click="removeInput(i)">×</button>
             </div>
 
             <label class="field-label">Output</label>
-            <input v-model="form.output" type="text" class="form-input" placeholder="e.g. User | null" />
+            <input v-model="form.output" type="text" class="form-input" placeholder="e.g. User | null, boolean" />
           </div>
 
           <div class="modal-actions">

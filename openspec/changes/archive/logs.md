@@ -409,3 +409,29 @@ HTTP Request
 | `mdFiles/gitMd/Commit.md` | Added fix entry |
 | `openspec/changes/archive/logs.md` | Appended this log entry |
 
+---
+
+## Log-2026-06-08-004 — Logic Inputs Upgraded to Structured {name, type} Objects
+
+### Summary
+Upgraded logic definitions from flat string inputs (`["x", "y"]`) to structured `{name, type}` objects (`[{name: "payload", type: "array"}, ...]`) — making the logic designer a proper workflow CRUD system with typed inputs like table columns.
+
+### Changes
+- `StoreLogicDefinitionRequest`: changed `inputs.*` from `string|max:255` to `inputs.*.name + inputs.*.type` (both `required_with:inputs|string|max:255`)
+- `UpdateLogicDefinitionRequest`: same validation update
+- `LogicDesigner.vue`: inputs form changed from single text field per row to name+type dual fields (like column builder); `openEdit` handles backward compat with old string inputs; card preview shows `name:type`
+- `LogicNode.vue`: displays `name:type` badges, supports both old string and new object formats
+- `Sidebar.vue`: default logic node data uses structured `[{name: 'input', type: 'any'}]`
+- `Canvas.vue`: passes `typeField` from logic definitions to node data
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Http/Requests/LogicDefinition/StoreLogicDefinitionRequest.php` | `inputs.*` → `inputs.*.name + inputs.*.type` |
+| `backend/app/Http/Requests/LogicDefinition/UpdateLogicDefinitionRequest.php` | Same validation update |
+| `frontend/src/views/LogicDesigner.vue` | name+type inputs, backward compat, card preview |
+| `frontend/src/components/nodes/LogicNode.vue` | `name:type` badges, typeField line, backward compat |
+| `frontend/src/components/Sidebar.vue` | Default logic data → structured inputs |
+| `frontend/src/views/Canvas.vue` | Passes `typeField` from logic defs |
+| `mdFiles/gitMd/Commit.md` | Added upgrade entry |
+

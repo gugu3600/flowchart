@@ -28,6 +28,10 @@ const props = defineProps({
       {{ data.description }}
     </p>
     <div class="node-logic-body">
+      <div v-if="data.typeField" class="node-logic-row">
+        <span class="node-logic-label">Type:</span>
+        <span class="node-tag node-tag-slate">{{ data.typeField }}</span>
+      </div>
       <div class="node-logic-row">
         <i class="pi pi-arrow-right" />
         <span class="node-logic-label">Inputs:</span>
@@ -37,7 +41,8 @@ const props = defineProps({
             :key="i"
             class="node-tag node-tag-purple"
           >
-            {{ inp }}
+            <span v-if="inp.name">{{ inp.name }}<span class="preview-type">:{{ inp.type || 'any' }}</span></span>
+            <span v-else>{{ inp }}</span>
           </span>
         </div>
       </div>
@@ -45,7 +50,7 @@ const props = defineProps({
         <i class="pi pi-arrow-left" />
         <span class="node-logic-label">Output:</span>
         <span class="node-tag node-tag-emerald">
-          {{ data.output }}
+          {{ data.output || 'void' }}
         </span>
       </div>
     </div>
