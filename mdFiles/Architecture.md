@@ -15,10 +15,11 @@
 ## Frontend Pages
 | Route | Page | Purpose |
 |-------|------|---------|
-| `/login` | Login.vue | JWT login form |
+| `/login` | Login.vue | JWT login form, links to register |
+| `/register` | Register.vue | User registration form (name, email, password, confirm password) |
 | `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
-| `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (inputs, output, description) |
+| `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output) |
 
 ## Canvas Modes (Tab-Separated)
 

@@ -5,6 +5,7 @@ import { getTables, createTable, updateTable, deleteTable } from '../api/tables.
 const tables = ref([])
 const loading = ref(false)
 const saving = ref(false)
+const deleting = ref(false)
 const error = ref('')
 const editing = ref(null)
 const form = ref(null)
@@ -86,6 +87,7 @@ async function handleSave() {
 async function handleDelete(id) {
   if (!confirm('Delete this table definition?')) return
   error.value = ''
+  deleting.value = true
   try {
     const res = await deleteTable(id)
     if (res.success) {
@@ -93,6 +95,8 @@ async function handleDelete(id) {
     }
   } catch (err) {
     error.value = err.message || 'Failed to delete table'
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -126,8 +130,8 @@ async function handleDelete(id) {
           <div v-for="t in tables" :key="t.id" class="designer-card">
             <div class="designer-card-body">
               <h3 class="designer-card-title">{{ t.name }}</h3>
-              <p class="designer-card-meta">{{ t.columns.length }} columns</p>
-              <ul class="designer-card-preview">
+              <p class="designer-card-meta">{{ (t.columns || []).length }} columns</p>
+              <ul v-if="t.columns" class="designer-card-preview">
                 <li v-for="c in t.columns.slice(0, 5)" :key="c.name" class="preview-col">
                   <code>{{ c.name }}</code>
                   <span class="preview-type">{{ c.type }}</span>
@@ -142,7 +146,7 @@ async function handleDelete(id) {
             </div>
             <div class="designer-card-actions">
               <button class="btn-sm btn-secondary" @click="openEdit(t)">Edit</button>
-              <button class="btn-sm btn-danger" @click="handleDelete(t.id)">Delete</button>
+              <button class="btn-sm btn-danger" :disabled="deleting" @click="handleDelete(t.id)">{{ deleting ? '...' : 'Delete' }}</button>
             </div>
           </div>
         </div>
@@ -175,7 +179,7 @@ async function handleDelete(id) {
             <button class="btn-secondary" @click="cancelForm">Cancel</button>
             <button
               class="btn-primary"
-              :disabled="saving || !form.name || form.columns.some((c) => !c.name)"
+              :disabled="saving || !form.name || form.columns.some((c) => !c.name || !c.type)"
               @click="handleSave"
             >
               {{ saving ? 'Saving...' : 'Save' }}

@@ -20,6 +20,9 @@
 - Backend Store/UpdateLogicDefinitionRequest validates inputs.*.name + inputs.*.type
 - LogicNode.vue shows "name:type" badges, handles backward compat with old string inputs
 - LogicDesigner.vue has name+type input fields per row (like table column builder)
+- Full code review completed: fixed BaseController error() check, FlowController resource type, missing node-tag-slate CSS, try/catch on Canvas onDrop, added deleting states to CRUD pages, column type validation
+- Created Register.vue view with /register route, linked from login page
+- Security audit: ownership verified for all CRUD controllers; rate limiting, password complexity, JWT refresh flow identified as TODO items
 
 ## 2026-06-04
 

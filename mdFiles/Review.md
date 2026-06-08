@@ -3,16 +3,21 @@
 > Last updated: 2026-06-08 12:00 UTC
 
 ## [Phase 1: Security & Route Protection]
-- [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks (`role:silver|gold|platinum`, `role:gold|platinum`, `role:platinum`).
-- [x] JWT auth routes configured (`/api/login`, `/api/register`, `/api/me`, `/api/logout`).
-- [x] Super-admin role seeded with all permissions for development access.
-- [x] Controllers refactored: validation → FormRequest, business logic → Service, DB → Repository.
-- [x] RepositoryServiceProvider binds all interfaces → implementations.
-- [x] API response shape standardized via Resources + BaseController wrapper.
-- [x] JWT delivered via HTTP-only Secure SameSite=Strict cookie (no token in JSON body).
-- [x] `Auth::guard('api')` removed — default `api` guard used everywhere.
-- [ ] **Client-Side Separation:** Inspect frontend imports and build bundles. Ensure absolutely zero database connections or raw SQL queries are linked into the Vue client bundle to prevent client-side bypasses.
-- [ ] **Input Sanitization:** Check Laravel controller validation arrays. Ensure all custom node identifiers, route configurations, folder names, and database layout parameters are fully validated and sanitized to protect against payload manipulation.
+- [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
+- [x] Register endpoint: `RegisterRequest` validates name/email/password; `RegisterService` hashes password + issues JWT.
+- [x] `BaseController::error()` bug fixed — was checking `$errorMsg` instead of `$error` (always included empty `error` key).
+- [x] `FlowController::saveEdges()` fixed — was returning `FlowNodeResource` instead of `FlowEdgeResource`.
+- [x] `FlowService::saveEdges()` verified — correctly calls `$this->edgeRepository->deleteByFlowId()` (not node repo).
+- [x] All models use `$fillable` whitelists (mass-assignment protection).
+- [x] All JSON fields have `array` cast in models.
+- [x] JWT cookie: `HttpOnly=true`, `Secure=true`, `SameSite=Strict`; logout blacklists token.
+- [x] Password stored with `'hashed'` cast + `Hash::make()` (no double-hashing).
+- [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
+- [ ] **Rate Limiting:** Login and register routes are unthrottled — add `throttle:5,1` middleware.
+- [ ] **Password Complexity:** Registration only requires `min:8` — add regex for uppercase+digit+special.
+- [ ] **JWT Refresh Flow:** Cookie TTL (43200 min) vs JWT TTL (60 min) mismatch — add refresh-token mechanism.
+- [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
+- [ ] **Input Sanitization:** Ensure all custom node identifiers and parameters are validated.
 
 ## [Phase 2: Architectural & System Integrity]
 - [ ] **State Integrity & Memory Leaks:** Verify that deleting nodes or edges inside the Vue Flow UI completely unmounts reactive parameters without leaving unreferenced leakage inside memory arrays.

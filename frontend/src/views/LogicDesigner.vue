@@ -5,6 +5,7 @@ import { getLogics, createLogic, updateLogic, deleteLogic } from '../api/logics.
 const logics = ref([])
 const loading = ref(false)
 const saving = ref(false)
+const deleting = ref(false)
 const error = ref('')
 const editing = ref(null)
 const form = ref(null)
@@ -96,6 +97,7 @@ async function handleSave() {
 async function handleDelete(id) {
   if (!confirm('Delete this logic definition?')) return
   error.value = ''
+  deleting.value = true
   try {
     const res = await deleteLogic(id)
     if (res.success) {
@@ -103,6 +105,8 @@ async function handleDelete(id) {
     }
   } catch (err) {
     error.value = err.message || 'Failed to delete logic'
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -144,7 +148,7 @@ async function handleDelete(id) {
             </div>
             <div class="designer-card-actions">
               <button class="btn-sm btn-secondary" @click="openEdit(l)">Edit</button>
-              <button class="btn-sm btn-danger" @click="handleDelete(l.id)">Delete</button>
+              <button class="btn-sm btn-danger" :disabled="deleting" @click="handleDelete(l.id)">{{ deleting ? '...' : 'Delete' }}</button>
             </div>
           </div>
         </div>

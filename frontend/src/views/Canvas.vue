@@ -253,7 +253,8 @@ function onDrop(event) {
   event.preventDefault()
   const raw = event.dataTransfer.getData('application/json')
   if (!raw) return
-  const nodeDef = JSON.parse(raw)
+  let nodeDef
+  try { nodeDef = JSON.parse(raw) } catch { return }
   const position = screenToFlowCoordinate({
     x: event.clientX,
     y: event.clientY,

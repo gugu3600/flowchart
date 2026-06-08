@@ -51,6 +51,10 @@ async function handleLogin() {
           :loading="loading"
           class="mt-2"
         />
+        <p class="text-center text-sm text-surface-500 dark:text-surface-400">
+          No account?
+          <a href="/register" class="text-primary-500 hover:underline">Register</a>
+        </p>
       </form>
     </AppCard>
   </div>

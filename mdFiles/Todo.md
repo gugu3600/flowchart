@@ -31,6 +31,20 @@
 - [x] Create Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder.
 - [x] Canvas auto-loads table/logic definitions as nodes with definitionId tracking.
 - [x] Canvas has two modes (Flow/Schema tabs) — tables and logics cannot mix; `isValidConnection` enforces boundaries.
+- [x] Logic inputs upgraded to structured `{name, type}` objects (workflow-style CRUD like table columns).
+- [x] Register.vue — user registration page with route, linked from login page.
+- [x] Fixed critical: `saveEdges` returned `FlowNodeResource` instead of `FlowEdgeResource`.
+- [x] Fixed critical: `BaseController::error()` checked `$errorMsg` instead of `$error`.
+- [x] Added `node-tag-slate` class to style.css used by LogicNode.
+- [x] Wrapped `Canvas.vue` onDrop `JSON.parse` in try/catch to prevent crash on invalid drops.
+- [x] Added `deleting` loading state to both designer pages.
+- [x] TableDesigner: validates both `c.name` AND `c.type` before submit; guards null columns.
+- [ ] **SECURITY: Add rate limiting** to `/api/login` and `/api/register` routes (throttle: 5 attempts/min).
+- [ ] **SECURITY: Enforce password complexity** — require uppercase+digit+special char in RegisterRequest.
+- [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
+- [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
+- [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.
+- [ ] **CODE QUALITY: Replace `<a href>` with `<router-link>`** in all views for subpath compatibility.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

@@ -435,3 +435,35 @@ Upgraded logic definitions from flat string inputs (`["x", "y"]`) to structured 
 | `frontend/src/views/Canvas.vue` | Passes `typeField` from logic defs |
 | `mdFiles/gitMd/Commit.md` | Added upgrade entry |
 
+---
+
+## Log-2026-06-08-005 — Register Page, Code Review Fixes & Security Audit
+
+### Summary
+- **Register page**: Created `Register.vue` with name/email/password/confirm form, added `/register` route, linked from Login page. Uses existing `POST /api/register` backend endpoint.
+- **Critical bug fixes**: `BaseController::error()` checked `$errorMsg` instead of `$error` (dead code). `FlowController::saveEdges()` returned `FlowNodeResource` instead of `FlowEdgeResource`.
+- **Frontend fixes**: Added missing `.node-tag-slate` CSS class; wrapped `Canvas.vue` onDrop `JSON.parse` in try/catch; added `deleting` loading state to both designer pages; enforced column `type` validation in TableDesigner.
+- **Security audit**: Verified ownership checks on all CRUD controllers. Documented 3 remaining items (rate limiting, password complexity, JWT refresh flow).
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `frontend/src/views/Register.vue` | User registration form |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/app/Http/Controllers/api/BaseController.php` | `$errorMsg` → `$error` in empty check |
+| `backend/app/Http/Controllers/api/FlowController.php` | Import+use `FlowEdgeResource` in saveEdges |
+| `frontend/src/router/index.js` | Added `/register` → Register.vue route |
+| `frontend/src/views/Login.vue` | Added register link |
+| `frontend/src/views/TableDesigner.vue` | Added `deleting` state, null columns guard, type validation |
+| `frontend/src/views/LogicDesigner.vue` | Added `deleting` state |
+| `frontend/src/views/Canvas.vue` | try/catch on onDrop JSON.parse |
+| `frontend/src/style.css` | Added `.node-tag-slate` class |
+| `mdFiles/Todo.md` | Added security & code quality items |
+| `mdFiles/Review.md` | Added audit findings, security TODOs |
+| `mdFiles/Architecture.md` | Added register route |
+| `mdFiles/gitMd/Commit.md` | Added full summary |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+

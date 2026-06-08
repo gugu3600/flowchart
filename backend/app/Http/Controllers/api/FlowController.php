@@ -7,6 +7,7 @@ use App\Http\Requests\Flow\SaveFlowRequest;
 use App\Http\Requests\Flow\SaveNodesRequest;
 use App\Http\Requests\Flow\StoreFlowRequest;
 use App\Http\Requests\Flow\UpdateFlowRequest;
+use App\Http\Resources\FlowEdgeResource;
 use App\Http\Resources\FlowNodeResource;
 use App\Http\Resources\FlowResource;
 use App\Models\Flow;
@@ -83,7 +84,7 @@ class FlowController extends BaseController
         $edges = $this->flowService->saveEdges($flow->id, Auth::id(), $request->validated('edges'));
 
         return $this->success(
-            ['edges' => FlowNodeResource::collection($edges)],
+            ['edges' => FlowEdgeResource::collection($edges)],
             'Edges saved',
         );
     }
