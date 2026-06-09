@@ -51,6 +51,11 @@ async function handleLogin() {
           :loading="loading"
           class="login-btn"
         />
+
+        <p class="register-login-link">
+          Don't have an account?
+          <router-link to="/register">Register</router-link>
+        </p>
       </form>
     </div>
   </div>

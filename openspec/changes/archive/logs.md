@@ -665,3 +665,21 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `mdFiles/Architecture.md` | Updated component tree, page descriptions, reusable components table |
 | `mdFiles/Todo.md` | Added form UX tasks to done list |
 
+---
+
+## Log-2026-06-09-007 — Add Register Link to Login Page + Update All .md Files
+
+### Summary
+- Added "Don't have an account? Register" link to Login.vue (was missing — Register.vue already linked to login).
+- Updated timestamps on all `.md` files: Architecture.md (16:00), Todo.md (16:00), Review.md (16:00), Skills.md (16:00), schema.md (16:00), Commit.md.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/views/Login.vue` | Added register link after submit button |
+| `mdFiles/Architecture.md` | Updated login page description |
+| `mdFiles/Todo.md` | Added Login register link to done list |
+| `mdFiles/Review.md` | Timestamp updated |
+| `mdFiles/Skills.md` | Timestamp updated |
+| `mdFiles/schema.md` | Timestamp updated |
+
