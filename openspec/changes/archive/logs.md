@@ -469,6 +469,35 @@ Upgraded logic definitions from flat string inputs (`["x", "y"]`) to structured 
 
 ---
 
+## Log-2026-06-09-001 — Help Guide, Edge/Node Deletion & Project Documentation Update
+
+### Summary
+- **Help guide page**: Created `HelpGuide.vue` at `/help` with comprehensive how-to documentation — authentication, canvas modes (Flow/Schema), drag-drop nodes, connecting with edges, deleting edges/nodes, save/load flows, Table Designer, Logic Designer, and keyboard shortcuts.
+- **Edge/node deletion**: Added `delete-key-code="['Delete', 'Backspace']"` prop to VueFlow, `@edge-click` selection handler, and `@edges-delete`/`@nodes-delete` event handlers that remove selected elements from the reactive arrays on Delete/Backspace keypress.
+- **Project READMEs**: Replaced stock Vue/Laravel template READMEs with project-specific documentation covering tech stack, pages/routes, and development setup.
+- **Documentation update**: Updated all `mdFiles/` (Architecture.md, Review.md, Skills.md, schema.md, Todo.md, Commit.md) with current timestamps and new feature entries.
+
+### Added Files
+| File | Purpose |
+|------|---------|
+| `frontend/src/views/HelpGuide.vue` | How-to guide page with app usage instructions and keyboard shortcuts |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/router/index.js` | Added `/help` route pointing to `HelpGuide.vue` |
+| `frontend/src/views/Canvas.vue` | Added `delete-key-code`, edge/node delete handlers, Help nav link |
+| `frontend/README.md` | Replaced stock Vue template with project-specific readme |
+| `backend/README.md` | Replaced stock Laravel readme with project-specific readme |
+| `mdFiles/Architecture.md` | Added `/help` route, HelpGuide.vue to component tree, updated timestamps |
+| `mdFiles/Review.md` | Added edge deletion to verified items |
+| `mdFiles/Skills.md` | Updated timestamp |
+| `mdFiles/schema.md` | Updated timestamp |
+| `mdFiles/Todo.md` | Added help guide + edge deletion as completed |
+| `mdFiles/gitMd/Commit.md` | Added 2026-06-09 commit entries |
+
+---
+
 ## Log-2026-06-08-006 — Strict Cross-Mode Node Filtering (Absolute Domain Separation)
 
 ### Summary
