@@ -8,8 +8,7 @@ use App\Http\Controllers\api\LogicDefinitionController;
 use Illuminate\Support\Facades\Route;
 
 // ── public routes ──────────────────────────────────────────────────
-// Registration is disabled for security (admin accounts created via seeder only)
-// Route::post('register', [AuthController::class, 'register']);
+Route::post('register', [AuthController::class, 'register'])->middleware('throttle:login');
 Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 // ── authenticated routes ───────────────────────────────────────────

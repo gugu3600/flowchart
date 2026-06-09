@@ -1094,3 +1094,134 @@ body {
   margin-top: 0.5rem;
   width: 100%;
 }
+
+/*
+ * ── Register page ─────────────────────────────────────────────────
+ */
+
+.register-card {
+  width: 100%;
+  max-width: 520px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.register-tiers {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.register-tier-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.75rem 0.5rem;
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  text-align: center;
+}
+
+.register-tier-card:hover {
+  border-color: #475569;
+  transform: translateY(-1px);
+}
+
+.register-tier-active {
+  border-color: #3b82f6;
+  background: #1a2332;
+}
+
+.register-tier-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.register-tier-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.register-tier-desc {
+  font-size: 0.7rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.register-divider {
+  height: 1px;
+  background: #334155;
+  margin: 0.5rem 0;
+}
+
+.register-payment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.register-payment-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.register-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.register-payment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  transition: border-color 0.2s, background 0.15s;
+}
+
+.register-payment-btn:hover {
+  border-color: #475569;
+}
+
+.register-payment-active {
+  border-color: #3b82f6;
+  background: #1a2332;
+}
+
+.register-login-link {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.register-login-link a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.register-login-link a:hover {
+  text-decoration: underline;
+}

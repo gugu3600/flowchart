@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-09 12:00 UTC
+> Last updated: 2026-06-09 13:00 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -42,14 +42,25 @@
 - [x] Wrapped `Canvas.vue` onDrop `JSON.parse` in try/catch to prevent crash on invalid drops.
 - [x] Added `deleting` loading state to both designer pages.
 - [x] TableDesigner: validates both `c.name` AND `c.type` before submit; guards null columns.
-- [ ] **SECURITY: Add rate limiting** to `/api/login` and `/api/register` routes (throttle: 5 attempts/min).
-- [ ] **SECURITY: Enforce password complexity** — require uppercase+digit+special char in RegisterRequest.
+- [x] **SECURITY: Add rate limiting** to `/api/login` and `/api/register` routes (throttle: 20 attempts/min).
+- [x] **SECURITY: Enforce password complexity** — require uppercase+digit+special char in RegisterRequest.
+- [x] Register.vue redesigned with tier selection (Free/Silver/Gold/Platinum) and pricing display
+- [x] Payment method selection (KBZ Pay, AYA Pay, CB Pay, MMQR) for paid tiers during registration
+- [x] Backend `/api/register` re-enabled — assigns selected tier role, accepts payment_method
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
 - [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.
 - [ ] **CODE QUALITY: Replace `<a href>` with `<router-link>`** in all views for subpath compatibility.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
+
+## [Phase 1.5: Payment & Mail System (Backend — Laravel Queue)]
+- [ ] Implement payment gateway integration (KBZ Pay, AYA Pay, CB Pay, MMQR)
+- [ ] Create payments table migration and model
+- [ ] Build payment confirmation endpoint (webhook/callback)
+- [ ] Implement mail system with Laravel Queue (welcome email, payment receipt)
+- [ ] Upgrade user tier on successful payment confirmation
+- [ ] Handle failed/cancelled payments and tier rollback
 
 ## [Phase 2: Gold Tier Schema Compiler & Diagram View]
 - [ ] Develop database schema compiler translating custom table nodes into valid SQL DDL.
