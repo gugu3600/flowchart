@@ -1133,6 +1133,58 @@ body {
 
 .floating-input:focus ~ .floating-border {
   background: #3b82f6;
+  height: 2px;
+}
+
+.floating-error .floating-border {
+  background: #ef4444;
+}
+
+.floating-error .floating-input:focus ~ .floating-border {
+  background: #ef4444;
+}
+
+.floating-error .floating-label {
+  color: #ef4444;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 0.5rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.password-toggle:hover {
+  color: #94a3b8;
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin-top: -0.5rem;
+}
+
+.remember-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.remember-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  user-select: none;
 }
 
 /*

@@ -6,13 +6,14 @@ import { AppButton, FloatingInput } from '../components'
 const form = reactive({ email: '', password: '' })
 const error = ref('')
 const loading = ref(false)
+const remember = ref(false)
 
 async function handleLogin() {
   error.value = ''
   loading.value = true
 
   try {
-    const res = await apiClient.post('/login', form)
+    const res = await apiClient.post('/login', { ...form, remember: remember.value })
     if (res.success) {
       window.location.href = '/canvas'
     }
@@ -36,7 +37,13 @@ async function handleLogin() {
         <div v-if="error" class="error-msg">{{ error }}</div>
 
         <FloatingInput v-model="form.email" id="email" type="email" label="Email" autocomplete="email" />
-        <FloatingInput v-model="form.password" id="password" type="password" label="Password" autocomplete="current-password" />
+
+        <FloatingInput v-model="form.password" id="password" type="password" label="Password" autocomplete="current-password" show-password-toggle />
+
+        <label class="remember-row">
+          <input type="checkbox" v-model="remember" class="remember-checkbox" />
+          <span class="remember-label">Remember me</span>
+        </label>
 
         <AppButton
           type="submit"

@@ -92,8 +92,8 @@ async function handleRegister() {
 
         <FloatingInput v-model="form.name" id="reg-name" label="Name" />
         <FloatingInput v-model="form.email" id="reg-email" type="email" label="Email" autocomplete="email" />
-        <FloatingInput v-model="form.password" id="reg-password" type="password" label="Password" autocomplete="new-password" />
-        <FloatingInput v-model="form.password_confirmation" id="reg-password-confirm" type="password" label="Confirm Password" autocomplete="new-password" />
+        <FloatingInput v-model="form.password" id="reg-password" type="password" label="Password" autocomplete="new-password" show-password-toggle />
+        <FloatingInput v-model="form.password_confirmation" id="reg-password-confirm" type="password" label="Confirm Password" autocomplete="new-password" show-password-toggle />
 
         <PaymentMethodPicker v-if="needsPayment" v-model="form.payment_method" :methods="paymentMethods" :loading="paymentMethodsLoading" />
 
@@ -101,7 +101,7 @@ async function handleRegister() {
 
         <p class="register-login-link">
           Already have an account?
-          <a href="/login">Login</a>
+          <router-link to="/login">Login</router-link>
         </p>
       </form>
     </div>

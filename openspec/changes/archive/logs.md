@@ -644,3 +644,24 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `mdFiles/Todo.md` | Added backend payment-methods done item |
 | `mdFiles/Architecture.md` | Added payment-methods to route table (31 total), updated registration flow |
 
+---
+
+## Log-2026-06-09-006 — User-Friendly Login/Register Forms
+
+### Summary
+- **FloatingInput.vue**: Added `showPasswordToggle` prop — renders an eye icon button to toggle password visibility (inline SVG icons). Added `hasError` prop for red border/label error state.
+- **Login.vue**: Added "Remember me" checkbox. Password field uses `show-password-toggle`.
+- **Register.vue**: Both password fields use `show-password-toggle`. Changed `<a href="/login">` to `<router-link to="/login">`.
+- **style.css**: Added `.password-toggle`, `.remember-row`, `.remember-checkbox`, `.remember-label`, `.floating-error` styles. Enhanced `.floating-border` focus height to 2px explicitly.
+- **Architecture.md**: Updated component tree with 3 new components, updated page descriptions, updated Reusable Components table.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/components/FloatingInput.vue` | Added showPasswordToggle + hasError props, password visibility toggle button |
+| `frontend/src/views/Login.vue` | Added "Remember me" checkbox, password show toggle |
+| `frontend/src/views/Register.vue` | Added password show toggle for both fields, `<router-link>` |
+| `frontend/src/style.css` | Added password toggle, remember me, error state styles; enhanced border |
+| `mdFiles/Architecture.md` | Updated component tree, page descriptions, reusable components table |
+| `mdFiles/Todo.md` | Added form UX tasks to done list |
+

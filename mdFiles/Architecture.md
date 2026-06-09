@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-09 15:00 UTC
+> Last updated: 2026-06-09 16:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -16,8 +16,8 @@
 | Route | Page | Purpose |
 |-------|------|---------|
 | `/help` | HelpGuide.vue | How-to guide and documentation for the web app |
-| `/login` | Login.vue | JWT login form, links to register |
-| `/register` | Register.vue | User registration with tier selection (Free/Silver/Gold/Platinum), pricing display, and payment method picker (KBZ Pay / AYA Pay / CB Pay / MMQR) for paid tiers |
+| `/login` | Login.vue | JWT login form with floating-label inputs, show/hide password toggle, "Remember me" checkbox, links to register |
+| `/register` | Register.vue | User registration with tier selection (Free/Silver/Gold/Platinum), pricing display, floating-label inputs with password toggle, payment method picker (KBZ Pay / AYA Pay / CB Pay / MMQR) for paid tiers |
 | `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output) |
@@ -52,6 +52,9 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
+│   ├── FloatingInput.vue     — Floating-label input with bottom-border underline, password toggle, error state
+│   ├── TierSelector.vue      — 2×2 tier card grid for registration
+│   ├── PaymentMethodPicker.vue — 2×2 payment method grid with loading state
 │   ├── Sidebar.vue           — Drag-and-drop palette (Flow mode: Logic, Folder/File)
 │   ├── SchemaSidebar.vue     — Drag-and-drop palette (Schema mode: Table only)
 │   ├── index.js              — Barrel exports
@@ -146,9 +149,9 @@ src/
 ## Reusable Components
 | Component | Used In | Purpose |
 |-----------|---------|---------|
-| `FloatingInput` | Login.vue, Register.vue | Floating-label input with bottom-border underline (v-model, type, id, label, autocomplete props) |
+| `FloatingInput` | Login.vue, Register.vue | Floating-label input with bottom-border underline, password show/hide toggle, error state (v-model, type, id, label, autocomplete, showPasswordToggle, hasError props) |
 | `TierSelector` | Register.vue | 2×2 tier card grid (v-model, tiers array) |
-| `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid (v-model, methods array) |
+| `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid with loading state (v-model, methods, loading props) |
 | `AppButton` | Multiple views | Styled action button with loading state |
 | `AppCard` | Multiple views | Card container with optional title/subtitle |
 
