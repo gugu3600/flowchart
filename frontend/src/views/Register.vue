@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import apiClient from '../api/apiClient.js'
 import { AppButton, FloatingInput, TierSelector, PaymentMethodPicker } from '../components'
 
@@ -14,6 +14,8 @@ const form = reactive({
 
 const error = ref('')
 const loading = ref(false)
+const paymentMethods = ref([])
+const paymentMethodsLoading = ref(false)
 
 const tiers = [
   { id: 'free', label: 'Free', price: 0, color: '#64748b', desc: 'Basic canvas access' },
@@ -22,14 +24,26 @@ const tiers = [
   { id: 'platinum', label: 'Platinum', price: 7500, color: '#a855f7', desc: 'Visual folder mapping + all features' },
 ]
 
-const paymentMethods = [
-  { id: 'kbzpay', label: 'KBZ Pay', icon: '💳' },
-  { id: 'ayapay', label: 'AYA Pay', icon: '💳' },
-  { id: 'cbpay', label: 'CB Pay', icon: '💳' },
-  { id: 'mmqr', label: 'MMQR', icon: '📱' },
-]
-
 const needsPayment = computed(() => form.tier !== 'free')
+
+async function fetchPaymentMethods() {
+  paymentMethodsLoading.value = true
+  try {
+    const res = await apiClient.get('/payment-methods')
+    paymentMethods.value = res.data?.methods ?? []
+  } catch {
+    paymentMethods.value = []
+  } finally {
+    paymentMethodsLoading.value = false
+  }
+}
+
+watch(() => form.tier, (tier) => {
+  form.payment_method = ''
+  if (tier !== 'free') {
+    fetchPaymentMethods()
+  }
+})
 
 async function handleRegister() {
   error.value = ''
@@ -81,7 +95,7 @@ async function handleRegister() {
         <FloatingInput v-model="form.password" id="reg-password" type="password" label="Password" autocomplete="new-password" />
         <FloatingInput v-model="form.password_confirmation" id="reg-password-confirm" type="password" label="Confirm Password" autocomplete="new-password" />
 
-        <PaymentMethodPicker v-if="needsPayment" v-model="form.payment_method" :methods="paymentMethods" />
+        <PaymentMethodPicker v-if="needsPayment" v-model="form.payment_method" :methods="paymentMethods" :loading="paymentMethodsLoading" />
 
         <AppButton type="submit" :label="needsPayment ? 'Register & Pay' : 'Create Free Account'" :loading="loading" class="login-btn" />
 

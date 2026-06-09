@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 // ── public routes ──────────────────────────────────────────────────
 Route::post('register', [AuthController::class, 'register'])->middleware('throttle:login');
 Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
+Route::get('payment-methods', [AuthController::class, 'paymentMethods']);
 
 // ── authenticated routes ───────────────────────────────────────────
 Route::middleware('auth:api')->group(function () {

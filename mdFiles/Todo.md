@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-09 14:00 UTC
+> Last updated: 2026-06-09 15:00 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -49,6 +49,7 @@
 - [x] Backend `/api/register` re-enabled — assigns selected tier role, accepts payment_method
 - [x] Extracted reusable components from Register.vue: FloatingInput, TierSelector, PaymentMethodPicker
 - [x] Login.vue also uses FloatingInput component
+- [x] GET /api/payment-methods endpoint (mock) — payment methods fetched from backend, not hardcoded in frontend
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
 - [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.

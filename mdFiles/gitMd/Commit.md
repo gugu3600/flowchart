@@ -1,13 +1,14 @@
 # Git Commits
 
-> Last updated: 2026-06-09 14:00 UTC
+> Last updated: 2026-06-09 15:00 UTC
 
 ## 2026-06-09
 
-- extracted FloatingInput, TierSelector, PaymentMethodPicker components from Register.vue
-- refactored: Login.vue uses FloatingInput, Register.vue uses all 3 new components
-- all component CSS now lives in style.css (global), not scoped
-- updated Todo.md, Architecture.md (Reusable Components table), Commit.md, archive logs
+- GET /api/payment-methods endpoint (mock) — AuthController@paymentMethods
+- Register.vue fetches payment methods from backend instead of hardcoding
+- PaymentMethodPicker loading state while fetching
+- backend/ route + controller, frontend/ view + component + CSS updates
+- updated Todo.md, Architecture.md (31 routes), Commit.md, archive logs
 
 - Moved route guard from router/index.js to router/routeGuard.js
 - Created AdminController with users/show/update/updateRoles/upgrade/destroy endpoints

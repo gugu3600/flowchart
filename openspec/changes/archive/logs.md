@@ -623,3 +623,24 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `mdFiles/Todo.md` | Added refactoring task to done list |
 | `mdFiles/Architecture.md` | Added Reusable Components table |
 
+---
+
+## Log-2026-06-09-005 — Fetch Payment Methods from Backend (Mock)
+
+### Summary
+- Added `GET /api/payment-methods` public endpoint to AuthController that returns mock payment methods (KBZ Pay, AYA Pay, CB Pay, MMQR) with icon and label.
+- Payment methods are no longer hardcoded in `Register.vue` — the frontend fetches them from the backend via a `watch` on `form.tier` when a paid tier is selected.
+- `PaymentMethodPicker` now accepts a `loading` prop and shows "Loading payment methods..." while fetching.
+- No actual payment services or business logic implemented yet — purely mock data.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/routes/api.php` | Added `GET /api/payment-methods` public route |
+| `backend/app/Http/Controllers/api/AuthController.php` | Added `paymentMethods()` method returning mock data |
+| `frontend/src/views/Register.vue` | Removed hardcoded `paymentMethods` array; fetches from backend via `watch` on tier |
+| `frontend/src/components/PaymentMethodPicker.vue` | Added `loading` prop + loading state display |
+| `frontend/src/style.css` | Added `.payment-loading` style |
+| `mdFiles/Todo.md` | Added backend payment-methods done item |
+| `mdFiles/Architecture.md` | Added payment-methods to route table (31 total), updated registration flow |
+

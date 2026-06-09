@@ -58,4 +58,16 @@ class AuthController extends BaseController
         return $this->success([], 'Logged out successfully')
             ->cookie('jwt_token', '', -1, '/');
     }
+
+    public function paymentMethods(): JsonResponse
+    {
+        $methods = [
+            ['id' => 'kbzpay', 'label' => 'KBZ Pay', 'icon' => '💳'],
+            ['id' => 'ayapay', 'label' => 'AYA Pay', 'icon' => '💳'],
+            ['id' => 'cbpay', 'label' => 'CB Pay', 'icon' => '💳'],
+            ['id' => 'mmqr', 'label' => 'MMQR', 'icon' => '📱'],
+        ];
+
+        return $this->success(['methods' => $methods], 'Payment methods retrieved');
+    }
 }

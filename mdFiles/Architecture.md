@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-09 14:00 UTC
+> Last updated: 2026-06-09 15:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -78,11 +78,12 @@ src/
 1. User navigates to `/register`
 2. Selects a tier from 4 cards: Free (0 MMK), Silver (3,000 MMK), Gold (6,000 MMK), Platinum (7,500 MMK)
 3. Fills in name, email, password, confirm password
-4. For paid tiers (Silver/Gold/Platinum), selects a payment method: KBZ Pay, AYA Pay, CB Pay, or MMQR
-5. POST to `/api/register` with `{name, email, password, password_confirmation, tier, payment_method?}`
-6. Backend creates user, assigns selected tier role, returns JWT in HTTP-only cookie
-7. Free tier users can register without selecting any payment method
-8. Payment processing and mail system will be implemented later via Laravel Queue
+4. For paid tiers (Silver/Gold/Platinum), the frontend fetches available payment methods from `GET /api/payment-methods` (mock data, no payment logic implemented yet)
+5. Selects a payment method: KBZ Pay, AYA Pay, CB Pay, or MMQR
+6. POST to `/api/register` with `{name, email, password, password_confirmation, tier, payment_method?}`
+7. Backend creates user, assigns selected tier role, returns JWT in HTTP-only cookie
+8. Free tier users can register without selecting any payment method
+9. Payment processing and mail system will be implemented later via Laravel Queue
 
 ## Pricing
 | Tier | Price (MMK) |
@@ -100,13 +101,14 @@ src/
 5. `isValidConnection` enforces domain boundaries — table nodes cannot connect to logic nodes
 6. User can reposition, connect, save; clicking refresh (⟳) reloads definitions
 
-## API Routes (30 total)
+## API Routes (31 total)
 
 ### Public (throttled 20/min)
 | Method | Route | Handler |
 |--------|-------|---------|
 | POST | `/api/register` | AuthController@register (accepts tier + payment_method) |
 | POST | `/api/login` | AuthController@login |
+| GET | `/api/payment-methods` | AuthController@paymentMethods (mock data, no auth required) |
 
 ### Authenticated (auth:api)
 | Method | Route | Handler |
