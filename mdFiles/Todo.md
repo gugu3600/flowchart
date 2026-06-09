@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-08 12:00 UTC
+> Last updated: 2026-06-09 12:00 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -32,6 +32,8 @@
 - [x] Canvas auto-loads table/logic definitions as nodes with definitionId tracking.
 - [x] Canvas has two modes (Flow/Schema tabs) — tables and logics cannot mix; `isValidConnection` enforces boundaries.
 - [x] Cross-mode node filtering: saved nodes filtered by mode on load (tables skipped in Flow, logics/folders skipped in Schema).
+- [x] Edge/node deletion via Delete/Backspace key with `delete-key-code` prop.
+- [x] Help guide page (`/help`) with usage instructions and keyboard shortcuts.
 - [x] Logic inputs upgraded to structured `{name, type}` objects (workflow-style CRUD like table columns).
 - [x] Register.vue — user registration page with route, linked from login page.
 - [x] Fixed critical: `saveEdges` returned `FlowNodeResource` instead of `FlowEdgeResource`.

@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-08 12:00 UTC
+> Last updated: 2026-06-09 12:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -15,9 +15,10 @@
 ## Frontend Pages
 | Route | Page | Purpose |
 |-------|------|---------|
+| `/help` | HelpGuide.vue | How-to guide and documentation for the web app |
 | `/login` | Login.vue | JWT login form, links to register |
 | `/register` | Register.vue | User registration form (name, email, password, confirm password) |
-| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions |
+| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output) |
 
@@ -62,11 +63,13 @@ src/
 │       └── index.js           — Barrel exports
 ├── views/
 │   ├── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
-│   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load
+│   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load, edge/node deletion
+│   ├── HelpGuide.vue         — How-to guide with app usage instructions and keyboard shortcuts
+│   ├── Register.vue          — Registration form (name, email, password, confirm)
 │   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
 │   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
 ├── router/
-│   └── index.js              — Vue Router (/login, /canvas, /tables, /logics routes)
+│   └── index.js              — Vue Router (/login, /register, /canvas, /help, /tables, /logics routes)
 ├── App.vue                   — <router-view /> root
 └── main.js                   — createApp + router + PrimeVue plugin
 ```

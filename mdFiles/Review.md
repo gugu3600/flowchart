@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-08 12:00 UTC
+> Last updated: 2026-06-09 12:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -34,6 +34,7 @@
 - [x] Canvas modes (Flow/Schema tabs) with `isValidConnection` domain boundary enforcement.
 - [x] Cross-mode node filtering: `loadFlowData` skips table nodes in Flow mode, logic/folder nodes in Schema mode.
 - [x] Drop validation: `onDrop` rejects items whose type doesn't match the active mode.
+- [x] Edge/node deletion: `delete-key-code` prop + `@edges-delete` / `@nodes-delete` handlers remove selected edges and nodes on Delete/Backspace.
 - [x] Fixed route model binding: `$tableDefinition` → `$table`, `$logicDefinition` → `$logic` to match route params.
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
 - [ ] Write E2E tests for Table Designer and Logic Designer CRUD pages.

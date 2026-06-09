@@ -249,6 +249,20 @@ function onConnect(params) {
   ]
 }
 
+function onEdgeClick(event, edge) {
+  edge.selected = true
+}
+
+function onEdgesDelete(removedEdges) {
+  const removedIds = new Set(removedEdges.map(e => e.id))
+  edges.value = edges.value.filter(e => !removedIds.has(e.id))
+}
+
+function onNodesDelete(removedNodes) {
+  const removedIds = new Set(removedNodes.map(n => n.id))
+  nodes.value = nodes.value.filter(n => !removedIds.has(n.id))
+}
+
 function onDragOver(event) {
   event.preventDefault()
 }
@@ -348,6 +362,7 @@ function refresh() {
       <div class="canvas-header-right">
         <a v-if="mode === 'flow'" href="/logics" class="nav-link">Logics</a>
         <a v-if="mode === 'schema'" href="/tables" class="nav-link">Tables</a>
+        <a href="/help" class="nav-link">Help</a>
         <button class="btn-sm btn-secondary" @click="refresh">⟳</button>
         <button class="btn-sm btn-primary" :disabled="!currentFlowId || saving" @click="handleSave">
           {{ saving ? 'Saving...' : 'Save' }}
@@ -371,8 +386,12 @@ function refresh() {
           :node-types="nodeTypes"
           :default-edge-options="{ type: 'smoothstep', animated: true }"
           :is-valid-connection="isValidConnection"
+          :delete-key-code="['Delete', 'Backspace']"
           fit-view-on-init
           @connect="onConnect"
+          @edge-click="onEdgeClick"
+          @edges-delete="onEdgesDelete"
+          @nodes-delete="onNodesDelete"
           @dragover="onDragOver"
           @drop="onDrop"
         />

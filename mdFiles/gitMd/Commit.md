@@ -1,6 +1,14 @@
 # Git Commits
 
-> Last updated: 2026-06-08 12:00 UTC
+> Last updated: 2026-06-09 12:00 UTC
+
+## 2026-06-09
+
+- Added edge/node deletion: `delete-key-code` prop + `@edges-delete` / `@nodes-delete` handlers in Canvas.vue
+- Created HelpGuide.vue — how-to guide page at `/help` with usage instructions, feature overview, and keyboard shortcuts
+- Added `/help` route to Vue Router and Help link in Canvas.vue header
+- Updated all project documentation files (Architecture.md, Review.md, Skills.md, schema.md, Todo.md, Commit.md)
+- Replaced stock frontend/backend README.md with project-specific descriptions
 
 ## 2026-06-08
 
