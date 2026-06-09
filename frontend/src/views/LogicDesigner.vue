@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getLogics, createLogic, updateLogic, deleteLogic } from '../api/logics.js'
+import AppHeader from '../components/AppHeader.vue'
+import { useUserStore } from '../stores/useUserStore.js'
+
+const { isAdmin } = useUserStore()
 
 const logics = ref([])
 const loading = ref(false)
@@ -113,14 +117,14 @@ async function handleDelete(id) {
 
 <template>
   <div class="designer-page">
-    <header class="designer-header">
-      <h1 class="designer-title">Logic Designer</h1>
-      <div class="designer-nav">
+    <AppHeader title="Logic Designer">
+      <template #right>
         <a href="/tables" class="nav-link">Tables</a>
         <a href="/canvas" class="nav-link">Canvas</a>
+        <a v-if="isAdmin" href="/admin" class="nav-link">Admin</a>
         <a href="/login" class="nav-link">Logout</a>
-      </div>
-    </header>
+      </template>
+    </AppHeader>
 
     <div class="designer-body">
       <div v-if="error" class="error-msg designer-error">{{ error }}</div>
@@ -155,7 +159,7 @@ async function handleDelete(id) {
       </template>
 
       <div v-if="showForm" class="modal-overlay" @click.self="cancelForm">
-        <div class="modal">
+        <div class="modal modal-sm">
           <h2 class="modal-title">{{ editing ? 'Edit Logic' : 'New Logic' }}</h2>
 
           <div class="modal-body">
@@ -170,11 +174,11 @@ async function handleDelete(id) {
               <button class="btn-sm btn-secondary" @click="addInput">+ Add Input</button>
             </div>
 
-            <div v-for="(inp, i) in form.inputs" :key="i" class="input-row">
-              <input v-model="form.inputs[i].name" type="text" class="form-input" placeholder="name" style="flex:1" />
-              <input v-model="form.inputs[i].type" type="text" class="form-input" placeholder="string, int, User..." style="flex:1.5" />
-              <button class="btn-sm btn-danger" @click="removeInput(i)">×</button>
-            </div>
+              <div v-for="(inp, i) in form.inputs" :key="i" class="input-row">
+                <input v-model="form.inputs[i].name" type="text" class="form-input col-flex-1" placeholder="name" />
+                <input v-model="form.inputs[i].type" type="text" class="form-input col-flex-15" placeholder="string, int, User..." />
+                <button class="btn-sm btn-danger" @click="removeInput(i)">×</button>
+              </div>
 
             <label class="field-label">Output</label>
             <input v-model="form.output" type="text" class="form-input" placeholder="e.g. User | null, boolean" />
@@ -197,187 +201,4 @@ async function handleDelete(id) {
 </template>
 
 <style scoped>
-.designer-page {
-  min-height: 100vh;
-  background: #0f172a;
-  color: #f1f5f9;
-}
-
-.designer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-}
-
-.designer-title {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.designer-nav {
-  display: flex;
-  gap: 1rem;
-}
-
-.nav-link {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  text-decoration: none;
-}
-
-.nav-link:hover {
-  color: #3b82f6;
-}
-
-.designer-body {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.designer-error {
-  margin-bottom: 1rem;
-}
-
-.designer-loading,
-.designer-empty {
-  text-align: center;
-  padding: 3rem;
-  color: #64748b;
-}
-
-.designer-toolbar {
-  margin-bottom: 1rem;
-}
-
-.designer-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.designer-card {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  padding: 1rem;
-}
-
-.designer-card-body {
-  flex: 1;
-}
-
-.designer-card-title {
-  margin: 0 0 0.25rem;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.designer-card-desc {
-  margin: 0 0 0.5rem;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-.designer-card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.designer-card-actions {
-  display: flex;
-  gap: 0.4rem;
-  flex-shrink: 0;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  font-weight: 500;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.btn-sm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.field-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #94a3b8;
-}
-
-.inputs-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
 </style>

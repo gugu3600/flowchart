@@ -5,6 +5,8 @@ import Canvas from '../views/Canvas.vue'
 import HelpGuide from '../views/HelpGuide.vue'
 import TableDesigner from '../views/TableDesigner.vue'
 import LogicDesigner from '../views/LogicDesigner.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
+import { adminGuard } from './routeGuard.js'
 
 const routes = [
   {
@@ -38,6 +40,12 @@ const routes = [
     component: LogicDesigner,
   },
   {
+    path: '/admin',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { requiresAdmin: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/login',
   },
@@ -46,6 +54,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresAdmin) {
+    return adminGuard(to, from, next)
+  }
+  next()
 })
 
 export default router

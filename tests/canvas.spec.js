@@ -10,7 +10,9 @@ test.describe('Canvas', () => {
 
     await page.waitForURL('**/canvas', { timeout: 10000 })
 
-    await expect(page.locator('.canvas-title')).toHaveText('Flowchart')
+    await expect(page.locator('.user-profile')).toBeVisible({ timeout: 10000 })
+
+    await expect(page.locator('.page-title')).toHaveText('Flowchart')
     await expect(page.locator('.sidebar')).toBeVisible({ timeout: 10000 })
     await expect(page.locator('.sidebar')).toContainText('Logic')
     await expect(page.locator('.sidebar')).toContainText('Folder / File')
@@ -44,8 +46,10 @@ test.describe('Canvas', () => {
 
     await expect(page.locator('select.flow-select')).toBeVisible({ timeout: 10000 })
 
-    const saveBtn = page.locator('button:has-text("Save")')
-    await expect(saveBtn).toBeVisible()
+    await expect(page.locator('.user-profile')).toBeVisible({ timeout: 10000 })
+
+    const saveBtn = page.locator('button:has-text("Save"):not([disabled])')
+    await expect(saveBtn).toBeVisible({ timeout: 5000 })
     await saveBtn.click()
 
     const flowSelect = page.locator('select.flow-select')

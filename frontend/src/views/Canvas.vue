@@ -9,6 +9,11 @@ import SchemaSidebar from '../components/SchemaSidebar.vue'
 import { getFlows, getFlow, createFlow, saveFlow } from '../api/flows.js'
 import { getTables } from '../api/tables.js'
 import { getLogics } from '../api/logics.js'
+import { useUserStore } from '../stores/useUserStore.js'
+import UserProfile from '../components/UserProfile.vue'
+import AppHeader from '../components/AppHeader.vue'
+
+const { fetchUser, isAdmin, canSave } = useUserStore()
 
 const mode = ref('flow')
 
@@ -39,6 +44,7 @@ const nodeTypes = computed(() =>
 )
 
 onMounted(async () => {
+  await fetchUser()
   await loadFlows()
 })
 
@@ -182,6 +188,10 @@ async function handleCreateFlow() {
 
 async function handleSave() {
   if (!currentFlowId.value) return
+  if (!canSave.value) {
+    error.value = 'Saving requires a Silver or higher subscription. Upgrade to unlock.'
+    return
+  }
   saving.value = true
   error.value = ''
   try {
@@ -321,10 +331,8 @@ function refresh() {
 
 <template>
   <div class="canvas-page">
-    <header class="canvas-header">
-      <div class="canvas-header-left">
-        <h1 class="canvas-title">Flowchart</h1>
-
+    <AppHeader title="Flowchart">
+      <template #left>
         <div class="mode-tabs">
           <button
             :class="['mode-tab', { active: mode === 'flow' }]"
@@ -357,19 +365,25 @@ function refresh() {
           <button class="btn-sm btn-secondary" @click="showNewFlowInput = false; newFlowName = ''">Cancel</button>
         </div>
         <button v-else class="btn-sm btn-secondary" @click="showNewFlowInput = true">+ New Flow</button>
-      </div>
+      </template>
 
-      <div class="canvas-header-right">
+      <template #right>
         <a v-if="mode === 'flow'" href="/logics" class="nav-link">Logics</a>
         <a v-if="mode === 'schema'" href="/tables" class="nav-link">Tables</a>
+        <a v-if="isAdmin" href="/admin" class="nav-link">Admin</a>
         <a href="/help" class="nav-link">Help</a>
         <button class="btn-sm btn-secondary" @click="refresh">⟳</button>
-        <button class="btn-sm btn-primary" :disabled="!currentFlowId || saving" @click="handleSave">
+        <button
+          class="btn-sm btn-primary"
+          :disabled="!currentFlowId || saving || !canSave"
+          :title="!canSave ? 'Upgrade to Silver to save' : ''"
+          @click="handleSave"
+        >
           {{ saving ? 'Saving...' : 'Save' }}
         </button>
-        <a href="/login" class="canvas-logout">Logout</a>
-      </div>
-    </header>
+        <UserProfile />
+      </template>
+    </AppHeader>
 
     <div v-if="error" class="canvas-error error-msg">{{ error }}</div>
 
@@ -402,143 +416,4 @@ function refresh() {
 </template>
 
 <style scoped>
-.canvas-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #0f172a;
-}
-
-.canvas-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.canvas-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-}
-
-.canvas-header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.canvas-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f1f5f9;
-  white-space: nowrap;
-}
-
-.mode-tabs {
-  display: flex;
-  gap: 0;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.mode-tab {
-  background: #334155;
-  color: #94a3b8;
-  border: none;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s, color 0.15s;
-}
-
-.mode-tab.active {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.mode-tab:not(.active):hover {
-  background: #475569;
-  color: #f1f5f9;
-}
-
-.nav-link {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-decoration: none;
-}
-
-.nav-link:hover { color: #3b82f6; }
-
-.flow-select {
-  background: #334155;
-  color: #f1f5f9;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-width: 140px;
-}
-
-.flow-select:focus { outline: none; border-color: #3b82f6; }
-
-.new-flow-form { display: flex; align-items: center; gap: 0.4rem; }
-
-.flow-name-input {
-  background: #334155;
-  color: #f1f5f9;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.875rem;
-  width: 140px;
-}
-
-.flow-name-input:focus { outline: none; border-color: #3b82f6; }
-
-.btn-sm {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  font-weight: 500;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.canvas-logout {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.canvas-logout:hover { color: #f87171; }
-
-.canvas-error { margin: 0.5rem 1rem 0; flex-shrink: 0; }
-
-.canvas-body { display: flex; flex: 1; overflow: hidden; }
-
-.canvas-flow-wrapper { flex: 1; position: relative; }
-
-.canvas-loading,
-.canvas-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #64748b;
-  font-size: 0.9rem;
-}
 </style>

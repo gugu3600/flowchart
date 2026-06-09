@@ -20,11 +20,12 @@ class AuthController extends BaseController
     {
         $result = $this->registerService->register($request->validated());
 
+        $secure = config('app.env') === 'production';
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'User registered successfully',
             201,
-        )->cookie('jwt_token', $result['token'], 43200, '/', null, true, true, false, 'Strict');
+        )->cookie('jwt_token', $result['token'], 43200, '/', null, $secure, true, false, 'Strict');
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -35,16 +36,17 @@ class AuthController extends BaseController
             return $this->error(null, 'Invalid credentials', 401);
         }
 
+        $secure = config('app.env') === 'production';
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'Login successful',
-        )->cookie('jwt_token', $result['token'], 43200, '/', null, true, true, false, 'Strict');
+        )->cookie('jwt_token', $result['token'], 43200, '/', null, $secure, true, false, 'Strict');
     }
 
     public function me(): JsonResponse
     {
         return $this->success(
-            new UserResource($this->authService->me()['user']),
+            ['user' => new UserResource($this->authService->me()['user'])],
             'Authenticated user retrieved',
         );
     }
