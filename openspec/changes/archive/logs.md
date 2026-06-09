@@ -570,3 +570,31 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `frontend/src/router/index.js:58-74` | inline `router.beforeEach` with admin guard → moved to `routeGuard.js` |
 | `backend/app/Http/Controllers/api/AuthController.php:54-69` | `stats()` method → moved to `AdminController` |
 
+---
+
+## Log-2026-06-09-003 — Registration with Tier Selection, Pricing & Payment Methods
+
+### Summary
+- **Re-enabled `/api/register`** route (was commented out for security). Registration is now open.
+- **RegisterRequest** updated: accepts optional `tier` field (free/silver/gold/platinum, defaults to free) and `payment_method` (required_if tier is paid, validated against kbzpay/ayapay/cbpay/mmqr).
+- **RegisterService** updated: assigns the selected tier role via `$user->assignRole($tier)` after user creation.
+- **Register.vue** completely redesigned:
+  - 4 tier selection cards in a 2×2 grid with pricing: Free (0 MMK), Silver (3,000 MMK), Gold (6,000 MMK), Platinum (7,500 MMK)
+  - Floating-label form fields matching the new login design
+  - Payment method grid (KBZ Pay, AYA Pay, CB Pay, MMQR) appears only when a paid tier is selected
+  - Submit button text changes: "Create Free Account" vs "Register & Pay"
+- **Todo.md**: Marked rate limiting + password complexity as done. Added Phase 1.5 for future payment & mail system with Laravel Queue.
+- **Architecture.md**: Added registration flow documentation, pricing table, updated route count to 30.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/routes/api.php` | Uncommented `/api/register` route |
+| `backend/app/Http/Requests/Auth/RegisterRequest.php` | Added `tier` and `payment_method` validation rules |
+| `backend/app/Services/Auth/RegisterService.php` | Assigns selected tier role on registration |
+| `frontend/src/views/Register.vue` | Complete redesign: tier cards, pricing, payment method grid |
+| `frontend/src/style.css` | Added register-tier, register-payment, register-login CSS classes |
+| `mdFiles/Todo.md` | Marked rate limiting + password done, added Phase 1.5 |
+| `mdFiles/Architecture.md` | Added registration flow, pricing table, route count → 30 |
+| `mdFiles/gitMd/Commit.md` | Added registration entries |
+

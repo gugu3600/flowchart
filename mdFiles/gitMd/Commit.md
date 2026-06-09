@@ -1,8 +1,15 @@
 # Git Commits
 
-> Last updated: 2026-06-09 12:40 UTC
+> Last updated: 2026-06-09 13:00 UTC
 
 ## 2026-06-09
+
+- Re-enabled `/api/register` route (was commented out for security)
+- RegisterRequest now accepts `tier` (free/silver/gold/platinum) and `payment_method` (kbzpay/ayapay/cbpay/mmqr)
+- RegisterService assigns selected tier role on user creation
+- Register.vue completely redesigned: 4 tier selection cards with pricing (Free 0, Silver 3,000, Gold 6,000, Platinum 7,500 MMK), floating-label form fields, payment method grid for paid tiers
+- Updated Todo.md: marked rate limiting + password complexity done, added Phase 1.5 for payment & mail system
+- Updated Architecture.md: added registration flow, pricing table, updated route count to 30
 
 - Moved route guard from router/index.js to router/routeGuard.js
 - Created AdminController with users/show/update/updateRoles/upgrade/destroy endpoints
