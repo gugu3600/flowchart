@@ -1,9 +1,11 @@
 # Git Commits
 
-> Last updated: 2026-06-09 15:00 UTC
+> Last updated: 2026-06-09 16:00 UTC
 
 ## 2026-06-09
 
+- `7353460` feat: password toggle, remember me, error states on login/register forms
+- `557f6f3` docs: rewrite Commit.md with all commits, add workflow rule to Todo.md
 - `1b970fe` Merge dev into test
 - `472a0f9` feat: fetch payment methods from backend (mock)
 - `464adad` Merge dev into test
