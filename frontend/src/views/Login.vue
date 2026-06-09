@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import apiClient from '../api/apiClient.js'
-import { AppButton } from '../components'
+import { AppButton, FloatingInput } from '../components'
 
 const form = reactive({ email: '', password: '' })
 const error = ref('')
@@ -35,29 +35,8 @@ async function handleLogin() {
       <form @submit.prevent="handleLogin" class="login-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
 
-        <div class="login-field">
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            placeholder=" "
-            class="login-input"
-          />
-          <label for="email" class="login-label">Email</label>
-          <span class="login-border"></span>
-        </div>
-
-        <div class="login-field">
-          <input
-            id="password"
-            v-model="form.password"
-            type="password"
-            placeholder=" "
-            class="login-input"
-          />
-          <label for="password" class="login-label">Password</label>
-          <span class="login-border"></span>
-        </div>
+        <FloatingInput v-model="form.email" id="email" type="email" label="Email" autocomplete="email" />
+        <FloatingInput v-model="form.password" id="password" type="password" label="Password" autocomplete="current-password" />
 
         <AppButton
           type="submit"

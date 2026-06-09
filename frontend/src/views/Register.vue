@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import apiClient from '../api/apiClient.js'
-import { AppButton } from '../components'
+import { AppButton, FloatingInput, TierSelector, PaymentMethodPicker } from '../components'
 
 const form = reactive({
   name: '',
@@ -72,66 +72,16 @@ async function handleRegister() {
       <form @submit.prevent="handleRegister" class="login-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
 
-        <div class="register-tiers">
-          <button
-            v-for="tier in tiers"
-            :key="tier.id"
-            type="button"
-            class="register-tier-card"
-            :class="{ 'register-tier-active': form.tier === tier.id }"
-            :style="form.tier === tier.id ? { borderColor: tier.color } : {}"
-            @click="form.tier = tier.id"
-          >
-            <span class="register-tier-badge" :style="{ background: tier.color }">{{ tier.label }}</span>
-            <span class="register-tier-price">
-              {{ tier.price === 0 ? 'Free' : tier.price.toLocaleString() + ' MMK' }}
-            </span>
-            <span class="register-tier-desc">{{ tier.desc }}</span>
-          </button>
-        </div>
+        <TierSelector v-model="form.tier" :tiers="tiers" />
 
         <div class="register-divider"></div>
 
-        <div class="login-field">
-          <input id="reg-name" v-model="form.name" type="text" placeholder=" " class="login-input" />
-          <label for="reg-name" class="login-label">Name</label>
-          <span class="login-border"></span>
-        </div>
+        <FloatingInput v-model="form.name" id="reg-name" label="Name" />
+        <FloatingInput v-model="form.email" id="reg-email" type="email" label="Email" autocomplete="email" />
+        <FloatingInput v-model="form.password" id="reg-password" type="password" label="Password" autocomplete="new-password" />
+        <FloatingInput v-model="form.password_confirmation" id="reg-password-confirm" type="password" label="Confirm Password" autocomplete="new-password" />
 
-        <div class="login-field">
-          <input id="reg-email" v-model="form.email" type="email" placeholder=" " class="login-input" />
-          <label for="reg-email" class="login-label">Email</label>
-          <span class="login-border"></span>
-        </div>
-
-        <div class="login-field">
-          <input id="reg-password" v-model="form.password" type="password" placeholder=" " class="login-input" />
-          <label for="reg-password" class="login-label">Password</label>
-          <span class="login-border"></span>
-        </div>
-
-        <div class="login-field">
-          <input id="reg-password-confirm" v-model="form.password_confirmation" type="password" placeholder=" " class="login-input" />
-          <label for="reg-password-confirm" class="login-label">Confirm Password</label>
-          <span class="login-border"></span>
-        </div>
-
-        <div v-if="needsPayment" class="register-payment-section">
-          <p class="register-payment-label">Select Payment Method</p>
-          <div class="register-payment-grid">
-            <button
-              v-for="pm in paymentMethods"
-              :key="pm.id"
-              type="button"
-              class="register-payment-btn"
-              :class="{ 'register-payment-active': form.payment_method === pm.id }"
-              @click="form.payment_method = pm.id"
-            >
-              <span>{{ pm.icon }}</span>
-              <span>{{ pm.label }}</span>
-            </button>
-          </div>
-        </div>
+        <PaymentMethodPicker v-if="needsPayment" v-model="form.payment_method" :methods="paymentMethods" />
 
         <AppButton type="submit" :label="needsPayment ? 'Register & Pay' : 'Create Free Account'" :loading="loading" class="login-btn" />
 
