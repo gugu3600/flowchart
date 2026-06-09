@@ -1,5 +1,33 @@
-# Vue 3 + Vite
+# Flowchart — Frontend
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Vue 3 + Vite frontend for the Flowchart architecture diagramming tool.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Tech Stack
+
+- Vue 3 (Composition API, `<script setup>`)
+- Vite
+- Tailwind CSS v4
+- PrimeVue 4
+- @vue-flow/core (canvas node editor)
+- axios (API client)
+- Vue Router
+
+## Pages
+
+| Route | Page | Purpose |
+|-------|------|---------|
+| `/login` | Login.vue | JWT login |
+| `/register` | Register.vue | User registration |
+| `/canvas` | Canvas.vue | Flowchart canvas (Flow + Schema modes) |
+| `/help` | HelpGuide.vue | How-to guide and documentation |
+| `/tables` | TableDesigner.vue | DB table schema CRUD |
+| `/logics` | LogicDesigner.vue | Logic/function definition CRUD |
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+The dev server starts at `http://localhost:3000` (configured in `vite.config.js`).

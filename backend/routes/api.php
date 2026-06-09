@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\FlowController;
+use App\Http\Controllers\api\TableDefinitionController;
+use App\Http\Controllers\api\LogicDefinitionController;
 use Illuminate\Support\Facades\Route;
 
 // ── public routes ──────────────────────────────────────────────────
@@ -18,4 +20,11 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('flows', FlowController::class);
     Route::post('flows/{flow}/nodes', [FlowController::class, 'saveNodes']);
     Route::post('flows/{flow}/edges', [FlowController::class, 'saveEdges']);
+    Route::post('flows/{flow}/save', [FlowController::class, 'save']);
+
+    // table definitions
+    Route::apiResource('tables', TableDefinitionController::class);
+
+    // logic definitions
+    Route::apiResource('logics', LogicDefinitionController::class);
 });
