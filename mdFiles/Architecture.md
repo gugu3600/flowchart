@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-09 13:00 UTC
+> Last updated: 2026-06-09 14:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -140,6 +140,15 @@ src/
 ## Future MVP Scale-Up Roadmap
 - **Trigger Condition:** Monitor application users' ratings and feedback on the Visual Folder Mapping Engine.
 - **Execution Step:** Once a stable rating threshold is confirmed, implement the custom backend generator script to parse the visual folder JSON mappings and compile full functional repository zip packages (Auto Code Generation) exclusively for Platinum/VIP status.
+
+## Reusable Components
+| Component | Used In | Purpose |
+|-----------|---------|---------|
+| `FloatingInput` | Login.vue, Register.vue | Floating-label input with bottom-border underline (v-model, type, id, label, autocomplete props) |
+| `TierSelector` | Register.vue | 2×2 tier card grid (v-model, tiers array) |
+| `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid (v-model, methods array) |
+| `AppButton` | Multiple views | Styled action button with loading state |
+| `AppCard` | Multiple views | Card container with optional title/subtitle |
 
 ## Middleware & Access Gatekeeping (Gatekeeper Bounds)
 - **Silver Check:** Wraps `/flows/save` endpoints. Verify user membership in ('silver', 'gold', 'platinum').

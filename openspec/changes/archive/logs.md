@@ -598,3 +598,28 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `mdFiles/Architecture.md` | Added registration flow, pricing table, route count → 30 |
 | `mdFiles/gitMd/Commit.md` | Added registration entries |
 
+---
+
+## Log-2026-06-09-004 — Refactor: Extract Reusable Components from Register View
+
+### Summary
+- **FloatingInput.vue** — reusable floating-label input (border-bottom underline style). Used by Login.vue and Register.vue. Props: modelValue, type, id, label, autocomplete.
+- **TierSelector.vue** — 2×2 tier card grid with badge/price/description. Props: modelValue, tiers array.
+- **PaymentMethodPicker.vue** — 2×2 payment method button grid with icon/label. Props: modelValue, methods array.
+- Login.vue simplified: 4 floating-label inputs replaced by 2 `<FloatingInput>` components.
+- Register.vue simplified: tier card markup → `<TierSelector>`, payment method grid → `<PaymentMethodPicker>`, 4 floating inputs → `<FloatingInput>`.
+- All component CSS lives in `style.css` (global), not in scoped blocks.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/components/FloatingInput.vue` | Created — reusable floating-label input |
+| `frontend/src/components/TierSelector.vue` | Created — tier card grid |
+| `frontend/src/components/PaymentMethodPicker.vue` | Created — payment method grid |
+| `frontend/src/components/index.js` | Added 3 new component exports |
+| `frontend/src/views/Login.vue` | Uses FloatingInput instead of raw markup |
+| `frontend/src/views/Register.vue` | Uses 3 new components instead of raw markup |
+| `frontend/src/style.css` | Added FloatingInput / TierSelector / PaymentMethodPicker CSS; removed .login-field/.register-tier/.register-payment classes (moved with new names) |
+| `mdFiles/Todo.md` | Added refactoring task to done list |
+| `mdFiles/Architecture.md` | Added Reusable Components table |
+
