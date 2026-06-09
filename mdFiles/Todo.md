@@ -79,3 +79,8 @@
 - [ ] Deploy the 3-Tier MVP to production bounds.
 - [ ] Monitor user ratings specifically tracking the acceptance of the Visual Folder Mapping feature by Vibe Coders.
 - [ ] Post-validation step: Once user rating threshold is verified, initiate development of the custom backend script for automatic repository code generation based on the visual mapping.
+
+## Enforced Workflow Rule (from 2026-06-09)
+- [ ] Every commit must also update `mdFiles/gitMd/Commit.md` (append commit hash + message) and `openspec/changes/archive/logs.md` (append a Log- entry describing the change).
+- [ ] `mdFiles/gitMd/Commit.md` should contain every git commit in reverse-chronological order, organized by date.
+- [ ] `openspec/changes/archive/logs.md` should contain structured summaries (Summary + Modified Files) for each feature/fix commit.

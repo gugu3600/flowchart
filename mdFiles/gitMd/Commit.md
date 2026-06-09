@@ -4,85 +4,54 @@
 
 ## 2026-06-09
 
-- GET /api/payment-methods endpoint (mock) — AuthController@paymentMethods
-- Register.vue fetches payment methods from backend instead of hardcoding
-- PaymentMethodPicker loading state while fetching
-- backend/ route + controller, frontend/ view + component + CSS updates
-- updated Todo.md, Architecture.md (31 routes), Commit.md, archive logs
-
-- Moved route guard from router/index.js to router/routeGuard.js
-- Created AdminController with users/show/update/updateRoles/upgrade/destroy endpoints
-- Added admin management UI (AdminDashboard.vue): users table, role editing modal, delete confirmation, upgrade modal
-- Added tier definitions section in admin dashboard (fetched from GET /api/admin/tiers)
-- Added backend upgrade endpoint (PUT /api/admin/users/{user}/upgrade) with backend confirmation
-- Permission middleware on all write endpoints (save-flows, generate-schema, map-structure)
-- Rate limiting on login endpoint (20/min) with password complexity validation
-- Login form redesigned: floating labels, border-bottom underline inputs
-- Created Playwright admin tests (admin.spec.js): admin dashboard, tier definitions, upgrade flow, route guard
-- All 14 Playwright tests passing
-- Updated frontend/backend README.md with admin panel, route guard, permission docs
-- Both dev and test branches pushed and merged
-
-- Added edge/node deletion: `delete-key-code` prop + `@edges-delete` / `@nodes-delete` handlers in Canvas.vue
-- Created HelpGuide.vue — how-to guide page at `/help` with usage instructions, feature overview, and keyboard shortcuts
-- Added `/help` route to Vue Router and Help link in Canvas.vue header
-- Updated all project documentation files (Architecture.md, Review.md, Skills.md, schema.md, Todo.md, Commit.md)
-- Replaced stock frontend/backend README.md with project-specific descriptions
+- `1b970fe` Merge dev into test
+- `472a0f9` feat: fetch payment methods from backend (mock)
+- `464adad` Merge dev into test
+- `8421040` refactor: move CSS to style.css, update docs
+- `0464f37` Merge dev into test
+- `36ae10f` refactor: extract FloatingInput, TierSelector, PaymentMethodPicker components
+- `a06f5a1` Merge dev into test
+- `cbbb048` docs: update Commit.md and archive logs with registration session
+- `1350b1a` feat: register with tier selection, pricing, payment methods
+- `cc1a195` docs: update Commit.md and archive logs with admin/permissions session
+- `51c56d8` Merge dev into test
+- `7168678` docs: update README with admin panel, route guard, permission middleware
+- `32054f5` Merge dev into test
+- `15da48c` feat: admin management, tier upgrade, route guard, rate limiting, password validation
+- `7758e4e` merge dev into main: help guide, edge deletion, designer pages, doc updates
+- `a9f993e` chore: update openspec archive log for help guide & edge deletion
+- `58e8a52` feat: help guide page, edge/node deletion, project readme updates
 
 ## 2026-06-08
 
-- Built Table Designer page (`/tables`) — CRUD table schemas with column builder (name, type, PK/FK/UQ)
-- Built Logic Designer page (`/logics`) — CRUD logic definitions with inputs/output builder
-- Backend: `table_definitions` and `logic_definitions` migrations, models, repositories, services, controllers
-- Combined save endpoint (`POST /api/flows/{flow}/save`) with node→edge ID mapping
-- Sidebar.vue drag-and-drop palette (Logic, Folder/File node types)
-- SchemaSidebar.vue drag-and-drop palette (Table only)
-- Canvas.vue: two mode tabs (Flow/Schema) with separate node type registrations
-- `isValidConnection` enforces domain boundaries — tables cannot connect to logics
-- Canvas auto-loads relevant definitions based on active mode
-- All 10 Playwright tests passing
-- Fixed route model binding bug: TableDefinition & LogicDefinition controller params renamed to match route params ($table, $logic)
-- Table designer now supports DATETIME, TIMESTAMP, DATE column types (free-text type field) with working create/update
-- Logic inputs upgraded from flat strings to structured {name, type} objects (workflow-style CRUD)
-- Backend Store/UpdateLogicDefinitionRequest validates inputs.*.name + inputs.*.type
-- LogicNode.vue shows "name:type" badges, handles backward compat with old string inputs
-- LogicDesigner.vue has name+type input fields per row (like table column builder)
-- Full code review completed: fixed BaseController error() check, FlowController resource type, missing node-tag-slate CSS, try/catch on Canvas onDrop, added deleting states to CRUD pages, column type validation
-- Created Register.vue view with /register route, linked from login page
-- Security audit: ownership verified for all CRUD controllers; rate limiting, password complexity, JWT refresh flow identified as TODO items
-- Strict cross-mode node filtering: saved nodes filtered by mode on load; onDrop rejects wrong-mode drops; tables never appear in Flow, logics/folders never appear in Schema
+- `887c8f0` fix: strict cross-mode node filtering (absolute domain separation)
+- `4786215` feat: register page, code review fixes, security audit
+- `fe1e5ef` feat: structured {name,type} inputs for logic definitions (workflow CRUD)
+- `926148c` fix: route model binding for table/logic definition updates
+- `75d9949` feat: canvas tab modes (Flow/Schema) with isValidConnection domain boundaries
+- `f2f8f01` Add last-updated timestamps to all .md files
+- `df927b9` Table Designer, Logic Designer & interactive canvas with definition-to-node bridge
 
 ## 2026-06-04
 
-- Initial project setup with backend (Laravel) and frontend (Vue + Vite)
-- Installed spatie/laravel-permission for RBAC
-- Installed tymon/jwt-auth for API authentication
-- Created custom artisan commands: make:service, make:repository
-- Configured API routes with spatie permission middleware
-- Set up openspec change logging system
-- Configured Playwright E2E test framework
-- Created dev and test branches
-- Switched DB to `flowchart`, designed 3NF schema (flows, flow_nodes, flow_edges)
-- Created `mdFiles/schema.md` documenting full DB schema
-- Created `tests/setup.spec.js` for Playwright smoke tests
-- Created Eloquent models (Flow, FlowNode, FlowEdge) with relationships
-- Created AuthController (JWT register/login/me/logout) + FlowController (CRUD)
-- Created RoleAndPermissionSeeder with super-admin + free/silver/gold/platinum tier roles
-- 3NF verification PASSED
-- Refactored to Repository/Service pattern: Form Requests for validation, Repositories for DB, Services for logic
-- RepositoryServiceProvider with interface→implementation bindings
-- Removed Auth::guard('api') — default guard is already api
-- API Resources (UserResource, FlowResource, FlowNodeResource, FlowEdgeResource)
-- JWT stored in HTTP-only Secure cookie (XSS-safe), removed from response body
-- JwtCookieMiddleware reads cookie and injects Authorization header
-- Fixed BaseController response wrapper
-- Removed mdFiles/, tests/, openspec/, root configs from main tracking; locked main branch
-- Created backend/config/cors.php for frontend (localhost:3000) CORS with credentials
-- Installed axios + vue-router in frontend, created apiClient.js with response interceptor
-- Set up Vue Router with /login route
-- Created Login.vue with login form + apiClient integration
-- Installed Tailwind CSS v4 + PrimeVue 4 + primeicons
-- Created reusable components: AppCard, AppButton, AppInput, AppNavbar (PrimeVue + Tailwind wrappers)
-- Added @theme surface palette + reusable utility classes (.form-input, .btn-primary, .btn-secondary, .card, .error-msg) in style.css
-- Playwright E2E login tests: valid credentials + invalid credentials (2 tests, passing)
-- Installed @vue-flow/core and created reusable node components: BaseNode, TableNode, LogicNode, FolderFileNode
+- `c4c3d66` Merge dev: node tailwind refactor to style.css
+- `fc34bba` refactor: extract all node tailwind classes into assets/style.css
+- `4a42975` Merge dev: reusable flowchart node components
+- `6a38be9` feat: reusable flowchart node components (BaseNode, TableNode, LogicNode, FolderFileNode)
+- `a684ae4` Merge dev: frontend login page, tailwind v4 + primevue 4, axios apiClient, playwright e2e
+- `b763587` feat: frontend login page, tailwind v4 + primevue 4, axios apiClient, playwright e2e
+- `4641100` Sync test with dev: .gitignore update
+- `f467c4d` chore: update .gitignore (exclude docs/tests/root config)
+- `feed6dc` chore: remove docs, tests, and root config from main tracking
+- `f0e9e11` Sync test branch with main: full backend scaffold, schema, controllers, services, resources
+- `2f9c915` Merge main into dev: scaffold, schema, controllers, services, resources, cookie auth
+- `6873c56` feat: api resources, cookie-based jwt, remove redundant auth guard
+- `13b03b0` refactor: repository/service pattern with form requests
+- `2368f7d` feat: create models, controllers, role/permission seeders with super-admin
+- `e95032c` feat(database): create flowchart DB schema with 3NF migrations
+- `209ea19` docs: add Commit.md to track project history
+- `9cae740` dev: first commit
+
+---
+
+> **Note from 2026-06-09:** Going forward, every commit must also update `mdFiles/gitMd/Commit.md` (append the commit hash and message) and `openspec/changes/archive/logs.md` (append a Log- entry describing the change). See `mdFiles/Todo.md` for the enforced workflow rule.
