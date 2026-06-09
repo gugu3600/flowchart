@@ -6,34 +6,56 @@ Laravel 13 RESTful API backend for the Flowchart architecture diagramming tool.
 
 - Laravel 13
 - MySQL 8.4
-- tymon/jwt-auth (JWT authentication)
+- tymon/jwt-auth (JWT authentication via HTTP-only Secure SameSite=Strict cookies)
 - spatie/laravel-permission (RBAC)
 - Repository / Service / FormRequest pattern
 
 ## Key Features
 
-- JWT authentication with HTTP-only Secure SameSite=Strict cookies
-- Spatie RBAC with free/silver/gold/platinum tier roles
+- JWT cookie-based auth with `JwtCookieMiddleware` (extracts token from cookie into Authorization header)
+- Spatie RBAC with 5 roles: `super-admin`, `free`, `silver`, `gold`, `platinum`
+- Tier permissions: `save-flows`, `generate-schema`, `map-structure`, `manage-users`, `manage-roles`
+- Permission middleware on all write endpoints (backend-enforced, not just frontend)
 - Combined save endpoint (`POST /api/flows/{flow}/save`) with node→edge ID mapping
 - Table and logic definition CRUD with column / input builders
+- Admin management: user CRUD, role/tier assignment, upgrade endpoint
+- Login rate limiting (20 attempts/minute) and password complexity validation
+- Registration disabled for security (admin accounts via seeder only)
 
-## API Routes (22 total)
+## API Routes (29 total)
 
-| Method | Route | Auth |
-|--------|-------|------|
-| POST | `/api/register` | Public |
-| POST | `/api/login` | Public |
+| Method | Route | Auth / Guard |
+|--------|-------|-------------|
+| POST | `/api/login` | Public (throttled) |
+| POST | `/api/register` | Disabled (commented out) |
 | GET | `/api/me` | Authenticated |
 | POST | `/api/logout` | Authenticated |
-| GET/POST | `/api/flows` | Authenticated |
-| GET/PUT/DELETE | `/api/flows/{flow}` | Authenticated |
-| POST | `/api/flows/{flow}/nodes` | Authenticated |
-| POST | `/api/flows/{flow}/edges` | Authenticated |
-| POST | `/api/flows/{flow}/save` | Authenticated |
-| GET/POST | `/api/tables` | Authenticated |
-| GET/PUT/DELETE | `/api/tables/{table}` | Authenticated |
-| GET/POST | `/api/logics` | Authenticated |
-| GET/PUT/DELETE | `/api/logics/{logic}` | Authenticated |
+| GET | `/api/stats` | Authenticated |
+| GET | `/api/flows` | Authenticated |
+| POST | `/api/flows` | `permission:save-flows` |
+| GET | `/api/flows/{flow}` | Authenticated |
+| PUT | `/api/flows/{flow}` | `permission:save-flows` |
+| DELETE | `/api/flows/{flow}` | `permission:save-flows` |
+| POST | `/api/flows/{flow}/nodes` | `permission:save-flows` |
+| POST | `/api/flows/{flow}/edges` | `permission:save-flows` |
+| POST | `/api/flows/{flow}/save` | `permission:save-flows` |
+| GET | `/api/tables` | Authenticated |
+| POST | `/api/tables` | `permission:generate-schema` |
+| GET | `/api/tables/{table}` | Authenticated |
+| PUT | `/api/tables/{table}` | `permission:generate-schema` |
+| DELETE | `/api/tables/{table}` | `permission:generate-schema` |
+| GET | `/api/logics` | Authenticated |
+| POST | `/api/logics` | `permission:map-structure` |
+| GET | `/api/logics/{logic}` | Authenticated |
+| PUT | `/api/logics/{logic}` | `permission:map-structure` |
+| DELETE | `/api/logics/{logic}` | `permission:map-structure` |
+| GET | `/api/admin/tiers` | `role:super-admin` |
+| GET | `/api/admin/users` | `role:super-admin` |
+| GET | `/api/admin/users/{user}` | `role:super-admin` |
+| PUT | `/api/admin/users/{user}` | `role:super-admin` |
+| PUT | `/api/admin/users/{user}/roles` | `role:super-admin` |
+| PUT | `/api/admin/users/{user}/upgrade` | `role:super-admin` |
+| DELETE | `/api/admin/users/{user}` | `role:super-admin` |
 
 ## Development
 
@@ -44,3 +66,5 @@ php artisan key:generate
 php artisan migrate --seed
 php artisan serve --port=8000
 ```
+
+Default admin: `admin@flowchart.dev` / `password` (created by `RoleAndPermissionSeeder`).
