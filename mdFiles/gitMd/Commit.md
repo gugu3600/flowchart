@@ -1,8 +1,21 @@
 # Git Commits
 
-> Last updated: 2026-06-09 12:00 UTC
+> Last updated: 2026-06-09 12:40 UTC
 
 ## 2026-06-09
+
+- Moved route guard from router/index.js to router/routeGuard.js
+- Created AdminController with users/show/update/updateRoles/upgrade/destroy endpoints
+- Added admin management UI (AdminDashboard.vue): users table, role editing modal, delete confirmation, upgrade modal
+- Added tier definitions section in admin dashboard (fetched from GET /api/admin/tiers)
+- Added backend upgrade endpoint (PUT /api/admin/users/{user}/upgrade) with backend confirmation
+- Permission middleware on all write endpoints (save-flows, generate-schema, map-structure)
+- Rate limiting on login endpoint (20/min) with password complexity validation
+- Login form redesigned: floating labels, border-bottom underline inputs
+- Created Playwright admin tests (admin.spec.js): admin dashboard, tier definitions, upgrade flow, route guard
+- All 14 Playwright tests passing
+- Updated frontend/backend README.md with admin panel, route guard, permission docs
+- Both dev and test branches pushed and merged
 
 - Added edge/node deletion: `delete-key-code` prop + `@edges-delete` / `@nodes-delete` handlers in Canvas.vue
 - Created HelpGuide.vue — how-to guide page at `/help` with usage instructions, feature overview, and keyboard shortcuts

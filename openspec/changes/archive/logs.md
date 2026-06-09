@@ -516,3 +516,57 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 | `mdFiles/Review.md` | Added cross-mode filtering to verified items |
 | `mdFiles/gitMd/Commit.md` | Added entry |
 
+---
+
+## Log-2026-06-09-002 — Admin Management, Tier Upgrade, Route Guard, Permissions Enforcement
+
+### Summary
+- **Route guard extracted**: Moved from `router/index.js` to `router/routeGuard.js` — reusable `adminGuard` with async store import, keeps router config clean.
+- **AdminController** created with 6 endpoints: `stats`, `users` (paginated), `show`, `update`, `updateRoles`, `upgrade`, `destroy`.
+- **Admin dashboard** (`AdminDashboard.vue`): users table with role editing modal, tier upgrade modal (with backend confirmation dialog), user delete with confirmation, tier definitions section showing all 4 tiers and their permissions.
+- **Tier upgrade endpoint** (`PUT /api/admin/users/{user}/upgrade`): validates target tier against valid Spatie roles, prevents super-admin downgrade, syncs role and returns `{user, confirmed: true}`.
+- **Permission middleware** on all write API routes:
+  - `permission:save-flows` on flow POST/PUT/DELETE/saveNodes/saveEdges/save
+  - `permission:generate-schema` on table POST/PUT/DELETE
+  - `permission:map-structure` on logic POST/PUT/DELETE
+  - `role:super-admin` on all admin endpoints
+  - All GET routes remain open to any authenticated user
+- **Rate limiting**: Login endpoint throttled to 20 attempts/minute (up from 5) via `RateLimiter::for('login')` in `AppServiceProvider`.
+- **Password complexity**: `RegisterRequest` validates uppercase + lowercase + digit + special character with custom error message.
+- **Login form redesigned**: Floating labels, border-bottom underline inputs, dark card with centered layout.
+- **Playwright tests** (`tests/admin.spec.js`): 4 tests covering admin dashboard rendering, tier definitions display (4 tiers), upgrade modal flow with confirmation, and non-admin route guard redirect.
+- **All 14 tests passing**: admin (4), canvas (2), example (2), login (2), setup (4).
+- **Git workflow**: Changes committed to `dev`, merged into `test`, both branches pushed to origin with full merge history.
+
+### Added Files
+| File | Layer | Purpose |
+|------|-------|---------|
+| `backend/app/Http/Controllers/api/AdminController.php` | Controller | Admin endpoints: stats, users CRUD, tiers, upgrade |
+| `frontend/src/api/admin.js` | API | Admin API client (getUsers, updateUserRoles, upgradeUser, getTiers) |
+| `frontend/src/router/routeGuard.js` | Router | Extracted adminGuard with async store import |
+| `tests/admin.spec.js` | Test | Playwright E2E: admin dashboard, tiers, upgrade, route guard |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `backend/routes/api.php` | Permission middleware on write routes, admin group, upgrade route, login throttle |
+| `backend/app/Providers/AppServiceProvider.php` | RateLimiter for login (20/min) |
+| `backend/app/Http/Requests/Auth/RegisterRequest.php` | Password complexity regex + custom error message |
+| `backend/app/Http/Controllers/api/AuthController.php` | Removed stats method (moved to AdminController) |
+| `frontend/src/router/index.js` | Imports adminGuard from routeGuard.js |
+| `frontend/src/views/AdminDashboard.vue` | Users table, role modal, upgrade modal, tier definitions section |
+| `frontend/src/views/Login.vue` | Redesigned with floating labels, border-bottom inputs |
+| `frontend/src/style.css` | Added login page CSS (floating label, border-bottom), admin table, upgrade success classes |
+| `tests/login.spec.js` | Updated login assertion for new h1 "Welcome Back" |
+| `tests/canvas.spec.js` | Minor selector updates |
+| `frontend/README.md` | Updated with admin panel, route guard, testing section |
+| `backend/README.md` | Updated with full 29-route table, permission guards, rate limiting docs |
+| `mdFiles/gitMd/Commit.md` | Added 2026-06-09 entries |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+### Deleted Code
+| File | Reason |
+|------|--------|
+| `frontend/src/router/index.js:58-74` | inline `router.beforeEach` with admin guard → moved to `routeGuard.js` |
+| `backend/app/Http/Controllers/api/AuthController.php:54-69` | `stats()` method → moved to `AdminController` |
+
