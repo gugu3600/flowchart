@@ -76,6 +76,10 @@ async function loadFlowData(flowId) {
     if (flowRes.success) {
       const flow = flowRes.data.flow
       for (const n of flow.nodes || []) {
+        const isFlowType = n.type === 'logic' || n.type === 'folderFile'
+        const isSchemaType = n.type === 'table'
+        if (mode.value === 'flow' && !isFlowType) continue
+        if (mode.value === 'schema' && !isSchemaType) continue
         savedNodes.push({
           id: String(n.id),
           type: n.type,
@@ -249,12 +253,18 @@ function onDragOver(event) {
   event.preventDefault()
 }
 
+function isAllowedType(type) {
+  if (mode.value === 'flow') return type === 'logic' || type === 'folderFile'
+  return type === 'table'
+}
+
 function onDrop(event) {
   event.preventDefault()
   const raw = event.dataTransfer.getData('application/json')
   if (!raw) return
   let nodeDef
   try { nodeDef = JSON.parse(raw) } catch { return }
+  if (!isAllowedType(nodeDef.type)) return
   const position = screenToFlowCoordinate({
     x: event.clientX,
     y: event.clientY,

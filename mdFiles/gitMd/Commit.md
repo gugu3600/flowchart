@@ -23,6 +23,7 @@
 - Full code review completed: fixed BaseController error() check, FlowController resource type, missing node-tag-slate CSS, try/catch on Canvas onDrop, added deleting states to CRUD pages, column type validation
 - Created Register.vue view with /register route, linked from login page
 - Security audit: ownership verified for all CRUD controllers; rate limiting, password complexity, JWT refresh flow identified as TODO items
+- Strict cross-mode node filtering: saved nodes filtered by mode on load; onDrop rejects wrong-mode drops; tables never appear in Flow, logics/folders never appear in Schema
 
 ## 2026-06-04
 

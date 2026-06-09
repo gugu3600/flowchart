@@ -32,6 +32,8 @@
 - [x] Reusable flowchart node components created: BaseNode, TableNode, LogicNode, FolderFileNode.
 - [x] Canvas tests: flow selector, sidebar, create flow, save flow (2 tests, passing).
 - [x] Canvas modes (Flow/Schema tabs) with `isValidConnection` domain boundary enforcement.
+- [x] Cross-mode node filtering: `loadFlowData` skips table nodes in Flow mode, logic/folder nodes in Schema mode.
+- [x] Drop validation: `onDrop` rejects items whose type doesn't match the active mode.
 - [x] Fixed route model binding: `$tableDefinition` → `$table`, `$logicDefinition` → `$logic` to match route params.
 - [ ] Write E2E tests for tier-gated features (403 paywall intercept).
 - [ ] Write E2E tests for Table Designer and Logic Designer CRUD pages.

@@ -467,3 +467,23 @@ Upgraded logic definitions from flat string inputs (`["x", "y"]`) to structured 
 | `mdFiles/gitMd/Commit.md` | Added full summary |
 | `openspec/changes/archive/logs.md` | Appended this log entry |
 
+---
+
+## Log-2026-06-08-006 — Strict Cross-Mode Node Filtering (Absolute Domain Separation)
+
+### Summary
+Enhanced the Canvas mode separation to ensure **absolute domain isolation** between Flow and Schema modes:
+
+- **Load filtering**: `loadFlowData()` now filters saved nodes by the active mode. Flow mode skips `table` nodes; Schema mode skips `logic` and `folderFile` nodes. This prevents stale cross-mode nodes from appearing after mode switch.
+- **Drop validation**: `onDrop()` validates the dropped item's type against the active mode via `isAllowedType()`. Logic/folderFile items dropped on Schema mode are silently ignored; table items dropped on Flow mode are silently ignored.
+- Together with the existing `isValidConnection` guard (which blocks cross-domain edges), this provides **triple protection**: nodes can't be loaded, can't be dropped, and can't be connected across domains.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/views/Canvas.vue` | Added mode-based node filtering on load + `isAllowedType()` guard in onDrop |
+| `mdFiles/Architecture.md` | Documented strict mode filtering |
+| `mdFiles/Todo.md` | Marked cross-mode filtering complete |
+| `mdFiles/Review.md` | Added cross-mode filtering to verified items |
+| `mdFiles/gitMd/Commit.md` | Added entry |
+

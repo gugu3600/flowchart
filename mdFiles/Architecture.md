@@ -30,6 +30,12 @@
 
 The `isValidConnection` prop on VueFlow enforces domain boundaries: table nodes cannot connect to logic/folder nodes and vice versa.
 
+Additionally, when loading saved flow data, nodes are **filtered by mode**:
+- Flow mode: only `logic` and `folderFile` nodes are loaded (table nodes are silently skipped)
+- Schema mode: only `table` nodes are loaded (logic/folderFile nodes are silently skipped)
+
+The `onDrop` handler also rejects dropped items whose type doesn't match the active mode. This ensures **absolute separation** — tables never appear in Flow canvas, logic/folders never appear in Schema canvas, even if previously saved.
+
 ## Frontend Component Architecture
 ```
 src/
