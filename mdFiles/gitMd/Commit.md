@@ -1,6 +1,6 @@
 # Git Commits
 
-> Last updated: 2026-06-10 08:30 UTC
+> Last updated: 2026-06-10 09:00 UTC
 
 ## 2026-06-10
 
@@ -12,6 +12,7 @@
 - `9cc4e16` docs: update Commit.md
 - `4de78c8` feat: subscribe page/modal/endpoint — upgrade modal Subscribe button, /subscribe page with payment picker, POST /api/subscribe backend, upgrade links point to /subscribe (26 tests passing)
 - `c5acb67` docs: fix commit hash in Commit.md after amend
+- `6e6b773` feat: seed tier demo users — freeuser, silveruser, golduser, platinumuser (all password: password), idempotent seeder
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps
 - `156efc9` docs: update Commit.md with form UX commit

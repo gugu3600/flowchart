@@ -1,6 +1,6 @@
 # Database Schema — `flowchart`
 
-> Last updated: 2026-06-10 08:30 UTC
+> Last updated: 2026-06-10 09:00 UTC
 
 ## Overview
 
@@ -67,6 +67,7 @@ users (1) ──< flows (1) ──< flow_nodes
 | email_verified_at | TIMESTAMP | Nullable |
 | password | VARCHAR(255) | Hashed |
 | remember_token | VARCHAR(100) | Nullable |
+| subscription_expires_at | TIMESTAMP | Nullable — set on tier upgrade; auto-downgraded via `subscription:expire` command |
 | created_at | TIMESTAMP | |
 | updated_at | TIMESTAMP | |
 

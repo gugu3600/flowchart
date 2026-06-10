@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-10 08:30 UTC
+> Last updated: 2026-06-10 09:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -72,10 +72,11 @@ src/
 │   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load, edge/node deletion
 │   ├── HelpGuide.vue         — How-to guide with app usage instructions and keyboard shortcuts
 │   ├── Register.vue          — Registration form (name, email, password, confirm)
+│   ├── Subscribe.vue         — Self-service subscription with tier cards, payment method picker
 │   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
 │   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
 ├── router/
-│   └── index.js              — Vue Router (/login, /register, /canvas, /help, /tables, /logics routes)
+│   └── index.js              — Vue Router (/login, /register, /subscribe, /canvas, /help, /tables, /logics routes)
 ├── App.vue                   — <router-view /> root
 └── main.js                   — createApp + router + PrimeVue plugin
 ```
@@ -116,7 +117,7 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 5. `isValidConnection` enforces domain boundaries — table nodes cannot connect to logic nodes
 6. User can reposition, connect, save; clicking refresh (⟳) reloads definitions
 
-## API Routes (31 total)
+## API Routes (32 total)
 
 ### Public (throttled 20/min)
 | Method | Route | Handler |
@@ -128,10 +129,10 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 ### Authenticated (auth:api)
 | Method | Route | Handler |
 |--------|-------|---------|
-    | GET | `/api/me` | AuthController@me |
-    | POST | `/api/logout` | AuthController@logout |
-    | POST | `/api/subscribe` | AuthController@subscribe (self-service tier upgrade) |
-    | GET/POST | `/api/flows` | FlowController@index/store |
+| GET | `/api/me` | AuthController@me |
+| POST | `/api/logout` | AuthController@logout |
+| POST | `/api/subscribe` | AuthController@subscribe (self-service tier upgrade) |
+| GET/POST | `/api/flows` | FlowController@index/store |
 | GET/PUT/DELETE | `/api/flows/{flow}` | FlowController@show/update/destroy |
 | POST | `/api/flows/{flow}/nodes` | FlowController@saveNodes |
 | POST | `/api/flows/{flow}/edges` | FlowController@saveEdges |

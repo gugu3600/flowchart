@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-10 08:30 UTC
+> Last updated: 2026-06-10 09:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -30,7 +30,12 @@
 - [x] Store: added `canGenerateSchema` computed property
 - [x] **Tested 2026-06-10**: Free registration works, logic limit 4/4 enforced (5th=403), table creation blocked for free (403 perms)
 - [x] **Tested 2026-06-10**: Gold/platinum — node color, edge color, table CRUD, unlimited logics — 25 total tests passing
+- [x] **Tested 2026-06-10**: Route guard refactored — return-only (no next()), login 409 for already-authenticated users, adminGuard simplified
+- [x] **Tested 2026-06-10**: Color reactivity fix — setNodeColor/setEdgeColor mutate nodes.value/edges.value directly; backend-first save flow
+- [x] **Tested 2026-06-10**: Insert bugfix — FlowNodeRepository/FlowEdgeRepository json_encode JSON columns for bulkCreate (bypasses Eloquent casts)
 - [x] **Tested 2026-06-10**: Self-service subscribe — free user upgrades to silver via POST /api/subscribe, role + subscription_expires_at set
+- [x] **Tested 2026-06-10**: Seeded tier demo users — freeuser, silveruser, golduser, platinumuser (all password: "password"), idempotent seeder
+- [x] **Tested 2026-06-10**: Full suite 26/26 tests passing (14 setup/login/canvas/admin + 12 tier-colors/subscribe)
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Rate Limiting:** Login and register routes are unthrottled — add `throttle:5,1` middleware.
 - [ ] **Password Complexity:** Registration only requires `min:8` — add regex for uppercase+digit+special.
