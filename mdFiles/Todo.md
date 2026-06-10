@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-10 09:00 UTC
+> Last updated: 2026-06-10 09:30 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -73,6 +73,7 @@
 - [x] Subscribe page (/subscribe) — tier cards, payment method picker, subscribe button, auto-redirect to canvas
 - [x] Backend POST /api/subscribe — self-service tier upgrade with payment_method validation, sets subscription_expires_at
 - [x] Seeded tier demo users: freeuser@mail.com, silveruser@mail.com, golduser@mail.com, platinumuser@mail.com (all password: "password")
+- [x] Draggable node resize — NodeResizer from @vue-flow/node-resizer on all node types (min 160x60, visible on select)
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.

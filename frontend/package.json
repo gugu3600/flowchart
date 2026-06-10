@@ -12,6 +12,7 @@
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.3.0",
     "@vue-flow/core": "^1.48.2",
+    "@vue-flow/node-resizer": "^1.5.1",
     "axios": "^1.17.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.5",

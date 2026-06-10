@@ -1,5 +1,7 @@
 <script setup>
 import { Position, Handle } from '@vue-flow/core'
+import { NodeResizer } from '@vue-flow/node-resizer'
+import '@vue-flow/node-resizer/dist/style.css'
 
 const props = defineProps({
   id: { type: String, required: true },
@@ -21,6 +23,12 @@ const props = defineProps({
       selected ? 'selected' : '',
     ]"
   >
+    <NodeResizer
+      :is-visible="selected"
+      min-width="160"
+      min-height="60"
+      handle-class-name="node-resize-handle"
+    />
     <Handle
       v-if="showTarget"
       type="target"
