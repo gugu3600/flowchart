@@ -4,7 +4,7 @@
 
 ## 2026-06-10
 
-- `f2663b5` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
+- `7220011` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
 - Tier-gated logic CRUD + subscription durations
 
 - `9cc4e16` docs: update Commit.md
