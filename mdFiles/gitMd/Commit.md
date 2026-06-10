@@ -13,7 +13,7 @@
 - `4de78c8` feat: subscribe page/modal/endpoint — upgrade modal Subscribe button, /subscribe page with payment picker, POST /api/subscribe backend, upgrade links point to /subscribe (26 tests passing)
 - `c5acb67` docs: fix commit hash in Commit.md after amend
 - `6e6b773` feat: seed tier demo users — freeuser, silveruser, golduser, platinumuser (all password: password), idempotent seeder
-- `4a224c0` feat: draggable node resize — NodeResizer in BaseNode.vue, @vue-flow/node-resizer package, resize handles on select (26 tests passing)
+- `006780d` feat: draggable node resize — NodeResizer in BaseNode.vue, @vue-flow/node-resizer package, resize handles on select (26 tests passing)
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps
 - `156efc9` docs: update Commit.md with form UX commit
