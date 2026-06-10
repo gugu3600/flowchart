@@ -37,4 +37,9 @@ class FlowRepository implements FlowRepositoryInterface
     {
         return Flow::destroy($id);
     }
+
+    public function countForUser(int $userId): int
+    {
+        return Flow::where('user_id', $userId)->count();
+    }
 }

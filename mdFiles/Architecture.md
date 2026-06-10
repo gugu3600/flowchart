@@ -1,9 +1,10 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-09 16:00 UTC
+> Last updated: 2026-06-10 04:30 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
+- **API:** axios client configured via `VITE_API_BASE_URL` in `frontend/.env` (no fallback — must be set). Base URL points to Laravel backend (`http://localhost:8000/api`).
 - **Backend:** Laravel 13 running RESTful APIs, MySQL Database.
 - **Authentication:** JWT-based authentication using tymon/jwt-auth. Token stored in HTTP-only Secure SameSite=Strict cookie via `JwtCookieMiddleware`.
 - **Role-Based Access Control:** Spatie Laravel Permissions (free/silver/gold/platinum tiers + super-admin).
@@ -16,11 +17,11 @@
 | Route | Page | Purpose |
 |-------|------|---------|
 | `/help` | HelpGuide.vue | How-to guide and documentation for the web app |
-| `/login` | Login.vue | JWT login form with floating-label inputs, show/hide password toggle, "Remember me" checkbox, links to register |
+| `/login` | Login.vue | JWT login form with floating-label inputs, show/hide password toggle, "Remember me" checkbox, link to register |
 | `/register` | Register.vue | User registration with tier selection (Free/Silver/Gold/Platinum), pricing display, floating-label inputs with password toggle, payment method picker (KBZ Pay / AYA Pay / CB Pay / MMQR) for paid tiers |
-| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace |
-| `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ) |
-| `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output) |
+| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace. Free tier: sandbox only (no save). Silver+: color picker for node backgrounds and edge strokes, save up to 5 flows. Gold+: unlimited flows. |
+| `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ). Gold+ (`generate-schema` permission) can create/edit/delete. Free/Silver read-only. ColumnBuilder component for column rows. |
+| `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output). Free: max 4 logics with upgrade modal. Silver+: unlimited. |
 
 ## Canvas Modes (Tab-Separated)
 
@@ -41,7 +42,7 @@ The `onDrop` handler also rejects dropped items whose type doesn't match the act
 ```
 src/
 ├── api/
-│   ├── apiClient.js          — Axios instance (withCredentials, response unwrapper)
+│   ├── apiClient.js          — Axios instance (withCredentials, response unwrapper, baseURL from VITE_API_BASE_URL)
 │   ├── flows.js              — Flows CRUD + save API
 │   ├── tables.js             — Table definitions CRUD API
 │   └── logics.js             — Logic definitions CRUD API
@@ -52,6 +53,7 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
+│   ├── ColumnBuilder.vue     — v-model column row builder (name, type, PK/FK/UQ checkboxes, add/remove)
 │   ├── FloatingInput.vue     — Floating-label input with bottom-border underline, password toggle, error state
 │   ├── TierSelector.vue      — 2×2 tier card grid for registration
 │   ├── PaymentMethodPicker.vue — 2×2 payment method grid with loading state
@@ -87,6 +89,15 @@ src/
 7. Backend creates user, assigns selected tier role, returns JWT in HTTP-only cookie
 8. Free tier users can register without selecting any payment method
 9. Payment processing and mail system will be implemented later via Laravel Queue
+
+## Subscription Durations
+| Tier | Duration |
+|------|----------|
+| Silver | 33 days |
+| Gold | 37 days |
+| Platinum | 44 days |
+
+Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to free via `subscription:expire` command.
 
 ## Pricing
 | Tier | Price (MMK) |
@@ -125,7 +136,7 @@ src/
 | POST | `/api/flows/{flow}/save` | FlowController@save (combined) |
 | GET/POST | `/api/tables` | TableDefinitionController@index/store |
 | GET/PUT/DELETE | `/api/tables/{table}` | TableDefinitionController@show/update/destroy |
-| GET/POST | `/api/logics` | LogicDefinitionController@index/store |
+| GET/POST | `/api/logics` | LogicDefinitionController@index/store (free: max 4) |
 | GET/PUT/DELETE | `/api/logics/{logic}` | LogicDefinitionController@show/update/destroy |
 
 ## Strategic Monetization Matrix (Value-Based Hierarchy)
@@ -149,6 +160,7 @@ src/
 ## Reusable Components
 | Component | Used In | Purpose |
 |-----------|---------|---------|
+| `ColumnBuilder` | TableDesigner.vue | v-model column row builder with name/type/PK/FK/UQ fields, add/remove buttons |
 | `FloatingInput` | Login.vue, Register.vue | Floating-label input with bottom-border underline, password show/hide toggle, error state (v-model, type, id, label, autocomplete, showPasswordToggle, hasError props) |
 | `TierSelector` | Register.vue | 2×2 tier card grid (v-model, tiers array) |
 | `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid with loading state (v-model, methods, loading props) |
@@ -156,7 +168,8 @@ src/
 | `AppCard` | Multiple views | Card container with optional title/subtitle |
 
 ## Middleware & Access Gatekeeping (Gatekeeper Bounds)
-- **Silver Check:** Wraps `/flows/save` endpoints. Verify user membership in ('silver', 'gold', 'platinum').
-- **Gold Check:** Wraps `/flows/generate-schema` endpoints. Verify user membership in ('gold', 'platinum').
-- **Platinum Check:** Wraps `/flows/map-structure` endpoints. Strictly restrict to user membership == 'platinum'.
-- All violations must return `403 Forbidden` with localized and global paywall instructions.
+- **Save Flows:** Wraps `/flows/*` write endpoints. Verify user has `save-flows` permission (silver+).
+- **Generate Schema:** Wraps `/tables/*` write endpoints. Verify user has `generate-schema` permission (gold+).
+- **Map Structure:** Reserved for future platinum folder-mapping feature.
+- **Logic CRUD:** Open to all tiers. Free tier limited to 4 logics by service layer check.
+- All violations return `403 Forbidden` with localized and global paywall instructions.

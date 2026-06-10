@@ -110,6 +110,12 @@ class AdminController extends BaseController
         return $this->success(['tiers' => $roles], 'Tiers retrieved');
     }
 
+    private const SUBSCRIPTION_DURATIONS = [
+        'silver' => 33,
+        'gold' => 37,
+        'platinum' => 44,
+    ];
+
     public function upgrade(Request $request, User $user): JsonResponse
     {
         $validated = $request->validate([
@@ -122,6 +128,19 @@ class AdminController extends BaseController
 
         $tierRole = $validated['tier'];
         $user->syncRoles([$tierRole]);
+
+        if (isset(self::SUBSCRIPTION_DURATIONS[$tierRole])) {
+            $days = self::SUBSCRIPTION_DURATIONS[$tierRole];
+            $now = now();
+            $currentExpiry = $user->subscription_expires_at;
+            $base = ($currentExpiry && $currentExpiry->isFuture()) ? $currentExpiry : $now;
+            $user->subscription_expires_at = $base->copy()->addDays($days);
+            $user->save();
+        } else {
+            $user->subscription_expires_at = null;
+            $user->save();
+        }
+
         $user->load('roles');
 
         return $this->success([

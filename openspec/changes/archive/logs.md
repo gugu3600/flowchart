@@ -667,19 +667,104 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 
 ---
 
-## Log-2026-06-09-007 — Add Register Link to Login Page + Update All .md Files
+## Log-2026-06-09-008 — Tier-Gated Logic CRUD + Subscription Durations
 
 ### Summary
-- Added "Don't have an account? Register" link to Login.vue (was missing — Register.vue already linked to login).
-- Updated timestamps on all `.md` files: Architecture.md (16:00), Todo.md (16:00), Review.md (16:00), Skills.md (16:00), schema.md (16:00), Commit.md.
+- **Removed permission gate** from logic CRUD routes — all tiers can now create/update/delete logics (was gated by `permission:map-structure`, blocking free/silver/gold).
+- **Free tier logic limit** (max 4) enforced in `LogicDefinitionService::checkLogicLimit()` — returns 403 with upgrade message when exceeded.
+- **Repository updated**: `LogicDefinitionRepository` now has `countForUser()` for limit checks.
+- **Controller updated**: `LogicDefinitionController::index()` returns `logic_count` and `max_slots` (same pattern as FlowController).
+- **Subscription durations**: Added `subscription_expires_at` column to `users` table. `AdminController::upgrade()` now sets durations — silver 33 days, gold 37 days, platinum 44 days (from current expiry or now). `subscription:expire` artisan command available for periodic downgrades.
+- **UserResource**: Exposes `subscription_expires_at`.
+- **LogicDesigner.vue**: Shows free tier banner with limit info, logic slot counter (`<current>/<max>`), upgrade modal when free user hits 4-logic limit (triggered both by button click and 403 response).
+- **style.css**: Added `.logic-slot-info` class for the slot counter.
+- Updated all .md timestamps to 17:30 UTC.
 
 ### Modified Files
 | File | Change |
 |------|--------|
-| `frontend/src/views/Login.vue` | Added register link after submit button |
-| `mdFiles/Architecture.md` | Updated login page description |
-| `mdFiles/Todo.md` | Added Login register link to done list |
-| `mdFiles/Review.md` | Timestamp updated |
+| `backend/routes/api.php` | Removed `permission:map-structure` from logic routes |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepositoryInterface.php` | Added `countForUser()` contract |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepository.php` | Added `countForUser()` implementation |
+| `backend/app/Services/LogicDefinition/LogicDefinitionService.php` | Added `FREE_MAX_LOGICS=4`, `checkLogicLimit()`, `logicCount()`, `maxLogicSlots()` |
+| `backend/app/Http/Controllers/api/LogicDefinitionController.php` | index returns `logic_count` + `max_slots` |
+| `backend/database/migrations/..._add_subscription_expires_at_to_users_table.php` | New column `subscription_expires_at` (timestamp, nullable) |
+| `backend/app/Models/User.php` | `subscription_expires_at` fillable + cast |
+| `backend/app/Http/Resources/UserResource.php` | Exposes `subscription_expires_at` |
+| `backend/app/Http/Controllers/api/AdminController.php` | `upgrade()` sets subscription durations |
+| `backend/app/Console/Commands/SubscriptionExpire.php` | `subscription:expire` command |
+| `frontend/src/views/LogicDesigner.vue` | Free banner, logic slot counter, upgrade modal |
+| `frontend/src/style.css` | Added `.logic-slot-info` |
+| `mdFiles/Architecture.md` | Updated logic page description, added subscription durations, updated middleware section |
+| `mdFiles/Todo.md` | Added completed logic limit + subscription tasks |
+| `mdFiles/Review.md` | Added verification items for logic limit, subscription, login/register improvements |
+| `mdFiles/gitMd/Commit.md` | Updated timestamp |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+---
+
+## Log-2026-06-10-001 — Secure API Base URL in Frontend .env
+
+### Summary
+- Moved `VITE_API_BASE_URL` into `frontend/.env` — removed the `|| 'http://localhost:8000/api'` fallback from `apiClient.js`. The env var is now required and used directly.
+- Created `frontend/.env.example` as a template for new dev setups.
+- Updated all .md documentation timestamps and entries.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/api/apiClient.js` | Removed `||` fallback — uses `import.meta.env.VITE_API_BASE_URL` directly |
+| `frontend/.env` | Added `VITE_API_BASE_URL=http://localhost:8000/api` |
+| `frontend/.env.example` | Created with `VITE_API_BASE_URL` template |
+| `mdFiles/Todo.md` | Added env config to done list |
+| `mdFiles/Architecture.md` | Updated stack description to mention VITE_API_BASE_URL requirement |
+| `mdFiles/Review.md` | Added env config verification item |
 | `mdFiles/Skills.md` | Timestamp updated |
 | `mdFiles/schema.md` | Timestamp updated |
+| `mdFiles/gitMd/Commit.md` | Added 2026-06-10 env config entry |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+---
+
+## Log-2026-06-10-002 — Extract ColumnBuilder Component + Permission-Gate TableDesigner
+
+### Summary
+- **Extracted ColumnBuilder.vue**: Reusable v-model component for building column rows (name, type, PK/FK/UQ checkboxes, add/remove). Used by TableDesigner.vue.
+- **Permission-gated TableDesigner**: Added `canGenerateSchema` computed to `useUserStore` (checks for `generate-schema` permission or admin). "+ New Table" button, Edit, and Delete buttons hidden when user lacks the permission. Free/Silver users see upgrade banner instead.
+- **Backend already enforces `permission:generate-schema`** on all table write routes (Gold+). Frontend now reflects this in the UI.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/components/ColumnBuilder.vue` | Created — reusable column row builder |
+| `frontend/src/components/index.js` | Added ColumnBuilder export |
+| `frontend/src/stores/useUserStore.js` | Added `canGenerateSchema` computed |
+| `frontend/src/views/TableDesigner.vue` | Uses ColumnBuilder, permission-gated UI, upgrade banner |
+| `mdFiles/Todo.md` | Added ColumnBuilder + permission-gating tasks |
+| `mdFiles/Architecture.md` | Updated page descriptions, component tree, reusable components table |
+| `mdFiles/Review.md` | Added verification items |
+| `mdFiles/Skills.md` | Timestamp updated |
+| `mdFiles/schema.md` | Timestamp updated |
+| `mdFiles/gitMd/Commit.md` | Added 2026-06-10 entries |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
+---
+
+## Log-2026-06-10-003 — Test Registration, Logic Limits & Table Permissions
+
+### Summary
+- Registered free-tier test user (id=5, role=`free`, no permissions, `subscription_expires_at=null`).
+- Created 4 logics successfully. 5th logic returns `403` with limit message. Index shows `logic_count: 4, max_slots: 4`.
+- Created table blocked by `permission:generate-schema` middleware — returns `403` with "User does not have the right permissions."
+- All permission gating and limit enforcement verified working.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `mdFiles/Todo.md` | Added test results entry, timestamp updated |
+| `mdFiles/Review.md` | Added test verification item, timestamp updated |
+| `mdFiles/Skills.md` | Timestamp updated |
+| `mdFiles/schema.md` | Timestamp updated |
+| `mdFiles/gitMd/Commit.md` | Timestamp updated |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
 

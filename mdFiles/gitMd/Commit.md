@@ -1,8 +1,13 @@
 # Git Commits
 
-> Last updated: 2026-06-09 16:00 UTC
+> Last updated: 2026-06-10 04:30 UTC
 
-## 2026-06-09
+## 2026-06-10
+
+- `f2663b5` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
+- Tier-gated logic CRUD + subscription durations
+
+- `9cc4e16` docs: update Commit.md
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps
 - `156efc9` docs: update Commit.md with form UX commit

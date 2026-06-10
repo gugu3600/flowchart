@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-09 16:00 UTC
+> Last updated: 2026-06-10 04:30 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -12,6 +12,23 @@
 - [x] All JSON fields have `array` cast in models.
 - [x] JWT cookie: `HttpOnly=true`, `Secure=true`, `SameSite=Strict`; logout blacklists token.
 - [x] Password stored with `'hashed'` cast + `Hash::make()` (no double-hashing).
+- [x] Register.vue: tier selection, payment methods, password toggle, router-link
+- [x] Login.vue: remember me checkbox, password toggle, register link
+- [x] FloatingInput: showPasswordToggle, hasError props
+- [x] Payment methods fetched from backend (GET /api/payment-methods), not hardcoded
+- [x] Canvas.vue: free tier upgrade banner, silver+ slot bar, color toolbar
+- [x] Backend: flow count limit (5 for silver, 999 for gold+), flow_count/max_slots in index
+- [x] Backend: logic CRUD routes — removed permission::gate, all tiers can create
+- [x] Backend: free tier logic limit (max 4) enforced in LogicDefinitionService
+- [x] Backend: logic_count/max_slots returned in LogicDefinitionController@index
+- [x] Backend: subscription_expires_at column on users table (migration added)
+- [x] Backend: upgrade sets subscription durations (silver 33d, gold 37d, platinum 44d)
+- [x] Frontend: LogicDesigner.vue free banner, logic slot counter, upgrade modal on limit
+- [x] Frontend: API base URL moved to `.env` (VITE_API_BASE_URL), `||` fallback removed from apiClient.js, `.env.example` created
+- [x] Frontend: ColumnBuilder.vue extracted as reusable component from TableDesigner.vue
+- [x] Frontend: TableDesigner.vue permission-gated — create/edit/delete hidden for users without `generate-schema` (Gold+)
+- [x] Store: added `canGenerateSchema` computed property
+- [x] **Tested 2026-06-10**: Free registration works, logic limit 4/4 enforced (5th=403), table creation blocked for free (403 perms)
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Rate Limiting:** Login and register routes are unthrottled — add `throttle:5,1` middleware.
 - [ ] **Password Complexity:** Registration only requires `min:8` — add regex for uppercase+digit+special.

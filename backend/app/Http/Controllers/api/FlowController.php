@@ -24,11 +24,14 @@ class FlowController extends BaseController
     public function index(): JsonResponse
     {
         $flows = $this->flowService->allForUser(Auth::id());
+        $count = $this->flowService->flowCount(Auth::id());
+        $max = $this->flowService->maxSlots(Auth::id());
 
-        return $this->success(
-            ['flows' => FlowResource::collection($flows)],
-            'Flows retrieved',
-        );
+        return $this->success([
+            'flows' => FlowResource::collection($flows),
+            'flow_count' => $count,
+            'max_slots' => $max,
+        ], 'Flows retrieved');
     }
 
     public function store(StoreFlowRequest $request): JsonResponse

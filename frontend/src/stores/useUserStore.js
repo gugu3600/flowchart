@@ -44,6 +44,7 @@ export function useUserStore() {
   const isPlatinum = computed(() => hasRole('platinum'))
   const isAdmin = computed(() => (hasRole('super-admin') || state.user?.permissions?.includes('manage-users')) ?? false)
   const canSave = computed(() => (isAdmin.value || state.user?.permissions?.includes('save-flows')) ?? false)
+  const canGenerateSchema = computed(() => (isAdmin.value || state.user?.permissions?.includes('generate-schema')) ?? false)
 
   const tierLabel = computed(() => {
     if (isPlatinum.value) return 'Platinum'
@@ -69,6 +70,7 @@ export function useUserStore() {
     isPlatinum,
     isAdmin,
     canSave,
+    canGenerateSchema,
     tierLabel,
     tierColor,
   }

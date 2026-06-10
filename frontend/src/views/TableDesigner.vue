@@ -3,8 +3,9 @@ import { ref, onMounted } from 'vue'
 import { getTables, createTable, updateTable, deleteTable } from '../api/tables.js'
 import AppHeader from '../components/AppHeader.vue'
 import { useUserStore } from '../stores/useUserStore.js'
+import ColumnBuilder from '../components/ColumnBuilder.vue'
 
-const { isAdmin } = useUserStore()
+const { isAdmin, fetchUser, canGenerateSchema } = useUserStore()
 
 const tables = ref([])
 const loading = ref(false)
@@ -20,7 +21,10 @@ const emptyForm = () => ({
   columns: [{ name: '', type: 'VARCHAR(255)', pk: false, fk: false, unique: false }],
 })
 
-onMounted(loadTables)
+onMounted(async () => {
+  await fetchUser()
+  await loadTables()
+})
 
 async function loadTables() {
   loading.value = true
@@ -36,12 +40,14 @@ async function loadTables() {
 }
 
 function openNew() {
+  if (!canGenerateSchema) return
   editing.value = null
   form.value = emptyForm()
   showForm.value = true
 }
 
 function openEdit(table) {
+  if (!canGenerateSchema) return
   editing.value = table.id
   form.value = {
     name: table.name,
@@ -54,14 +60,6 @@ function cancelForm() {
   showForm.value = false
   form.value = null
   editing.value = null
-}
-
-function addColumn() {
-  form.value.columns.push({ name: '', type: 'VARCHAR(255)', pk: false, fk: false, unique: false })
-}
-
-function removeColumn(idx) {
-  form.value.columns.splice(idx, 1)
 }
 
 async function handleSave() {
@@ -103,6 +101,10 @@ async function handleDelete(id) {
     deleting.value = false
   }
 }
+
+function updateColumns(val) {
+  form.value.columns = val
+}
 </script>
 
 <template>
@@ -116,6 +118,14 @@ async function handleDelete(id) {
       </template>
     </AppHeader>
 
+    <div v-if="!canGenerateSchema" class="free-banner">
+      <span class="free-banner-icon">🔒</span>
+      <span class="free-banner-text">
+        You're on the <strong>Free</strong> plan. Table creation requires <strong>Gold</strong> or higher.
+        <router-link to="/register" class="free-banner-link">Upgrade to Gold</router-link> to start designing tables.
+      </span>
+    </div>
+
     <div class="designer-body">
       <div v-if="error" class="error-msg designer-error">{{ error }}</div>
 
@@ -123,11 +133,11 @@ async function handleDelete(id) {
 
       <template v-else>
         <div class="designer-toolbar">
-          <button class="btn-primary" @click="openNew">+ New Table</button>
+          <button v-if="canGenerateSchema" class="btn-primary" @click="openNew">+ New Table</button>
         </div>
 
         <div v-if="tables.length === 0" class="designer-empty">
-          No table definitions yet. Create one to get started.
+          No table definitions yet.
         </div>
 
         <div v-else class="designer-list">
@@ -148,7 +158,7 @@ async function handleDelete(id) {
                 </li>
               </ul>
             </div>
-            <div class="designer-card-actions">
+            <div v-if="canGenerateSchema" class="designer-card-actions">
               <button class="btn-sm btn-secondary" @click="openEdit(t)">Edit</button>
               <button class="btn-sm btn-danger" :disabled="deleting" @click="handleDelete(t.id)">{{ deleting ? '...' : 'Delete' }}</button>
             </div>
@@ -156,7 +166,7 @@ async function handleDelete(id) {
         </div>
       </template>
 
-      <div v-if="showForm" class="modal-overlay" @click.self="cancelForm">
+      <div v-if="showForm && canGenerateSchema" class="modal-overlay" @click.self="cancelForm">
         <div class="modal">
           <h2 class="modal-title">{{ editing ? 'Edit Table' : 'New Table' }}</h2>
 
@@ -164,19 +174,7 @@ async function handleDelete(id) {
             <label class="field-label">Table Name</label>
             <input v-model="form.name" type="text" class="form-input" placeholder="e.g. users" />
 
-            <div class="columns-header">
-              <span class="field-label">Columns</span>
-              <button class="btn-sm btn-secondary" @click="addColumn">+ Add Column</button>
-            </div>
-
-            <div v-for="(col, i) in form.columns" :key="i" class="column-row">
-              <input v-model="col.name" type="text" class="col-input" placeholder="name" />
-              <input v-model="col.type" type="text" class="col-input col-type" placeholder="VARCHAR(255)" />
-              <label class="col-check"><input v-model="col.pk" type="checkbox" /> PK</label>
-              <label class="col-check"><input v-model="col.fk" type="checkbox" /> FK</label>
-              <label class="col-check"><input v-model="col.unique" type="checkbox" /> UQ</label>
-              <button class="btn-sm btn-danger" @click="removeColumn(i)">×</button>
-            </div>
+            <ColumnBuilder :columns="form.columns" @update:columns="updateColumns" />
           </div>
 
           <div class="modal-actions">

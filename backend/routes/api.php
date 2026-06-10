@@ -42,14 +42,12 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('tables/{table}', [TableDefinitionController::class, 'destroy']);
     });
 
-    // logic definitions — write requires map-structure permission
+    // logic definitions — all authenticated users can CRUD (free tier limited by service)
     Route::get('logics', [LogicDefinitionController::class, 'index']);
     Route::get('logics/{logic}', [LogicDefinitionController::class, 'show']);
-    Route::middleware('permission:map-structure')->group(function () {
-        Route::post('logics', [LogicDefinitionController::class, 'store']);
-        Route::put('logics/{logic}', [LogicDefinitionController::class, 'update']);
-        Route::delete('logics/{logic}', [LogicDefinitionController::class, 'destroy']);
-    });
+    Route::post('logics', [LogicDefinitionController::class, 'store']);
+    Route::put('logics/{logic}', [LogicDefinitionController::class, 'update']);
+    Route::delete('logics/{logic}', [LogicDefinitionController::class, 'destroy']);
 
     // admin — super-admin only
     Route::middleware('role:super-admin')->prefix('admin')->group(function () {

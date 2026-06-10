@@ -6,9 +6,12 @@ use App\Http\Resources\FlowResource;
 use App\Repositories\flow\FlowRepositoryInterface;
 use App\Repositories\flow_edge\FlowEdgeRepositoryInterface;
 use App\Repositories\flow_node\FlowNodeRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class FlowService
 {
+    private const SILVER_MAX_FLOWS = 5;
+
     public function __construct(
         private readonly FlowRepositoryInterface $flowRepository,
         private readonly FlowNodeRepositoryInterface $nodeRepository,
@@ -27,6 +30,7 @@ class FlowService
 
     public function create(int $userId, array $data)
     {
+        $this->checkFlowLimit($userId);
         return $this->flowRepository->create([
             'user_id' => $userId,
             'name' => $data['name'],
@@ -52,7 +56,6 @@ class FlowService
         $this->flowRepository->findForUser($flowId, $userId);
         $this->nodeRepository->deleteByFlowId($flowId);
         $this->nodeRepository->bulkCreate($flowId, $nodes);
-
         return $this->flowRepository->findForUser($flowId, $userId)->nodes;
     }
 
@@ -61,7 +64,6 @@ class FlowService
         $this->flowRepository->findForUser($flowId, $userId);
         $this->edgeRepository->deleteByFlowId($flowId);
         $this->edgeRepository->bulkCreate($flowId, $edges);
-
         return $this->flowRepository->findForUser($flowId, $userId)->edges;
     }
 
@@ -82,7 +84,6 @@ class FlowService
                     'config' => $e['config'] ?? null,
                 ];
             })->toArray();
-
             $this->edgeRepository->bulkCreate($flowId, $mappedEdges);
         }
 
@@ -92,5 +93,34 @@ class FlowService
             'flow' => new FlowResource($flow),
             'node_id_map' => $nodeIdMap,
         ];
+    }
+
+    public function flowCount(int $userId): int
+    {
+        return $this->flowRepository->countForUser($userId);
+    }
+
+    public function maxSlots(int $userId): int
+    {
+        $user = Auth::user();
+        if (!$user) return 0;
+        if ($user->hasAnyRole(['platinum', 'gold', 'super-admin'])) return 999;
+        if ($user->hasRole('silver')) return self::SILVER_MAX_FLOWS;
+        return 0;
+    }
+
+    private function checkFlowLimit(int $userId): void
+    {
+        $user = Auth::user();
+        if (!$user) return;
+        if ($user->hasAnyRole(['platinum', 'gold', 'super-admin'])) return;
+        if ($user->hasRole('silver')) {
+            $count = $this->flowRepository->countForUser($userId);
+            if ($count >= self::SILVER_MAX_FLOWS) {
+                abort(403, 'You have reached the maximum of ' . self::SILVER_MAX_FLOWS . ' flows. Upgrade to Gold or higher for unlimited flows.');
+            }
+            return;
+        }
+        abort(403, 'Saving requires a Silver or higher subscription.');
     }
 }

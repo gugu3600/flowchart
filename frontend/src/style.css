@@ -427,6 +427,14 @@ body {
 
 .designer-toolbar {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logic-slot-info {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 .designer-list {
@@ -1300,4 +1308,136 @@ body {
   padding: 0.6rem;
   color: #64748b;
   font-size: 0.85rem;
+}
+
+/*
+ * ── Free tier banner ───────────────────────────────────────────────
+ */
+
+.free-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.free-banner-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.free-banner-text strong {
+  color: #e2e8f0;
+}
+
+.free-banner-link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.free-banner-link:hover {
+  text-decoration: underline;
+}
+
+/*
+ * ── Slot usage bar ─────────────────────────────────────────────────
+ */
+
+.slot-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 1rem;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.slot-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.slot-track {
+  flex: 1;
+  height: 6px;
+  background: #334155;
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.slot-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.slot-warning {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  white-space: nowrap;
+}
+
+/*
+ * ── Color toolbar ──────────────────────────────────────────────────
+ */
+
+.color-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.color-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-right: 0.25rem;
+  white-space: nowrap;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch-active {
+  border-color: #fff;
+}
+
+.color-clear {
+  background: none;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  margin-left: 0.25rem;
+}
+
+.color-clear:hover {
+  color: #f1f5f9;
+  border-color: #64748b;
 }

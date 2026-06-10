@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-09 16:00 UTC
+> Last updated: 2026-06-10 04:30 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -53,6 +53,21 @@
 - [x] FloatingInput: show/hide password toggle, error state (red border)
 - [x] Login.vue: "Remember me" checkbox, show password toggle
 - [x] Register.vue: show password toggle for both password fields, `<router-link>`
+- [x] Login.vue: added "Don't have an account? Register" link
+- [x] Free tier: save/create hidden, upgrade banner shown
+- [x] Silver tier: 5-slot save limit, node background color picker, edge stroke color picker
+- [x] Backend: flow count limit (5 for silver, unlimited gold+), max_slots/flow_count in index
+- [x] Remove permission gate from logic CRUD routes — all tiers can create logics
+- [x] Backend: logic count limit for free tier (max 4), logic_count/max_slots in index
+- [x] Backend: migration — add subscription_expires_at column to users table
+- [x] Backend: subscription durations (silver 33d, gold 37d, platinum 44d) set on upgrade
+- [x] Frontend: LogicDesigner.vue free banner, logic slot counter, upgrade modal on limit
+- [x] Frontend: API base URL moved to `.env` (VITE_API_BASE_URL), `||` fallback removed from apiClient.js, `.env.example` created
+- [x] Frontend: ColumnBuilder.vue extracted from TableDesigner.vue
+- [x] Frontend: TableDesigner.vue permission-gated — requires `generate-schema` permission (Gold+) for create/edit/delete
+- [x] Store: added `canGenerateSchema` computed property
+- [x] **Tested 2026-06-10**: Free register, logic limit (4 max), table 403 for free — all passing
+- [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
 - [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.

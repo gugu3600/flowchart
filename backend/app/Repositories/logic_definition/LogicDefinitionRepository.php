@@ -32,4 +32,9 @@ class LogicDefinitionRepository implements LogicDefinitionRepositoryInterface
     {
         return LogicDefinition::destroy($id);
     }
+
+    public function countForUser(int $userId): int
+    {
+        return LogicDefinition::where('user_id', $userId)->count();
+    }
 }

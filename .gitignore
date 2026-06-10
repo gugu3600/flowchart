@@ -22,3 +22,14 @@ node_modules/
 # CI
 /.github/
 test-results/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# AI session state
+.threadbridge/
+
+# Misc
+*.deb

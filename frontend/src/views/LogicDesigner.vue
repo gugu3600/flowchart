@@ -4,7 +4,7 @@ import { getLogics, createLogic, updateLogic, deleteLogic } from '../api/logics.
 import AppHeader from '../components/AppHeader.vue'
 import { useUserStore } from '../stores/useUserStore.js'
 
-const { isAdmin } = useUserStore()
+const { isFree, fetchUser } = useUserStore()
 
 const logics = ref([])
 const loading = ref(false)
@@ -14,6 +14,9 @@ const error = ref('')
 const editing = ref(null)
 const form = ref(null)
 const showForm = ref(false)
+const logicCount = ref(0)
+const maxLogicSlots = ref(0)
+const showUpgradeModal = ref(false)
 
 const emptyForm = () => ({
   name: '',
@@ -22,14 +25,21 @@ const emptyForm = () => ({
   output: '',
 })
 
-onMounted(loadLogics)
+onMounted(async () => {
+  await fetchUser()
+  await loadLogics()
+})
 
 async function loadLogics() {
   loading.value = true
   error.value = ''
   try {
     const res = await getLogics()
-    if (res.success) logics.value = res.data.logics || []
+    if (res.success) {
+      logics.value = res.data.logics || []
+      logicCount.value = res.data.logic_count ?? 0
+      maxLogicSlots.value = res.data.max_slots ?? 0
+    }
   } catch (err) {
     error.value = err.message || 'Failed to load logics'
   } finally {
@@ -38,6 +48,10 @@ async function loadLogics() {
 }
 
 function openNew() {
+  if (isFree && logicCount.value >= maxLogicSlots.value && maxLogicSlots.value > 0) {
+    showUpgradeModal.value = true
+    return
+  }
   editing.value = null
   form.value = emptyForm()
   showForm.value = true
@@ -86,13 +100,20 @@ async function handleSave() {
       }
     } else {
       const res = await createLogic(payload)
-      if (res.success) logics.value.push(res.data.logic)
+      if (res.success) {
+        logics.value.push(res.data.logic)
+        logicCount.value++
+      }
     }
     showForm.value = false
     form.value = null
     editing.value = null
   } catch (err) {
-    error.value = err.message || 'Failed to save logic'
+    if (err.response?.status === 403) {
+      showUpgradeModal.value = true
+    } else {
+      error.value = err.message || 'Failed to save logic'
+    }
   } finally {
     saving.value = false
   }
@@ -106,12 +127,17 @@ async function handleDelete(id) {
     const res = await deleteLogic(id)
     if (res.success) {
       logics.value = logics.value.filter((l) => l.id !== id)
+      logicCount.value = Math.max(0, logicCount.value - 1)
     }
   } catch (err) {
     error.value = err.message || 'Failed to delete logic'
   } finally {
     deleting.value = false
   }
+}
+
+function closeUpgradeModal() {
+  showUpgradeModal.value = false
 }
 </script>
 
@@ -126,6 +152,14 @@ async function handleDelete(id) {
       </template>
     </AppHeader>
 
+    <div v-if="isFree" class="free-banner">
+      <span class="free-banner-icon">🔒</span>
+      <span class="free-banner-text">
+        You're on the <strong>Free</strong> plan. You can create up to <strong>{{ maxLogicSlots }} logics</strong>.
+        <router-link to="/register" class="free-banner-link">Upgrade to Silver</router-link> for unlimited logics.
+      </span>
+    </div>
+
     <div class="designer-body">
       <div v-if="error" class="error-msg designer-error">{{ error }}</div>
 
@@ -134,6 +168,9 @@ async function handleDelete(id) {
       <template v-else>
         <div class="designer-toolbar">
           <button class="btn-primary" @click="openNew">+ New Logic</button>
+          <span v-if="maxLogicSlots > 0 && maxLogicSlots < 900" class="logic-slot-info">
+            {{ logicCount }}/{{ maxLogicSlots }} used
+          </span>
         </div>
 
         <div v-if="logics.length === 0" class="designer-empty">
@@ -193,6 +230,20 @@ async function handleDelete(id) {
             >
               {{ saving ? 'Saving...' : 'Save' }}
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="showUpgradeModal" class="modal-overlay" @click.self="closeUpgradeModal">
+        <div class="modal modal-sm">
+          <h2 class="modal-title">Upgrade Required</h2>
+          <p class="upgrade-intro">
+            You've reached the <strong>Free</strong> plan limit of <strong>{{ maxLogicSlots }} logics</strong>.
+            <router-link to="/register" class="free-banner-link" @click="closeUpgradeModal">Upgrade to Silver</router-link>
+            or higher to create unlimited logic definitions.
+          </p>
+          <div class="modal-actions">
+            <button class="btn-secondary" @click="closeUpgradeModal">Cancel</button>
           </div>
         </div>
       </div>
