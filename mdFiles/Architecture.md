@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-10 05:00 UTC
+> Last updated: 2026-06-10 08:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -11,7 +11,7 @@
 - **Caching:** Laravel's built-in caching system.
 - **Design Patterns:** Repository Pattern, Service Pattern, Form Request validation, API Resources.
 - **Database Schema:** 3NF normalized MySQL schema for `flows`, `flow_nodes`, `flow_edges`, `table_definitions`, `logic_definitions`.
-- **Testing:** Playwright (E2E) for frontend, PHPUnit for backend API tests.
+- **Testing:** Playwright (E2E) for frontend — 26 tests passing (12 tier-gated color/permission + subscribe tests), PHPUnit for backend API tests.
 
 ## Frontend Pages
 | Route | Page | Purpose |
@@ -20,6 +20,7 @@
 | `/login` | Login.vue | JWT login form with floating-label inputs, show/hide password toggle, "Remember me" checkbox, link to register |
 | `/register` | Register.vue | User registration with tier selection (Free/Silver/Gold/Platinum), pricing display, floating-label inputs with password toggle, payment method picker (KBZ Pay / AYA Pay / CB Pay / MMQR) for paid tiers |
 | `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace. Free tier: sandbox only (no save). Silver+: color picker for node backgrounds and edge strokes, save up to 5 flows. Gold+: unlimited flows. |
+| `/subscribe` | Subscribe.vue | Self-service subscription page — tier cards, payment method picker, subscribe button. Authenticated users only. |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ). Gold+ (`generate-schema` permission) can create/edit/delete. Free/Silver read-only. ColumnBuilder component for column rows. |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output). Free: max 4 logics with upgrade modal. Silver+: unlimited. |
 
@@ -127,9 +128,10 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 ### Authenticated (auth:api)
 | Method | Route | Handler |
 |--------|-------|---------|
-| GET | `/api/me` | AuthController@me |
-| POST | `/api/logout` | AuthController@logout |
-| GET/POST | `/api/flows` | FlowController@index/store |
+    | GET | `/api/me` | AuthController@me |
+    | POST | `/api/logout` | AuthController@logout |
+    | POST | `/api/subscribe` | AuthController@subscribe (self-service tier upgrade) |
+    | GET/POST | `/api/flows` | FlowController@index/store |
 | GET/PUT/DELETE | `/api/flows/{flow}` | FlowController@show/update/destroy |
 | POST | `/api/flows/{flow}/nodes` | FlowController@saveNodes |
 | POST | `/api/flows/{flow}/edges` | FlowController@saveEdges |

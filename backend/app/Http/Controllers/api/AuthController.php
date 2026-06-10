@@ -8,6 +8,8 @@ use App\Http\Resources\UserResource;
 use App\Services\Auth\AuthService;
 use App\Services\Auth\RegisterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AuthController extends BaseController
 {
@@ -67,6 +69,45 @@ class AuthController extends BaseController
 
         return $this->success([], 'Logged out successfully')
             ->cookie('jwt_token', '', -1, '/');
+    }
+
+    public function subscribe(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'tier' => ['required', 'string', Rule::in(['silver', 'gold', 'platinum'])],
+            'payment_method' => ['required', 'string', Rule::in(['kbzpay', 'ayapay', 'cbpay', 'mmqr'])],
+        ]);
+
+        $user = auth()->user();
+        $tierRole = $validated['tier'];
+
+        if ($user->hasRole('super-admin')) {
+            return $this->error(null, 'Super-admin cannot change tier', 422);
+        }
+
+        $user->syncRoles([$tierRole]);
+
+        $durations = [
+            'silver' => 33,
+            'gold' => 37,
+            'platinum' => 44,
+        ];
+
+        if (isset($durations[$tierRole])) {
+            $days = $durations[$tierRole];
+            $now = now();
+            $currentExpiry = $user->subscription_expires_at;
+            $base = ($currentExpiry && $currentExpiry->isFuture()) ? $currentExpiry : $now;
+            $user->subscription_expires_at = $base->copy()->addDays($days);
+            $user->save();
+        }
+
+        $user->load('roles');
+
+        return $this->success([
+            'user' => new UserResource($user),
+            'message' => "Subscribed to {$tierRole} tier successfully",
+        ], 'Subscription successful');
     }
 
     public function paymentMethods(): JsonResponse

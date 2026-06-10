@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import Subscribe from '../views/Subscribe.vue'
 import Canvas from '../views/Canvas.vue'
 import HelpGuide from '../views/HelpGuide.vue'
 import TableDesigner from '../views/TableDesigner.vue'
@@ -18,6 +19,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
+  },
+  {
+    path: '/subscribe',
+    name: 'Subscribe',
+    component: Subscribe,
   },
   {
     path: '/canvas',

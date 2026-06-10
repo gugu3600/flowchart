@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-10 05:00 UTC
+> Last updated: 2026-06-10 08:00 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -67,6 +67,11 @@
 - [x] Frontend: TableDesigner.vue permission-gated — requires `generate-schema` permission (Gold+) for create/edit/delete
 - [x] Store: added `canGenerateSchema` computed property
 - [x] **Tested 2026-06-10**: Free register, logic limit (4 max), table 403 for free — all passing
+- [x] **Tested 2026-06-10**: Gold/platinum — node color, edge color, table CRUD (generate-schema), unlimited logics — all 11 tier-colors tests passing (25 total)
+- [x] **Tested 2026-06-10**: Subscribe backend endpoint — free user upgrades to silver via /api/subscribe
+- [x] Upgrade modal — added Subscribe button per tier card (navigates to /subscribe?tier=)
+- [x] Subscribe page (/subscribe) — tier cards, payment method picker, subscribe button, auto-redirect to canvas
+- [x] Backend POST /api/subscribe — self-service tier upgrade with payment_method validation, sets subscription_expires_at
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.

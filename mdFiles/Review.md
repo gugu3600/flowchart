@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-10 05:00 UTC
+> Last updated: 2026-06-10 08:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -29,6 +29,8 @@
 - [x] Frontend: TableDesigner.vue permission-gated — create/edit/delete hidden for users without `generate-schema` (Gold+)
 - [x] Store: added `canGenerateSchema` computed property
 - [x] **Tested 2026-06-10**: Free registration works, logic limit 4/4 enforced (5th=403), table creation blocked for free (403 perms)
+- [x] **Tested 2026-06-10**: Gold/platinum — node color, edge color, table CRUD, unlimited logics — 25 total tests passing
+- [x] **Tested 2026-06-10**: Self-service subscribe — free user upgrades to silver via POST /api/subscribe, role + subscription_expires_at set
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Rate Limiting:** Login and register routes are unthrottled — add `throttle:5,1` middleware.
 - [ ] **Password Complexity:** Registration only requires `min:8` — add regex for uppercase+digit+special.
@@ -53,7 +55,7 @@
 - [x] Drop validation: `onDrop` rejects items whose type doesn't match the active mode.
 - [x] Edge/node deletion: `delete-key-code` prop + `@edges-delete` / `@nodes-delete` handlers remove selected edges and nodes on Delete/Backspace.
 - [x] Fixed route model binding: `$tableDefinition` → `$table`, `$logicDefinition` → `$logic` to match route params.
-- [ ] Write E2E tests for tier-gated features (403 paywall intercept).
+- [x] E2E tests for tier-gated features (gold/platinum colors, table CRUD, unlimited logics) — 11 tier-colors tests passing
 - [ ] Write E2E tests for Table Designer and Logic Designer CRUD pages.
 
 ## [Phase 4: Infrastructure & Configuration]

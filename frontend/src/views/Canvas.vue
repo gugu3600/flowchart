@@ -485,7 +485,7 @@ function refresh() {
       <span class="free-banner-icon">🔒</span>
       <span class="free-banner-text">
         You're on the <strong>Free</strong> plan. Create flowcharts visually, but they won't be saved.
-        <router-link to="/register" class="free-banner-link">Upgrade to Silver</router-link> to save your work.
+        <router-link to="/subscribe" class="free-banner-link">Upgrade to Silver</router-link> to save your work.
       </span>
     </div>
 

@@ -1,10 +1,14 @@
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
   visible: { type: Boolean, default: false },
   currentTier: { type: String, default: 'Free' },
 })
 
 defineEmits(['close'])
+
+const router = useRouter()
 
 const tiers = [
   {
@@ -25,10 +29,8 @@ const tiers = [
   },
 ]
 
-function tierClass(name) {
-  return {
-    'tier-card-current': name === 'Platinum',
-  }
+function goToSubscribe(tierName) {
+  router.push(`/subscribe?tier=${tierName.toLowerCase()}`)
 }
 </script>
 
@@ -57,6 +59,13 @@ function tierClass(name) {
             <ul class="tier-card-features">
               <li v-for="feat in tier.features" :key="feat" class="tier-card-feat">{{ feat }}</li>
             </ul>
+            <button
+              v-if="tier.name !== currentTier && tier.name !== 'Free'"
+              class="btn-sm btn-primary subscribe-btn"
+              @click="goToSubscribe(tier.name)"
+            >
+              Subscribe
+            </button>
           </div>
         </div>
       </div>
@@ -67,3 +76,14 @@ function tierClass(name) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.tier-card-disabled {
+  opacity: 0.5;
+}
+
+.subscribe-btn {
+  margin-top: 12px;
+  width: 100%;
+}
+</style>

@@ -156,7 +156,7 @@ function closeUpgradeModal() {
       <span class="free-banner-icon">🔒</span>
       <span class="free-banner-text">
         You're on the <strong>Free</strong> plan. You can create up to <strong>{{ maxLogicSlots }} logics</strong>.
-        <router-link to="/register" class="free-banner-link">Upgrade to Silver</router-link> for unlimited logics.
+        <router-link to="/subscribe" class="free-banner-link">Upgrade to Silver</router-link> for unlimited logics.
       </span>
     </div>
 
@@ -239,7 +239,7 @@ function closeUpgradeModal() {
           <h2 class="modal-title">Upgrade Required</h2>
           <p class="upgrade-intro">
             You've reached the <strong>Free</strong> plan limit of <strong>{{ maxLogicSlots }} logics</strong>.
-            <router-link to="/register" class="free-banner-link" @click="closeUpgradeModal">Upgrade to Silver</router-link>
+            <router-link to="/subscribe" class="free-banner-link" @click="closeUpgradeModal">Upgrade to Silver</router-link>
             or higher to create unlimited logic definitions.
           </p>
           <div class="modal-actions">

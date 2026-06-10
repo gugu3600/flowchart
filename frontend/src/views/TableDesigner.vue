@@ -122,7 +122,7 @@ function updateColumns(val) {
       <span class="free-banner-icon">🔒</span>
       <span class="free-banner-text">
         You're on the <strong>Free</strong> plan. Table creation requires <strong>Gold</strong> or higher.
-        <router-link to="/register" class="free-banner-link">Upgrade to Gold</router-link> to start designing tables.
+        <router-link to="/subscribe" class="free-banner-link">Upgrade to Gold</router-link> to start designing tables.
       </span>
     </div>
 
