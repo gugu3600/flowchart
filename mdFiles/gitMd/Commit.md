@@ -10,7 +10,7 @@
 - `5484d97` docs: fix commit hash in Commit.md after amend
 - `2b07240` Merge dev into test
 - `9cc4e16` docs: update Commit.md
-- `c788575` feat: subscribe page/modal/endpoint — upgrade modal Subscribe button, /subscribe page with payment picker, POST /api/subscribe backend, upgrade links point to /subscribe (26 tests passing)
+- `4de78c8` feat: subscribe page/modal/endpoint — upgrade modal Subscribe button, /subscribe page with payment picker, POST /api/subscribe backend, upgrade links point to /subscribe (26 tests passing)
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps
 - `156efc9` docs: update Commit.md with form UX commit
