@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-10 09:30 UTC
+> Last updated: 2026-06-10 11:30 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -74,8 +74,21 @@
 - [x] Backend POST /api/subscribe — self-service tier upgrade with payment_method validation, sets subscription_expires_at
 - [x] Seeded tier demo users: freeuser@mail.com, silveruser@mail.com, golduser@mail.com, platinumuser@mail.com (all password: "password")
 - [x] Draggable node resize — NodeResizer from @vue-flow/node-resizer on all node types (min 160x60, visible on select)
-- [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
-- [ ] **SECURITY: Add JWT refresh-token flow** — cookie TTL (30d) far exceeds JWT TTL (60min).
+- [x] **SECURITY: JWT refresh-token flow** — reduced TTL to 60min, added POST /api/refresh, cookie TTL synced, 401 interceptor with queue-based retry
+- [x] **SECURITY: DB transactions** — subscribe() and flow create() wrapped with lockForUpdate
+- [x] **SECURITY: Input sanitization** — strip_tags() on all node/edge/flow labels
+- [x] **SECURITY: Frontend auth guards** — requiresAuth meta + authGuard() on all protected routes
+- [x] **FIX: Cross-type node deletion bug** — save() only deletes nodes matching current mode's types
+- [x] **REFACTOR: Extract ModeTabs.vue** — reusable mode-switch component from Canvas.vue
+- [x] **REFACTOR: Extract ColorSwatchPalette.vue** — reusable color picker from Canvas.vue
+- [x] **REFACTOR: Extract useFlowMapper.js** — composable for server↔client node/edge mapping
+- [x] **BUGFIX: Load definitions for users without saved flows** — `loadFlowData(null)` called from `onMounted` when no flow is selected, so Free-tier users and new users see definition nodes on the canvas
+- [ ] **SECURITY: Replace mock payment** with real gateway integration
+- [ ] **SECURITY: Add downgrade protection** for subscription expiry
+- [ ] **SECURITY: Exclude super-admin** from auto-downgrade
+- [ ] **SECURITY: Add email verification** flow
+- [ ] **SECURITY: Set cookie Secure flag** (requires HTTPS deployment)
+- [ ] **SECURITY: Remove extra JSON keys** from API responses
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
 - [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.
 - [ ] **CODE QUALITY: Replace `<a href>` with `<router-link>`** in all views for subpath compatibility.

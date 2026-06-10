@@ -26,10 +26,12 @@ Vue 3 + Vite frontend for the Flowchart architecture diagramming tool.
 
 ## Architecture
 
-- **Route guard** extracted to `router/routeGuard.js` (admin guard with async store import)
+- **Route guard** extracted to `router/routeGuard.js` (auth guard + admin guard with async store import); protected routes marked with `meta: { requiresAuth: true }`
+- **API client** (`api/apiClient.js`): automatic 401 interception with token refresh via `POST /api/refresh` and queue-based retry for concurrent requests
 - **User store** (`stores/useUserStore.js`): singleton reactive store (no Pinia) with tier/role checks
 - **API layer** (`api/`): per-resource modules (flows, tables, logics, admin) wrapping axios client
-- **Components** (`components/`): reusable UI — AppHeader, UserProfile, UpgradeModal, StatCard, Sidebar, node components
+- **Components** (`components/`): reusable UI — AppHeader, UserProfile, UpgradeModal, StatCard, Sidebar, ModeTabs, ColorSwatchPalette, node components
+- **Composables** (`composables/`): `useFlowMapper.js` — server↔client node/edge mapping (`toClientNode`, `toClientEdge`, `toServerNode`, `toServerEdge`, `filterByMode`)
 - **Global CSS** (`style.css`): all styling (no scoped CSS in views)
 - **Tier enforcement**: `canSave` computed prevents save button for users without `save-flows` permission; backend also enforces via Spatie middleware
 

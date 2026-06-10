@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-10 09:30 UTC
+> Last updated: 2026-06-10 11:30 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -36,12 +36,19 @@
 - [x] **Tested 2026-06-10**: Self-service subscribe — free user upgrades to silver via POST /api/subscribe, role + subscription_expires_at set
 - [x] **Tested 2026-06-10**: Seeded tier demo users — freeuser, silveruser, golduser, platinumuser (all password: "password"), idempotent seeder
 - [x] **Tested 2026-06-10**: Full suite 26/26 tests passing (14 setup/login/canvas/admin + 12 tier-colors/subscribe)
+- [x] **Rate Limiting:** Login and register routes throttled 20/min.
+- [x] **Password Complexity:** Registration requires uppercase+digit+special char regex.
+- [x] **JWT Refresh Flow:** Cookie TTL synced to JWT_TTL; POST /api/refresh endpoint; 401 interceptor with queue-based retry.
+- [x] **Input Sanitization:** strip_tags() on all node, edge, and flow labels before persist.
+- [x] **Frontend Auth Guards:** requiresAuth meta + authGuard() on /subscribe, /canvas, /tables, /logics.
+- [x] **Cross-type node deletion:** save()/saveNodes()/saveEdges() use type-aware deletes.
+- [x] **DB Transactions:** subscribe() and flow create() wrapped with lockForUpdate.
+- [x] **ModeTabs, ColorSwatchPalette, useFlowMapper:** extracted and tested (build passes).
+- [x] **Color tools visual update:** setNodeColor/setEdgeColor now update node.style/edge.style immediately (not just config).
+- [x] **Duplicate edge prevention:** isValidConnection rejects connections where source+target already have an edge.
+- [x] **Definition loading without flow:** loadFlowData(null) called from onMounted when no flow selected — logics/tables visible to all users regardless of tier or saved-flow status.
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
-- [ ] **Rate Limiting:** Login and register routes are unthrottled — add `throttle:5,1` middleware.
-- [ ] **Password Complexity:** Registration only requires `min:8` — add regex for uppercase+digit+special.
-- [ ] **JWT Refresh Flow:** Cookie TTL (43200 min) vs JWT TTL (60 min) mismatch — add refresh-token mechanism.
 - [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
-- [ ] **Input Sanitization:** Ensure all custom node identifiers and parameters are validated.
 
 ## [Phase 2: Architectural & System Integrity]
 - [ ] **State Integrity & Memory Leaks:** Verify that deleting nodes or edges inside the Vue Flow UI completely unmounts reactive parameters without leaving unreferenced leakage inside memory arrays.

@@ -11,6 +11,18 @@ class FlowNodeRepository implements FlowNodeRepositoryInterface
         FlowNode::where('flow_id', $flowId)->delete();
     }
 
+    public function deleteByFlowIdAndTypes(int $flowId, array $types): array
+    {
+        $ids = FlowNode::where('flow_id', $flowId)
+            ->whereIn('type', $types)
+            ->pluck('id')
+            ->toArray();
+
+        FlowNode::whereIn('id', $ids)->delete();
+
+        return $ids;
+    }
+
     public function bulkCreate(int $flowId, array $nodes)
     {
         $rows = collect($nodes)->map(fn ($n) => [

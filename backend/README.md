@@ -30,6 +30,7 @@ Laravel 13 RESTful API backend for the Flowchart architecture diagramming tool.
 | POST | `/api/register` | Disabled (commented out) |
 | GET | `/api/me` | Authenticated |
 | POST | `/api/logout` | Authenticated |
+| POST | `/api/refresh` | Authenticated |
 | GET | `/api/stats` | Authenticated |
 | GET | `/api/flows` | Authenticated |
 | POST | `/api/flows` | `permission:save-flows` |
@@ -68,3 +69,13 @@ php artisan serve --port=8000
 ```
 
 Default admin: `admin@flowchart.dev` / `password` (created by `RoleAndPermissionSeeder`).
+
+## Security
+
+- **JWT TTL**: 60 minutes (configurable via `JWT_TTL` in `.env`). Automatic token refresh via `POST /api/refresh` extends the session transparently.
+- **Password policy**: Minimum 8 characters with uppercase, lowercase, digit, and special character.
+- **Rate limiting**: 20 attempts/minute on login and register.
+- **RBAC**: Spatie permissions enforced via middleware on all write endpoints.
+- **HTML sanitization**: All user-supplied labels (nodes, edges, flow names) are passed through `strip_tags()` before persisting.
+- **Race condition prevention**: Subscription upgrades and flow creation use DB transactions with `lockForUpdate()` to serialize concurrent requests.
+- **Cross-type node isolation**: Saving nodes in flow mode (logic/folderFile) preserves any existing schema mode (table) nodes and their edges, and vice versa. Each mode only touches its own node types.

@@ -6,14 +6,18 @@ import '@vue-flow/core/dist/theme-default.css'
 import { TableNode, LogicNode, FolderFileNode } from '../components/nodes'
 import Sidebar from '../components/Sidebar.vue'
 import SchemaSidebar from '../components/SchemaSidebar.vue'
+import ModeTabs from '../components/ModeTabs.vue'
+import ColorSwatchPalette from '../components/ColorSwatchPalette.vue'
 import { getFlows, getFlow, createFlow, saveFlow } from '../api/flows.js'
 import { getTables } from '../api/tables.js'
 import { getLogics } from '../api/logics.js'
 import { useUserStore } from '../stores/useUserStore.js'
+import { useFlowMapper } from '../composables/useFlowMapper.js'
 import UserProfile from '../components/UserProfile.vue'
 import AppHeader from '../components/AppHeader.vue'
 
 const { fetchUser, isAdmin, isSilver, isFree, canSave, tierLabel, tierColor } = useUserStore()
+const { toClientNode, toClientEdge, toServerNode, toServerEdge, filterByMode } = useFlowMapper()
 
 const mode = ref('flow')
 
@@ -55,10 +59,24 @@ const slotsRemaining = computed(() => Math.max(0, maxSlots.value - flowCount.val
 const nodeColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
 const edgeColors = ['#64748b', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
+const selectedNodeColor = computed(() => selectedNode.value?.style?.background || '')
+const selectedEdgeColor = computed(() => selectedEdge.value?.style?.stroke || '#64748b')
+
+function isNodeActive(c, selected) {
+  return selected === c
+}
+
+function isEdgeActive(c, selected) {
+  return c === '#64748b' ? selected === c || !selected : selected === c
+}
+
 onMounted(async () => {
   await fetchUser()
   if (canSave.value) {
     await loadFlows()
+  }
+  if (!currentFlowId.value) {
+    await loadFlowData(null)
   }
 })
 
@@ -93,40 +111,24 @@ async function loadFlowData(flowId) {
   loading.value = true
   error.value = ''
   try {
-    const flowRes = await getFlow(flowId)
     const savedNodes = []
     const savedEdges = []
 
-    if (flowRes.success) {
-      const flow = flowRes.data.flow
-      for (const n of flow.nodes || []) {
-        const isFlowType = n.type === 'logic' || n.type === 'folderFile'
-        const isSchemaType = n.type === 'table'
-        if (mode.value === 'flow' && !isFlowType) continue
-        if (mode.value === 'schema' && !isSchemaType) continue
-        const nodeConfig = n.config || {}
-        savedNodes.push({
-          id: String(n.id),
-          type: n.type,
-          position: { x: n.position_x, y: n.position_y },
-          data: { label: n.label, ...(n.data || {}) },
-          style: nodeConfig.backgroundColor ? { background: nodeConfig.backgroundColor } : {},
-          config: nodeConfig,
-        })
+    if (flowId) {
+      const flowRes = await getFlow(flowId)
+      if (flowRes.success) {
+        const flow = flowRes.data.flow
+        for (const n of flow.nodes || []) {
+          const isFlowType = n.type === 'logic' || n.type === 'folderFile'
+          const isSchemaType = n.type === 'table'
+          if (mode.value === 'flow' && !isFlowType) continue
+          if (mode.value === 'schema' && !isSchemaType) continue
+          savedNodes.push(toClientNode(n))
+        }
+        savedEdges.push(
+          ...(flow.edges || []).map(toClientEdge)
+        )
       }
-      savedEdges.push(
-        ...(flow.edges || []).map((e) => {
-          const edgeConfig = e.config || {}
-          return {
-            id: `e-${e.id}`,
-            source: String(e.source_node_id),
-            target: String(e.target_node_id),
-            label: e.label || '',
-            style: edgeConfig.strokeColor ? { stroke: edgeConfig.strokeColor } : {},
-            config: edgeConfig,
-          }
-        })
-      )
     }
 
     const existingDefIds = new Set()
@@ -228,48 +230,14 @@ async function handleSave() {
   error.value = ''
   try {
     const payload = {
-      nodes: nodes.value.map((n) => ({
-        id: n.id,
-        type: n.type,
-        label: n.data?.label || '',
-        position_x: n.position.x,
-        position_y: n.position.y,
-        data: n.data || {},
-        config: n.config || {},
-      })),
-      edges: edges.value.map((e) => ({
-        source: e.source,
-        target: e.target,
-        label: e.label || '',
-        config: e.config || {},
-      })),
+      nodes: nodes.value.map(toServerNode),
+      edges: edges.value.map(toServerEdge),
     }
     const res = await saveFlow(currentFlowId.value, payload)
     if (res.success) {
-      nodes.value = (res.data.flow?.nodes || []).map((n) => {
-        const nc = n.config || {}
-        return {
-          id: String(n.id),
-          type: n.type,
-          position: { x: n.position_x, y: n.position_y },
-          data: { label: n.label, ...(n.data || {}) },
-          style: nc.backgroundColor ? { background: nc.backgroundColor } : {},
-          config: nc,
-        }
-      })
-      edges.value = (res.data.flow?.edges || []).map((e) => {
-        const ec = e.config || {}
-        return {
-          id: `e-${e.id}`,
-          source: String(e.source_node_id),
-          target: String(e.target_node_id),
-          label: e.label || '',
-          style: ec.strokeColor ? { stroke: ec.strokeColor } : {},
-          config: ec,
-        }
-      })
+      nodes.value = filterByMode(res.data.flow?.nodes || [], mode.value).map(toClientNode)
+      edges.value = (res.data.flow?.edges || []).map(toClientEdge)
 
-      // Restore selection so color swatch active state stays in sync
       if (selectedNode.value) {
         selectedNode.value = nodes.value.find(n => n.id === selectedNode.value.id) || null
       }
@@ -291,6 +259,7 @@ function setNodeColor(color) {
   if (idx === -1) return
   const node = { ...nodes.value[idx] }
   node.config = { ...(node.config || {}), backgroundColor: color }
+  node.style = color ? { background: color } : {}
   nodes.value[idx] = node
   if (currentFlowId.value) {
     handleSave()
@@ -304,6 +273,7 @@ function setEdgeColor(color) {
   if (idx === -1) return
   const edge = { ...edges.value[idx] }
   edge.config = { ...(edge.config || {}), strokeColor: color }
+  edge.style = { ...(edge.style || {}), stroke: color || '#64748b' }
   edges.value[idx] = edge
   if (currentFlowId.value) {
     handleSave()
@@ -318,6 +288,8 @@ function isValidConnection(connection) {
   const src = findNode(connection.source)
   const tgt = findNode(connection.target)
   if (!src || !tgt) return false
+  if (connection.source === connection.target) return false
+  if (edges.value.some(e => e.source === connection.source && e.target === connection.target)) return false
   if (mode.value === 'schema') {
     return src.type === 'table' && tgt.type === 'table'
   }
@@ -433,20 +405,7 @@ function refresh() {
   <div class="canvas-page">
     <AppHeader title="Flowchart">
       <template #left>
-        <div class="mode-tabs">
-          <button
-            :class="['mode-tab', { active: mode === 'flow' }]"
-            @click="switchMode('flow')"
-          >
-            Flow
-          </button>
-          <button
-            :class="['mode-tab', { active: mode === 'schema' }]"
-            @click="switchMode('schema')"
-          >
-            Schema
-          </button>
-        </div>
+        <ModeTabs :mode="mode" @update:mode="switchMode" />
 
         <select
           v-if="canSave && flows.length > 0"
@@ -480,7 +439,6 @@ function refresh() {
       </template>
     </AppHeader>
 
-    <!-- Free tier upgrade banner -->
     <div v-if="isFree" class="free-banner">
       <span class="free-banner-icon">🔒</span>
       <span class="free-banner-text">
@@ -489,7 +447,6 @@ function refresh() {
       </span>
     </div>
 
-    <!-- Slot usage (silver+) -->
     <div v-else-if="canSave && maxSlots > 0 && maxSlots < 900" class="slot-bar">
       <span class="slot-label">Slots: {{ slotsUsed }}/{{ slotsTotal }} used</span>
       <div class="slot-track">
@@ -498,31 +455,27 @@ function refresh() {
       <span v-if="slotsRemaining <= 1" class="slot-warning">{{ slotsRemaining }} slot remaining</span>
     </div>
 
-    <!-- Color toolbar (silver+ when node/edge selected) -->
     <div v-if="!isFree && (selectedNode || selectedEdge)" class="color-bar">
       <template v-if="selectedNode">
-        <span class="color-label">Node Color:</span>
-        <button
-          v-for="c in nodeColors"
-          :key="c"
-          class="color-swatch"
-          :class="{ 'color-swatch-active': selectedNode.style?.background === c }"
-          :style="{ background: c }"
-          @click="setNodeColor(c)"
-        ></button>
-        <button class="color-clear" title="Remove custom color" @click="setNodeColor('')">✕</button>
+        <ColorSwatchPalette
+          label="Node Color:"
+          :colors="nodeColors"
+          :selected-color="selectedNodeColor"
+          clear-title="Remove custom color"
+          :is-active="isNodeActive"
+          @select="setNodeColor"
+        />
       </template>
       <template v-if="selectedEdge">
-        <span class="color-label">Edge Color:</span>
-        <button
-          v-for="c in edgeColors"
-          :key="c"
-          class="color-swatch"
-          :class="{ 'color-swatch-active': selectedEdge.style?.stroke === c || (!selectedEdge.style?.stroke && c === '#64748b') }"
-          :style="{ background: c }"
-          @click="setEdgeColor(c)"
-        ></button>
-        <button class="color-clear" title="Reset to default" @click="setEdgeColor('#64748b')">✕</button>
+        <ColorSwatchPalette
+          label="Edge Color:"
+          :colors="edgeColors"
+          :selected-color="selectedEdgeColor"
+          clear-title="Reset to default"
+          clear-value="#64748b"
+          :is-active="isEdgeActive"
+          @select="setEdgeColor"
+        />
       </template>
     </div>
 

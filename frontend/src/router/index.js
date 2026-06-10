@@ -7,7 +7,7 @@ import HelpGuide from '../views/HelpGuide.vue'
 import TableDesigner from '../views/TableDesigner.vue'
 import LogicDesigner from '../views/LogicDesigner.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
-import { adminGuard } from './routeGuard.js'
+import { authGuard, adminGuard } from './routeGuard.js'
 
 const routes = [
   {
@@ -24,11 +24,13 @@ const routes = [
     path: '/subscribe',
     name: 'Subscribe',
     component: Subscribe,
+    meta: { requiresAuth: true },
   },
   {
     path: '/canvas',
     name: 'Canvas',
     component: Canvas,
+    meta: { requiresAuth: true },
   },
   {
     path: '/help',
@@ -39,11 +41,13 @@ const routes = [
     path: '/tables',
     name: 'TableDesigner',
     component: TableDesigner,
+    meta: { requiresAuth: true },
   },
   {
     path: '/logics',
     name: 'LogicDesigner',
     component: LogicDesigner,
+    meta: { requiresAuth: true },
   },
   {
     path: '/admin',
@@ -75,6 +79,9 @@ router.beforeEach(async (to) => {
   }
 
   const isAuth = !!store.state.user
+
+  const authResult = authGuard(to, isAuth)
+  if (authResult) return authResult
 
   if (to.meta.requiresAdmin) {
     return adminGuard(to, isAuth, store)

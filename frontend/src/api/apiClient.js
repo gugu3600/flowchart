@@ -11,6 +11,20 @@ const apiClient = axios.create({
   },
 })
 
+let isRefreshing = false
+let failedQueue = []
+
+function processQueue(error) {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve()
+    }
+  })
+  failedQueue = []
+}
+
 apiClient.interceptors.response.use(
   (response) => {
     if (response.data && 'success' in response.data) {
@@ -18,7 +32,32 @@ apiClient.interceptors.response.use(
     }
     return response
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/refresh')) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        }).then(() => apiClient(originalRequest))
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        await axios.post(`${API_BASE_URL}/refresh`, {}, { withCredentials: true })
+        processQueue(null)
+        return apiClient(originalRequest)
+      } catch (refreshError) {
+        processQueue(refreshError)
+        window.location.href = '/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
     if (error.response?.data) {
       return Promise.reject(error.response.data)
     }

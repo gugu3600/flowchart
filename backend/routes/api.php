@@ -17,6 +17,7 @@ Route::middleware('auth:api')->group(function () {
     // auth
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('subscribe', [AuthController::class, 'subscribe']);
 
     // stats (available to all authenticated users)

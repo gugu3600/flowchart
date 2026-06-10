@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-10 09:30 UTC
+> Last updated: 2026-06-10 11:30 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -39,11 +39,15 @@ Additionally, when loading saved flow data, nodes are **filtered by mode**:
 
 The `onDrop` handler also rejects dropped items whose type doesn't match the active mode. This ensures **absolute separation** — tables never appear in Flow canvas, logic/folders never appear in Schema canvas, even if previously saved.
 
+Definition nodes (logics for flow mode, tables for schema mode) are loaded in two scenarios:
+- **With a saved flow:** `loadFlowData(flowId)` loads saved nodes from the flow, then fetches definitions from the API and creates definition stubs for any that aren't already on the canvas.
+- **Without a saved flow:** `loadFlowData(null)` is called from `onMounted` when no flow is selected (free tier or no flows yet). It skips saved-node loading but still fetches and displays definitions, so users can see and drag definitions even without a flow.
+
 ## Frontend Component Architecture
 ```
 src/
 ├── api/
-│   ├── apiClient.js          — Axios instance (withCredentials, response unwrapper, baseURL from VITE_API_BASE_URL)
+│   ├── apiClient.js          — Axios instance (withCredentials, response unwrapper, baseURL from VITE_API_BASE_URL); 401 interceptor with queue-based token refresh
 │   ├── flows.js              — Flows CRUD + save API
 │   ├── tables.js             — Table definitions CRUD API
 │   └── logics.js             — Logic definitions CRUD API
@@ -60,6 +64,8 @@ src/
 │   ├── PaymentMethodPicker.vue — 2×2 payment method grid with loading state
 │   ├── Sidebar.vue           — Drag-and-drop palette (Flow mode: Logic, Folder/File)
 │   ├── SchemaSidebar.vue     — Drag-and-drop palette (Schema mode: Table only)
+│   ├── ModeTabs.vue          — Flow/Schema mode toggle buttons (props: mode, emits: update:mode)
+│   ├── ColorSwatchPalette.vue — Color picker swatches (props: label, colors, selectedColor, isActive fn)
 │   ├── index.js              — Barrel exports
 │   └── nodes/
 │       ├── BaseNode.vue       — Shared node wrapper (Handle ports, color themes, selected ring)
@@ -67,16 +73,21 @@ src/
 │       ├── LogicNode.vue      — Logic/function node (inputs, outputs, description)
 │       ├── FolderFileNode.vue — Folder/file mapping node (path, children tree preview)
 │       └── index.js           — Barrel exports
+├── composables/
+│   └── useFlowMapper.js       — Server↔client mapping: toClientNode, toClientEdge, toServerNode, toServerEdge, filterByMode
 ├── views/
 │   ├── Login.vue             — Login form using AppCard / AppInput / AppButton + apiClient
-│   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load, edge/node deletion
+│   ├── Canvas.vue            — Tabbed Vue Flow (Flow/Schema), flow selector, sidebar, save/load, edge/node deletion; uses ModeTabs, ColorSwatchPalette, useFlowMapper
 │   ├── HelpGuide.vue         — How-to guide with app usage instructions and keyboard shortcuts
 │   ├── Register.vue          — Registration form (name, email, password, confirm)
 │   ├── Subscribe.vue         — Self-service subscription with tier cards, payment method picker
 │   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
 │   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
 ├── router/
-│   └── index.js              — Vue Router (/login, /register, /subscribe, /canvas, /help, /tables, /logics routes)
+│   ├── index.js              — Vue Router (/login, /register, /subscribe, /canvas, /help, /tables, /logics routes) with requiresAuth meta on protected routes
+│   └── routeGuard.js          — authGuard() + adminGuard() route navigation guards
+├── stores/
+│   └── useUserStore.js        — Singleton reactive store (no Pinia) with tier/role/computed permissions
 ├── App.vue                   — <router-view /> root
 └── main.js                   — createApp + router + PrimeVue plugin
 ```
@@ -167,8 +178,15 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 | `FloatingInput` | Login.vue, Register.vue | Floating-label input with bottom-border underline, password show/hide toggle, error state (v-model, type, id, label, autocomplete, showPasswordToggle, hasError props) |
 | `TierSelector` | Register.vue | 2×2 tier card grid (v-model, tiers array) |
 | `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid with loading state (v-model, methods, loading props) |
+| `ModeTabs` | Canvas.vue | Flow/Schema mode toggle buttons (props: mode, emits: update:mode) |
+| `ColorSwatchPalette` | Canvas.vue | Color picker swatches for node background / edge stroke (props: label, colors, selectedColor, isActive fn) |
 | `AppButton` | Multiple views | Styled action button with loading state |
 | `AppCard` | Multiple views | Card container with optional title/subtitle |
+
+## Composables
+| Composable | Used In | Purpose |
+|-----------|---------|---------|
+| `useFlowMapper` | Canvas.vue | Server↔client node/edge mapping: `toClientNode`, `toClientEdge`, `toServerNode`, `toServerEdge`, `filterByMode` |
 
 ## Middleware & Access Gatekeeping (Gatekeeper Bounds)
 - **Save Flows:** Wraps `/flows/*` write endpoints. Verify user has `save-flows` permission (silver+).

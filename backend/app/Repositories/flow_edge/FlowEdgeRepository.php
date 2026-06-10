@@ -11,6 +11,16 @@ class FlowEdgeRepository implements FlowEdgeRepositoryInterface
         FlowEdge::where('flow_id', $flowId)->delete();
     }
 
+    public function deleteByNodeIds(int $flowId, array $nodeIds): void
+    {
+        FlowEdge::where('flow_id', $flowId)
+            ->where(function ($q) use ($nodeIds) {
+                $q->whereIn('source_node_id', $nodeIds)
+                  ->orWhereIn('target_node_id', $nodeIds);
+            })
+            ->delete();
+    }
+
     public function bulkCreate(int $flowId, array $edges)
     {
         $rows = collect($edges)->map(fn ($e) => [

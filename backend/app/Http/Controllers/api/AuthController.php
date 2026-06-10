@@ -9,6 +9,7 @@ use App\Services\Auth\AuthService;
 use App\Services\Auth\RegisterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AuthController extends BaseController
@@ -23,11 +24,12 @@ class AuthController extends BaseController
         $result = $this->registerService->register($request->validated());
 
         $secure = config('app.env') === 'production';
+        $ttl = config('jwt.ttl', 60);
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'User registered successfully',
             201,
-        )->cookie('jwt_token', $result['token'], 43200, '/', null, $secure, true, false, 'Strict');
+        )->cookie('jwt_token', $result['token'], $ttl, '/', null, $secure, true, false, 'Strict');
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -49,10 +51,11 @@ class AuthController extends BaseController
         }
 
         $secure = config('app.env') === 'production';
+        $ttl = config('jwt.ttl', 60);
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'Login successful',
-        )->cookie('jwt_token', $result['token'], 43200, '/', null, $secure, true, false, 'Strict');
+        )->cookie('jwt_token', $result['token'], $ttl, '/', null, $secure, true, false, 'Strict');
     }
 
     public function me(): JsonResponse
@@ -71,6 +74,20 @@ class AuthController extends BaseController
             ->cookie('jwt_token', '', -1, '/');
     }
 
+    public function refresh(): JsonResponse
+    {
+        try {
+            $newToken = auth()->refresh();
+        } catch (\Exception $e) {
+            return $this->error(null, 'Token refresh failed. Please login again.', 401);
+        }
+
+        $secure = config('app.env') === 'production';
+        $ttl = config('jwt.ttl', 60);
+        return $this->success([], 'Token refreshed')
+            ->cookie('jwt_token', $newToken, $ttl, '/', null, $secure, true, false, 'Strict');
+    }
+
     public function subscribe(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -78,6 +95,7 @@ class AuthController extends BaseController
             'payment_method' => ['required', 'string', Rule::in(['kbzpay', 'ayapay', 'cbpay', 'mmqr'])],
         ]);
 
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $tierRole = $validated['tier'];
 
@@ -85,22 +103,26 @@ class AuthController extends BaseController
             return $this->error(null, 'Super-admin cannot change tier', 422);
         }
 
-        $user->syncRoles([$tierRole]);
-
         $durations = [
             'silver' => 33,
             'gold' => 37,
             'platinum' => 44,
         ];
 
-        if (isset($durations[$tierRole])) {
-            $days = $durations[$tierRole];
-            $now = now();
-            $currentExpiry = $user->subscription_expires_at;
-            $base = ($currentExpiry && $currentExpiry->isFuture()) ? $currentExpiry : $now;
-            $user->subscription_expires_at = $base->copy()->addDays($days);
-            $user->save();
-        }
+        DB::transaction(function () use ($user, $tierRole, $durations) {
+            $lockedUser = \App\Models\User::where('id', $user->id)->lockForUpdate()->first();
+
+            $lockedUser->syncRoles([$tierRole]);
+
+            if (isset($durations[$tierRole])) {
+                $days = $durations[$tierRole];
+                $now = now();
+                $currentExpiry = $lockedUser->subscription_expires_at;
+                $base = ($currentExpiry && $currentExpiry->isFuture()) ? $currentExpiry : $now;
+                $lockedUser->subscription_expires_at = $base->copy()->addDays($days);
+                $lockedUser->save();
+            }
+        });
 
         $user->load('roles');
 

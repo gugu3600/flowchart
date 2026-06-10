@@ -3,10 +3,12 @@
 namespace App\Services\Flow;
 
 use App\Http\Resources\FlowResource;
+use App\Models\User;
 use App\Repositories\flow\FlowRepositoryInterface;
 use App\Repositories\flow_edge\FlowEdgeRepositoryInterface;
 use App\Repositories\flow_node\FlowNodeRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FlowService
 {
@@ -30,13 +32,15 @@ class FlowService
 
     public function create(int $userId, array $data)
     {
-        $this->checkFlowLimit($userId);
-        return $this->flowRepository->create([
-            'user_id' => $userId,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'config' => $data['config'] ?? null,
-        ]);
+        return DB::transaction(function () use ($userId, $data) {
+            $this->checkFlowLimit($userId);
+            return $this->flowRepository->create([
+                'user_id' => $userId,
+                'name' => strip_tags($data['name']),
+                'description' => isset($data['description']) ? strip_tags($data['description']) : null,
+                'config' => $data['config'] ?? null,
+            ]);
+        });
     }
 
     public function update(int $id, int $userId, array $data)
@@ -54,16 +58,39 @@ class FlowService
     public function saveNodes(int $flowId, int $userId, array $nodes)
     {
         $this->flowRepository->findForUser($flowId, $userId);
-        $this->nodeRepository->deleteByFlowId($flowId);
-        $this->nodeRepository->bulkCreate($flowId, $nodes);
+
+        $payloadTypes = collect($nodes)->pluck('type')->unique()->toArray();
+
+        if (!empty($payloadTypes)) {
+            $this->nodeRepository->deleteByFlowIdAndTypes($flowId, $payloadTypes);
+        }
+
+        $sanitized = array_map(fn ($n) => [
+            ...$n,
+            'label' => isset($n['label']) ? strip_tags($n['label']) : '',
+        ], $nodes);
+        $this->nodeRepository->bulkCreate($flowId, $sanitized);
         return $this->flowRepository->findForUser($flowId, $userId)->nodes;
     }
 
     public function saveEdges(int $flowId, int $userId, array $edges)
     {
         $this->flowRepository->findForUser($flowId, $userId);
-        $this->edgeRepository->deleteByFlowId($flowId);
-        $this->edgeRepository->bulkCreate($flowId, $edges);
+
+        $edgeNodeIds = collect($edges)->flatMap(fn ($e) => [
+            $e['source_node_id'] ?? null,
+            $e['target_node_id'] ?? null,
+        ])->filter()->unique()->toArray();
+
+        if (!empty($edgeNodeIds)) {
+            $this->edgeRepository->deleteByNodeIds($flowId, $edgeNodeIds);
+        }
+
+        $sanitized = array_map(fn ($e) => [
+            ...$e,
+            'label' => isset($e['label']) ? strip_tags($e['label']) : null,
+        ], $edges);
+        $this->edgeRepository->bulkCreate($flowId, $sanitized);
         return $this->flowRepository->findForUser($flowId, $userId)->edges;
     }
 
@@ -71,16 +98,29 @@ class FlowService
     {
         $this->flowRepository->findForUser($flowId, $userId);
 
-        $this->nodeRepository->deleteByFlowId($flowId);
-        $nodeIdMap = $this->nodeRepository->bulkCreateWithReturn($flowId, $data['nodes'] ?? []);
+        // Only touch nodes of the types in the payload (preserves cross-type nodes)
+        $payloadTypes = collect($data['nodes'] ?? [])->pluck('type')->unique()->toArray();
 
-        $this->edgeRepository->deleteByFlowId($flowId);
+        $deletedNodeIds = [];
+        if (!empty($payloadTypes)) {
+            $deletedNodeIds = $this->nodeRepository->deleteByFlowIdAndTypes($flowId, $payloadTypes);
+        }
+
+        $this->edgeRepository->deleteByNodeIds($flowId, $deletedNodeIds);
+
+        $sanitizedNodes = array_map(fn ($n) => [
+            ...$n,
+            'label' => isset($n['label']) ? strip_tags($n['label']) : '',
+        ], $data['nodes'] ?? []);
+
+        $nodeIdMap = $this->nodeRepository->bulkCreateWithReturn($flowId, $sanitizedNodes);
+
         if (!empty($data['edges'])) {
             $mappedEdges = collect($data['edges'])->map(function ($e) use ($nodeIdMap) {
                 return [
                     'source_node_id' => $nodeIdMap[$e['source']] ?? 0,
                     'target_node_id' => $nodeIdMap[$e['target']] ?? 0,
-                    'label' => $e['label'] ?? null,
+                    'label' => isset($e['label']) ? strip_tags($e['label']) : null,
                     'config' => $e['config'] ?? null,
                 ];
             })->toArray();
@@ -115,6 +155,8 @@ class FlowService
         if (!$user) return;
         if ($user->hasAnyRole(['platinum', 'gold', 'super-admin'])) return;
         if ($user->hasRole('silver')) {
+            // Lock user row to serialize concurrent flow creation
+            User::where('id', $userId)->lockForUpdate()->first();
             $count = $this->flowRepository->countForUser($userId);
             if ($count >= self::SILVER_MAX_FLOWS) {
                 abort(403, 'You have reached the maximum of ' . self::SILVER_MAX_FLOWS . ' flows. Upgrade to Gold or higher for unlimited flows.');
