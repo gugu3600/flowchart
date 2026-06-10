@@ -1,15 +1,8 @@
-export async function adminGuard(to, from, next) {
-  try {
-    const { useUserStore } = await import('../stores/useUserStore.js')
-    const store = useUserStore()
-    if (!store.state.user) {
-      await store.fetchUser()
-    }
-    if (!store.isAdmin.value) {
-      return next('/canvas')
-    }
-  } catch {
-    return next('/login')
+export function adminGuard(to, isAuth, store) {
+  if (!isAuth) {
+    return '/login'
   }
-  next()
+  if (!store.isAdmin.value) {
+    return '/canvas'
+  }
 }

@@ -1,12 +1,13 @@
 # Git Commits
 
-> Last updated: 2026-06-10 04:30 UTC
+> Last updated: 2026-06-10 05:00 UTC
 
 ## 2026-06-10
 
+- `19d4b88` fix: route guard return-only, login 409 if authed, color reactivity & insert bugfixes
 - `7220011` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
-- Tier-gated logic CRUD + subscription durations
-
+- `5484d97` docs: fix commit hash in Commit.md after amend
+- `2b07240` Merge dev into test
 - `9cc4e16` docs: update Commit.md
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps

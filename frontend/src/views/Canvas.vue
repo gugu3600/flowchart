@@ -223,6 +223,7 @@ async function handleSave() {
     error.value = 'Saving requires a Silver or higher subscription. Upgrade to unlock.'
     return
   }
+  if (saving.value) return
   saving.value = true
   error.value = ''
   try {
@@ -267,6 +268,14 @@ async function handleSave() {
           config: ec,
         }
       })
+
+      // Restore selection so color swatch active state stays in sync
+      if (selectedNode.value) {
+        selectedNode.value = nodes.value.find(n => n.id === selectedNode.value.id) || null
+      }
+      if (selectedEdge.value) {
+        selectedEdge.value = edges.value.find(e => e.id === selectedEdge.value.id) || null
+      }
     }
   } catch (err) {
     error.value = err.message || 'Failed to save flow'
@@ -276,17 +285,29 @@ async function handleSave() {
 }
 
 function setNodeColor(color) {
-  const n = selectedNode.value
-  if (!n) return
-  n.style = { ...n.style, background: color }
-  n.config = { ...n.config, backgroundColor: color }
+  const sel = selectedNode.value
+  if (!sel) return
+  const idx = nodes.value.findIndex(n => n.id === sel.id)
+  if (idx === -1) return
+  const node = { ...nodes.value[idx] }
+  node.config = { ...(node.config || {}), backgroundColor: color }
+  nodes.value[idx] = node
+  if (currentFlowId.value) {
+    handleSave()
+  }
 }
 
 function setEdgeColor(color) {
-  const e = selectedEdge.value
-  if (!e) return
-  e.style = { ...e.style, stroke: color }
-  e.config = { ...e.config, strokeColor: color }
+  const sel = selectedEdge.value
+  if (!sel) return
+  const idx = edges.value.findIndex(e => e.id === sel.id)
+  if (idx === -1) return
+  const edge = { ...edges.value[idx] }
+  edge.config = { ...(edge.config || {}), strokeColor: color }
+  edges.value[idx] = edge
+  if (currentFlowId.value) {
+    handleSave()
+  }
 }
 
 function findNode(nodeId) {

@@ -1,6 +1,6 @@
 # Change Log Archive
 
-> Last updated: 2026-06-08 12:00 UTC
+> Last updated: 2026-06-10 05:00 UTC
 
 ## Log-2026-06-04-001 — Project Scaffolding & RBAC/JWT Setup
 
@@ -750,7 +750,34 @@ Enhanced the Canvas mode separation to ensure **absolute domain isolation** betw
 
 ---
 
-## Log-2026-06-10-003 — Test Registration, Logic Limits & Table Permissions
+## Log-2026-06-10-004 — Route Guard Fix, Backend Login Protection, Color Fixes, Tier Tests
+
+### Summary
+- **Frontend route guard**: Rewrote `router.beforeEach` to use `return` instead of `next` callback (avoids infinite loop risk). Already-logged-in users going to `/login` or `/register` are redirected to `/canvas`. Moved user fetch from `adminGuard` into main guard so login/register redirect works without async race.
+- **adminGuard**: Refactored — no longer async, no `next()` call — receives pre-loaded auth state, returns redirect directly.
+- **Backend login**: `AuthController::login()` now checks for valid `jwt_token` cookie. If the user is already authenticated, returns `409` with "Already authenticated. Please logout first."
+- **Color reactivity fix**: `setNodeColor`/`setEdgeColor` now find nodes/edges in `nodes.value`/`edges.value` by ID (not VueFlow's internal object). Colors only update visually after backend save confirms (no optimistic UI).
+- **Insert bug fix**: `FlowEdgeRepository::bulkCreate` and `FlowNodeRepository::bulkCreate` `json_encode` JSON columns before `insert()` (Eloquent's `insert()` bypasses model `casts()`).
+- **3 new API-level Playwright tests**: free tier save blocked (403), silver node color persisted, silver edge color persisted.
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `frontend/src/router/index.js` | Removed `next()` — uses `return`, redirects logged-in users from /login and /register |
+| `frontend/src/router/routeGuard.js` | Removed `next()`, uses `return`, receives pre-fetched auth state |
+| `backend/app/Http/Controllers/api/AuthController.php` | Added already-authenticated check to login (409) |
+| `frontend/src/views/Canvas.vue` | setNodeColor/setEdgeColor modify nodes.value directly, trigger save, no optimistic style update |
+| `backend/app/Repositories/flow_edge/FlowEdgeRepository.php` | json_encode config in bulkCreate |
+| `backend/app/Repositories/flow_node/FlowNodeRepository.php` | json_encode data/config in bulkCreate |
+| `tests/tier-colors.spec.js` | Added 3 API-level color enforcement tests |
+| `mdFiles/Architecture.md` | Timestamp updated |
+| `mdFiles/Todo.md` | Timestamp updated |
+| `mdFiles/Review.md` | Timestamp updated |
+| `mdFiles/Skills.md` | Timestamp updated |
+| `mdFiles/schema.md` | Timestamp updated |
+| `mdFiles/gitMd/Commit.md` | Timestamp updated |
+| `openspec/changes/archive/logs.md` | Appended this log entry |
+
 
 ### Summary
 - Registered free-tier test user (id=5, role=`free`, no permissions, `subscription_expires_at=null`).

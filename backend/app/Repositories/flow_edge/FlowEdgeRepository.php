@@ -13,14 +13,14 @@ class FlowEdgeRepository implements FlowEdgeRepositoryInterface
 
     public function bulkCreate(int $flowId, array $edges)
     {
-        $instances = collect($edges)->map(fn ($e) => new FlowEdge([
+        $rows = collect($edges)->map(fn ($e) => [
             'flow_id' => $flowId,
             'source_node_id' => $e['source_node_id'],
             'target_node_id' => $e['target_node_id'],
             'label' => $e['label'] ?? null,
-            'config' => $e['config'] ?? null,
-        ]));
+            'config' => isset($e['config']) ? json_encode($e['config']) : null,
+        ])->toArray();
 
-        return FlowEdge::insert($instances->toArray());
+        return FlowEdge::insert($rows);
     }
 }

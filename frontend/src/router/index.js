@@ -56,11 +56,27 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, from, next) => {
-  if (to.meta.requiresAdmin) {
-    return adminGuard(to, from, next)
+router.beforeEach(async (to) => {
+  const { useUserStore } = await import('../stores/useUserStore.js')
+  const store = useUserStore()
+
+  if (!store.state.user) {
+    try {
+      await store.fetchUser()
+    } catch {
+      store.state.user = null
+    }
   }
-  next()
+
+  const isAuth = !!store.state.user
+
+  if (to.meta.requiresAdmin) {
+    return adminGuard(to, isAuth, store)
+  }
+
+  if (isAuth && (to.name === 'Login' || to.name === 'Register')) {
+    return '/canvas'
+  }
 })
 
 export default router

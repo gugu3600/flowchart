@@ -30,6 +30,16 @@ class AuthController extends BaseController
 
     public function login(LoginRequest $request): JsonResponse
     {
+        if ($request->cookie('jwt_token')) {
+            try {
+                if (auth('api')->setToken($request->cookie('jwt_token'))->authenticate()) {
+                    return $this->error(null, 'Already authenticated. Please logout first.', 409);
+                }
+            } catch (\Exception $e) {
+                // Token is invalid/expired — allow login
+            }
+        }
+
         $result = $this->authService->login($request->validated());
 
         if (!$result) {
