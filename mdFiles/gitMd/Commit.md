@@ -4,7 +4,8 @@
 
 ## 2026-06-10
 
-- `19d4b88` fix: route guard return-only, login 409 if authed, color reactivity & insert bugfixes
+- `9765ba9` docs: fix hash in Commit.md
+- `65e74bd` fix: route guard return-only, login 409 if authed, color reactivity & insert bugfixes
 - `7220011` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
 - `5484d97` docs: fix commit hash in Commit.md after amend
 - `2b07240` Merge dev into test
