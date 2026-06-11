@@ -8,7 +8,7 @@ import Sidebar from '../components/Sidebar.vue'
 import SchemaSidebar from '../components/SchemaSidebar.vue'
 import ModeTabs from '../components/ModeTabs.vue'
 import ColorSwatchPalette from '../components/ColorSwatchPalette.vue'
-import { getFlows, getFlow, createFlow, saveFlow } from '../api/flows.js'
+import { getFlows, getFlow, createFlow, saveFlow, validateConnection } from '../api/flows.js'
 import { getTables } from '../api/tables.js'
 import { getLogics } from '../api/logics.js'
 import { useUserStore } from '../stores/useUserStore.js'
@@ -289,15 +289,40 @@ function isValidConnection(connection) {
   const tgt = findNode(connection.target)
   if (!src || !tgt) return false
   if (connection.source === connection.target) return false
-  if (edges.value.some(e => e.source === connection.source && e.target === connection.target)) return false
   if (mode.value === 'schema') {
     return src.type === 'table' && tgt.type === 'table'
   }
   return src.type !== 'table' && tgt.type !== 'table'
 }
 
-function onConnect(params) {
-  if (!isValidConnection(params)) return
+async function onConnect(params) {
+  const src = findNode(params.source)
+  const tgt = findNode(params.target)
+  if (!src || !tgt) return
+
+  if (edges.value.some(e => e.source === params.source && e.target === params.target)) {
+    error.value = 'These nodes are already connected'
+    return
+  }
+
+  if (currentFlowId.value) {
+    try {
+      const res = await validateConnection(currentFlowId.value, {
+        source_id: params.source,
+        target_id: params.target,
+        source_type: src.type,
+        target_type: tgt.type,
+      })
+      if (!res.success) {
+        error.value = res.message || 'Connection rejected'
+        return
+      }
+    } catch (err) {
+      error.value = err.message || 'Failed to validate connection'
+      return
+    }
+  }
+
   edges.value = [
     ...edges.value,
     {
@@ -389,9 +414,7 @@ function switchMode(newMode) {
   mode.value = newMode
   selectedNode.value = null
   selectedEdge.value = null
-  if (currentFlowId.value) {
-    loadFlowData(currentFlowId.value)
-  }
+  loadFlowData(currentFlowId.value)
 }
 
 function refresh() {

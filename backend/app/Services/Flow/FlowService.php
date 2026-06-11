@@ -116,14 +116,16 @@ class FlowService
         $nodeIdMap = $this->nodeRepository->bulkCreateWithReturn($flowId, $sanitizedNodes);
 
         if (!empty($data['edges'])) {
-            $mappedEdges = collect($data['edges'])->map(function ($e) use ($nodeIdMap) {
+            $mappedEdges = collect($data['edges'])->filter(function ($e) use ($nodeIdMap) {
+                return isset($nodeIdMap[$e['source']]) && isset($nodeIdMap[$e['target']]);
+            })->map(function ($e) use ($nodeIdMap) {
                 return [
-                    'source_node_id' => $nodeIdMap[$e['source']] ?? 0,
-                    'target_node_id' => $nodeIdMap[$e['target']] ?? 0,
+                    'source_node_id' => $nodeIdMap[$e['source']],
+                    'target_node_id' => $nodeIdMap[$e['target']],
                     'label' => isset($e['label']) ? strip_tags($e['label']) : null,
                     'config' => $e['config'] ?? null,
                 ];
-            })->toArray();
+            })->values()->toArray();
             $this->edgeRepository->bulkCreate($flowId, $mappedEdges);
         }
 
@@ -133,6 +135,46 @@ class FlowService
             'flow' => new FlowResource($flow),
             'node_id_map' => $nodeIdMap,
         ];
+    }
+
+    public function validateConnection(int $flowId, int $userId, string $sourceId, string $targetId, string $sourceType, string $targetType): array
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return ['valid' => false, 'message' => 'Authentication required.'];
+        }
+
+        if (!$user->hasPermissionTo('save-flows')) {
+            return ['valid' => false, 'message' => 'Saving requires a Silver or higher subscription. Upgrade to save your work.'];
+        }
+
+        if ($sourceId === $targetId) {
+            return ['valid' => false, 'message' => 'Cannot connect a node to itself.'];
+        }
+
+        $isSchema = $sourceType === 'table' || $targetType === 'table';
+        if ($isSchema) {
+            if ($sourceType !== 'table' || $targetType !== 'table') {
+                return ['valid' => false, 'message' => 'In schema mode, only table nodes can be connected.'];
+            }
+        } else {
+            if ($sourceType === 'table' || $targetType === 'table') {
+                return ['valid' => false, 'message' => 'In flow mode, table nodes cannot be connected.'];
+            }
+        }
+
+        $this->flowRepository->findForUser($flowId, $userId);
+
+        // if both nodes have DB IDs (already saved), check for duplicate edge
+        if (is_numeric($sourceId) && is_numeric($targetId)) {
+            $exists = $this->edgeRepository->exists($flowId, (int)$sourceId, (int)$targetId);
+            if ($exists) {
+                return ['valid' => false, 'message' => 'These nodes are already connected.'];
+            }
+        }
+
+        return ['valid' => true, 'message' => ''];
     }
 
     public function flowCount(int $userId): int

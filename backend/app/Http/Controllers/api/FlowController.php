@@ -7,6 +7,7 @@ use App\Http\Requests\Flow\SaveFlowRequest;
 use App\Http\Requests\Flow\SaveNodesRequest;
 use App\Http\Requests\Flow\StoreFlowRequest;
 use App\Http\Requests\Flow\UpdateFlowRequest;
+use App\Http\Requests\Flow\ValidateConnectionRequest;
 use App\Http\Resources\FlowEdgeResource;
 use App\Http\Resources\FlowNodeResource;
 use App\Http\Resources\FlowResource;
@@ -97,5 +98,23 @@ class FlowController extends BaseController
         $result = $this->flowService->save($flow->id, Auth::id(), $request->validated());
 
         return $this->success($result, 'Flow saved');
+    }
+
+    public function validateConnection(ValidateConnectionRequest $request, Flow $flow): JsonResponse
+    {
+        $result = $this->flowService->validateConnection(
+            $flow->id,
+            Auth::id(),
+            $request->validated('source_id'),
+            $request->validated('target_id'),
+            $request->validated('source_type'),
+            $request->validated('target_type'),
+        );
+
+        if ($result['valid']) {
+            return $this->success([], 'Connection is valid');
+        }
+
+        return $this->error([], $result['message'], 422);
     }
 }

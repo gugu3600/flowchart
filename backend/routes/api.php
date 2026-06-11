@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('flows/{flow}/nodes', [FlowController::class, 'saveNodes']);
         Route::post('flows/{flow}/edges', [FlowController::class, 'saveEdges']);
         Route::post('flows/{flow}/save', [FlowController::class, 'save']);
+        Route::post('flows/{flow}/validate-connection', [FlowController::class, 'validateConnection']);
     });
 
     // table definitions — write requires generate-schema permission

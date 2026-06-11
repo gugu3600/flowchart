@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-10 16:30 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -31,17 +31,16 @@
 | **Flow** | `Flow` | Logic, Folder/File | logic↔logic, logic↔folderFile, folderFile↔folderFile | Sidebar.vue (Logic + Folder/File) |
 | **Schema** | `Schema` | Table | table↔table only (FK relationships) | SchemaSidebar.vue (Table only) |
 
-The `isValidConnection` prop on VueFlow enforces domain boundaries: table nodes cannot connect to logic/folder nodes and vice versa.
+### Mode Separation Rules (Enforced)
 
-Additionally, when loading saved flow data, nodes are **filtered by mode**:
-- Flow mode: only `logic` and `folderFile` nodes are loaded (table nodes are silently skipped)
-- Schema mode: only `table` nodes are loaded (logic/folderFile nodes are silently skipped)
-
-The `onDrop` handler also rejects dropped items whose type doesn't match the active mode. This ensures **absolute separation** — tables never appear in Flow canvas, logic/folders never appear in Schema canvas, even if previously saved.
-
-Definition nodes (logics for flow mode, tables for schema mode) are loaded in two scenarios:
-- **With a saved flow:** `loadFlowData(flowId)` loads saved nodes from the flow, then fetches definitions from the API and creates definition stubs for any that aren't already on the canvas.
-- **Without a saved flow:** `loadFlowData(null)` is called from `onMounted` when no flow is selected (free tier or no flows yet). It skips saved-node loading but still fetches and displays definitions, so users can see and drag definitions even without a flow.
+1. **Definition loading:** `loadFlowData` only loads definitions matching the current mode — logics for flow, tables for schema. The `if/else` branch in `loadFlowData` ensures only the correct API is called.
+2. **Saved node filtering:** When loading saved flow data, nodes are filtered by `n.type` — flow mode keeps only `logic`/`folderFile`, schema mode keeps only `table`. All others are silently dropped.
+3. **Drop validation:** `onDrop` calls `isAllowedType()` which rejects items whose type doesn't match the active mode. A logic item cannot be dropped on schema canvas and vice versa.
+4. **Connection validation:** `isValidConnection` checks type compatibility (table↔table, logic↔logic/folderFile). Backend `POST /api/flows/{flow}/validate-connection` (gated by `permission:save-flows`) additionally checks tier eligibility, self-connection, type compatibility, and duplicate edges (when nodes have DB IDs). `onConnect` validates with backend before adding edge async.
+5. **Save response filtering:** `handleSave` applies `filterByMode()` to the server response, so only current-mode nodes survive the round-trip. Nodes of other modes exist on the server but are filtered out client-side.
+6. **Mode switch reload:** `switchMode` always calls `loadFlowData` (with or without a flowId), clearing the old mode's nodes and loading the new mode's definitions/saved nodes.
+7. **Edge isolation:** Edges referencing nodes filtered out by mode are also excluded from display since their source/target IDs won't match any displayed node.
+8. **Edge save safety:** `FlowService::save()` filters out edges whose source/target node IDs are not in the node ID map (unmappable edges) instead of defaulting to 0, preventing FK constraint violations.
 
 ## Frontend Component Architecture
 ```
@@ -148,6 +147,7 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 | POST | `/api/flows/{flow}/nodes` | FlowController@saveNodes |
 | POST | `/api/flows/{flow}/edges` | FlowController@saveEdges |
 | POST | `/api/flows/{flow}/save` | FlowController@save (combined) |
+| POST | `/api/flows/{flow}/validate-connection` | FlowController@validateConnection (tier+type+duplicate check) |
 | GET/POST | `/api/tables` | TableDefinitionController@index/store |
 | GET/PUT/DELETE | `/api/tables/{table}` | TableDefinitionController@show/update/destroy |
 | GET/POST | `/api/logics` | LogicDefinitionController@index/store (free: max 4) |

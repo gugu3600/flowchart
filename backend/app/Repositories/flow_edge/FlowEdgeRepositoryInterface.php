@@ -7,4 +7,5 @@ interface FlowEdgeRepositoryInterface
     public function deleteByFlowId(int $flowId);
     public function deleteByNodeIds(int $flowId, array $nodeIds);
     public function bulkCreate(int $flowId, array $edges);
+    public function exists(int $flowId, int $sourceNodeId, int $targetNodeId): bool;
 }

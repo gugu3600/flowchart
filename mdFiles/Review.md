@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-10 16:30 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -47,6 +47,11 @@
 - [x] **Color tools visual update:** setNodeColor/setEdgeColor now update node.style/edge.style immediately (not just config).
 - [x] **Duplicate edge prevention:** isValidConnection rejects connections where source+target already have an edge.
 - [x] **Definition loading without flow:** loadFlowData(null) called from onMounted when no flow selected — logics/tables visible to all users regardless of tier or saved-flow status.
+- [x] **Mode switch always reloads:** switchMode() no longer guarded by currentFlowId — always calls loadFlowData to clear old nodes and load new mode's definitions.
+- [x] **Backend connection validation:** POST /api/flows/{flow}/validate-connection checks tier, self-connection, type compatibility, duplicate edges.
+- [x] **FK crash in save() fixed:** Unmappable edges filtered instead of `?? 0` fallback.
+- [x] **onConnect backend-first validation:** Frontend calls validateConnection before adding edge; free-tier rejected at validation step.
+- [x] **Duplicate-edge guard moved to onConnect:** Removed from isValidConnection prop; local check in onConnect + backend exists().
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
 

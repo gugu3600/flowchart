@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-10 16:30 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -32,6 +32,11 @@
 - [x] Canvas auto-loads table/logic definitions as nodes with definitionId tracking.
 - [x] Canvas has two modes (Flow/Schema tabs) — tables and logics cannot mix; `isValidConnection` enforces boundaries.
 - [x] Cross-mode node filtering: saved nodes filtered by mode on load (tables skipped in Flow, logics/folders skipped in Schema).
+- [x] Cross-mode definition isolation: definition nodes (logics for flow, tables for schema) only load in their respective mode via `loadFlowData` if/else branch.
+- [x] Drop validation: `onDrop` rejects items whose type doesn't match the active mode.
+- [x] Connection validation: `isValidConnection` enforces type boundaries + duplicate edge prevention.
+- [x] Save response mode-filtering: `filterByMode()` strips non-current-mode nodes from save response.
+- [x] Mode switch reload: `switchMode()` always calls `loadFlowData` to clear old nodes and load new mode's data.
 - [x] Edge/node deletion via Delete/Backspace key with `delete-key-code` prop.
 - [x] Help guide page (`/help`) with usage instructions and keyboard shortcuts.
 - [x] Logic inputs upgraded to structured `{name, type}` objects (workflow-style CRUD like table columns).
@@ -83,6 +88,7 @@
 - [x] **REFACTOR: Extract ColorSwatchPalette.vue** — reusable color picker from Canvas.vue
 - [x] **REFACTOR: Extract useFlowMapper.js** — composable for server↔client node/edge mapping
 - [x] **BUGFIX: Load definitions for users without saved flows** — `loadFlowData(null)` called from `onMounted` when no flow is selected, so Free-tier users and new users see definition nodes on the canvas
+- [x] **BUGFIX: Cross-mode definition leakage on mode switch** — `switchMode()` now always calls `loadFlowData`, clearing old mode's nodes and loading new mode's definitions even without a saved flow
 - [ ] **SECURITY: Replace mock payment** with real gateway integration
 - [ ] **SECURITY: Add downgrade protection** for subscription expiry
 - [ ] **SECURITY: Exclude super-admin** from auto-downgrade
@@ -92,6 +98,10 @@
 - [ ] **CODE QUALITY: Extract duplicate modal CSS** (btn-sm, btn-danger, modal-*, field-label) from designer pages into global `style.css`.
 - [ ] **CODE QUALITY: Extract duplicate CRUD pattern** from designer pages into a `useCrud` composable.
 - [ ] **CODE QUALITY: Replace `<a href>` with `<router-link>`** in all views for subpath compatibility.
+- [x] **FEAT: Backend connection validation** — added `POST /api/flows/{flow}/validate-connection` with tier, type, self-connection, duplicate checks
+- [x] **FEAT: onConnect backend-first validation** — frontend validates with backend before adding edge, blocks transient edges for free-tier
+- [x] **FIX: FK crash in save()** — filter out unmappable edges instead of `?? 0` fallback
+- [x] **FIX: Duplicate-edge guard moved to onConnect** — removed from isValidConnection, added local check in onConnect + backend exists() check
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

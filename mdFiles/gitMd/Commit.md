@@ -1,9 +1,11 @@
 # Git Commits
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-10 16:30 UTC
 
 ## 2026-06-10
 
+- `e0adafd` feat: backend connection validation endpoint (`POST /api/flows/{flow}/validate-connection`); fix FK crash in save() (filter unmappable edges); frontend onConnect validates before adding edge; update Architecture.md, Todo.md, logs.md, Review.md
+- `d1eb350` feat: security fixes (JWT refresh, DB transactions, strip_tags, auth guards); fix cross-type node deletion; refactor Canvas.vue into ModeTabs, ColorSwatchPalette, useFlowMapper; fix color tools not applying visually; fix duplicate edges; fix logics not loading without saved flow
 - `9765ba9` docs: fix hash in Commit.md
 - `65e74bd` fix: route guard return-only, login 409 if authed, color reactivity & insert bugfixes
 - `7220011` feat: tier-gated logic CRUD, subscription durations, ColumnBuilder component, env security, free-tier tests
@@ -15,9 +17,7 @@
 - `6e6b773` feat: seed tier demo users — freeuser, silveruser, golduser, platinumuser (all password: password), idempotent seeder
 - `006780d` feat: draggable node resize — NodeResizer in BaseNode.vue, @vue-flow/node-resizer package, resize handles on select (26 tests passing)
 
-> *(uncommitted)* feat: security fixes — JWT refresh (60min TTL + POST /api/refresh + 401 interceptor), DB transactions with lockForUpdate, strip_tags() sanitization, frontend auth guards; fix cross-type node deletion on save; refactor Canvas.vue → ModeTabs, ColorSwatchPalette, useFlowMapper
-> *(uncommitted)* fix: logics not appearing in canvas for users without saved flows — load definitions on mount regardless of flow selection
-> *(uncommitted)* fix: color tools not updating node/edge style visually; duplicate edges allowed in schema mode
+
 
 - `28c6bd4` feat: add register link to login, update all .md timestamps
 - `156efc9` docs: update Commit.md with form UX commit

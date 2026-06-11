@@ -33,4 +33,12 @@ class FlowEdgeRepository implements FlowEdgeRepositoryInterface
 
         return FlowEdge::insert($rows);
     }
+
+    public function exists(int $flowId, int $sourceNodeId, int $targetNodeId): bool
+    {
+        return FlowEdge::where('flow_id', $flowId)
+            ->where('source_node_id', $sourceNodeId)
+            ->where('target_node_id', $targetNodeId)
+            ->exists();
+    }
 }

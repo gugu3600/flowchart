@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-10 16:30 UTC
 
 ## 2026-06-10 — Security Fixes & Canvas Refactoring
 
@@ -24,6 +24,7 @@
 - **Color tools not visually updating:** `setNodeColor()` and `setEdgeColor()` were not updating the `style` property on the node/edge object, so color changes only applied after save+reload. Fixed by setting `node.style` and `edge.style` directly before saving.
 - **Duplicate edges allowed in all modes:** `isValidConnection()` did not check for existing edges between the same source/target pair. Added `edges.value.some()` check to prevent duplicate connections.
 - **Logics not appearing in flow canvas for users without saved flows:** `loadFlowData()` was only called when a flow was selected (requires `canSave` + existing flows). Free-tier users or new users without flows never loaded definitions. Fixed by calling `loadFlowData(null)` from `onMounted` when no flow is selected, which loads definitions without saved flow data.
+- **Cross-mode definition leakage on mode switch:** `switchMode()` guarded `loadFlowData` behind `if (currentFlowId.value)`, so switching modes without a selected flow left the old mode's definition nodes on screen and never loaded the new mode's definitions. Fixed by removing the guard — `loadFlowData` now always runs on mode switch and handles null flowId gracefully.
 
 ### Files Modified
 | File | Change |
@@ -46,6 +47,13 @@
 | `frontend/src/views/Canvas.vue` | Refactored to use ModeTabs, ColorSwatchPalette, useFlowMapper |
 | `frontend/README.md` | Added composables section, updated components list |
 | `security-audit-findings.md` | Fix status table updated with completed fixes |
+
+### Backend Connection Validation & Save Fix (2026-06-10)
+- **Backend connection validation endpoint:** Added `POST /api/flows/{flow}/validate-connection` (gated by `permission:save-flows`) that checks tier eligibility, self-connection, type compatibility (table↔table for schema, logic↔folderFile for flow), and duplicate edges (when nodes have DB IDs).
+- **`onConnect` now validates with backend before adding edge:** Calls `validateConnection()` API first; only adds edge to UI if backend returns success. Free-tier users are rejected at the validation step, preventing misleading transient edges.
+- **FK constraint crash in `FlowService::save()` fixed:** The `$nodeIdMap[$e['source']] ?? 0` fallback inserted `source_node_id=0` which violated the FK constraint to `flow_nodes.id`, causing a silent 500 error. Fixed by filtering out edges with unmappable source/target instead of defaulting to 0.
+- **Duplicate-edge guard moved to `onConnect`:** Prevents adding duplicate edges locally. Backend also protects against duplicates for saved nodes via `FlowEdgeRepository::exists()`.
+- **`FlowEdgeRepositoryInterface` / `FlowEdgeRepository`:** Added `exists(int $flowId, int $sourceNodeId, int $targetNodeId): bool` method for duplicate detection.
 
 ### Remaining Items
 - Fix 1.1: Replace mock payment with real gateway
