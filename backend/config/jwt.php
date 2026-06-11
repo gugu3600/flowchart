@@ -298,4 +298,25 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT Cookie
+    |--------------------------------------------------------------------------
+    |
+    | Configure the cookie used to store the JWT token. These values are
+    | consumed by AuthController when attaching the token as an HTTP-only
+    | cookie on login, register, and refresh responses.
+    |
+    */
+
+    'cookie' => [
+        'name' => env('JWT_COOKIE_NAME', 'jwt_token'),
+        'path' => env('JWT_COOKIE_PATH', '/'),
+        'domain' => env('JWT_COOKIE_DOMAIN'),
+        'secure' => env('JWT_COOKIE_SECURE', false),
+        'http_only' => env('JWT_COOKIE_HTTP_ONLY', true),
+        'same_site' => env('JWT_COOKIE_SAME_SITE', 'strict'),
+        'raw' => false,
+    ],
+
 ];

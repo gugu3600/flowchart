@@ -19,24 +19,38 @@ class AuthController extends BaseController
         private readonly AuthService $authService,
     ) {}
 
+    private function jwtCookie(string $value, int $minutes): \Illuminate\Cookie\CookieJar|\Symfony\Component\HttpFoundation\Cookie
+    {
+        $cfg = config('jwt.cookie');
+        return cookie(
+            $cfg['name'],
+            $value,
+            $minutes,
+            $cfg['path'],
+            $cfg['domain'],
+            (bool) $cfg['secure'],
+            (bool) $cfg['http_only'],
+            (bool) $cfg['raw'],
+            $cfg['same_site']
+        );
+    }
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $result = $this->registerService->register($request->validated());
 
-        $secure = config('app.env') === 'production';
-        $ttl = config('jwt.ttl', 60);
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'User registered successfully',
             201,
-        )->cookie('jwt_token', $result['token'], $ttl, '/', null, $secure, true, false, 'Strict');
+        )->withCookie($this->jwtCookie($result['token'], config('jwt.ttl', 60)));
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
-        if ($request->cookie('jwt_token')) {
+        if ($request->cookie(config('jwt.cookie.name'))) {
             try {
-                if (auth('api')->setToken($request->cookie('jwt_token'))->authenticate()) {
+                if (auth('api')->setToken($request->cookie(config('jwt.cookie.name')))->authenticate()) {
                     return $this->error(null, 'Already authenticated. Please logout first.', 409);
                 }
             } catch (\Exception $e) {
@@ -50,12 +64,10 @@ class AuthController extends BaseController
             return $this->error(null, 'Invalid credentials', 401);
         }
 
-        $secure = config('app.env') === 'production';
-        $ttl = config('jwt.ttl', 60);
         return $this->success(
             ['user' => new UserResource($result['user'])],
             'Login successful',
-        )->cookie('jwt_token', $result['token'], $ttl, '/', null, $secure, true, false, 'Strict');
+        )->withCookie($this->jwtCookie($result['token'], config('jwt.ttl', 60)));
     }
 
     public function me(): JsonResponse
@@ -71,7 +83,7 @@ class AuthController extends BaseController
         $this->authService->logout();
 
         return $this->success([], 'Logged out successfully')
-            ->cookie('jwt_token', '', -1, '/');
+            ->withCookie($this->jwtCookie('', -1));
     }
 
     public function refresh(): JsonResponse
@@ -82,10 +94,8 @@ class AuthController extends BaseController
             return $this->error(null, 'Token refresh failed. Please login again.', 401);
         }
 
-        $secure = config('app.env') === 'production';
-        $ttl = config('jwt.ttl', 60);
         return $this->success([], 'Token refreshed')
-            ->cookie('jwt_token', $newToken, $ttl, '/', null, $secure, true, false, 'Strict');
+            ->withCookie($this->jwtCookie($newToken, config('jwt.ttl', 60)));
     }
 
     private const TIER_RANK = [

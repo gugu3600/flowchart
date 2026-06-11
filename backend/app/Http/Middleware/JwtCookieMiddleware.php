@@ -10,7 +10,7 @@ class JwtCookieMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($token = $request->cookie('jwt_token')) {
+        if ($token = $request->cookie(config('jwt.cookie.name'))) {
             $request->headers->set('Authorization', "Bearer $token");
         }
 
