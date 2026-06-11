@@ -4,8 +4,11 @@
 
 ## 2026-06-10
 
+- `51e3b5b` docs: add feature commit entry to Commit.md
 - `3edf7bb` docs: fix commit hash in Commit.md after amend
 - `03d0c13` feat: backend connection validation endpoint (`POST /api/flows/{flow}/validate-connection`); fix FK crash in save() (filter unmappable edges); frontend onConnect validates before adding edge; update Architecture.md, Todo.md, logs.md, Review.md
+
+
 - `d1eb350` feat: security fixes (JWT refresh, DB transactions, strip_tags, auth guards); fix cross-type node deletion; refactor Canvas.vue into ModeTabs, ColorSwatchPalette, useFlowMapper; fix color tools not applying visually; fix duplicate edges; fix logics not loading without saved flow
 - `9765ba9` docs: fix hash in Commit.md
 - `65e74bd` fix: route guard return-only, login 409 if authed, color reactivity & insert bugfixes
