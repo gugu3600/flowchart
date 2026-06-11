@@ -88,6 +88,13 @@ class AuthController extends BaseController
             ->cookie('jwt_token', $newToken, $ttl, '/', null, $secure, true, false, 'Strict');
     }
 
+    private const TIER_RANK = [
+        'free' => 0,
+        'silver' => 1,
+        'gold' => 2,
+        'platinum' => 3,
+    ];
+
     public function subscribe(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -101,6 +108,16 @@ class AuthController extends BaseController
 
         if ($user->hasRole('super-admin')) {
             return $this->error(null, 'Super-admin cannot change tier', 422);
+        }
+
+        $currentRole = collect($user->getRoleNames())->first(fn ($r) => isset(self::TIER_RANK[$r])) ?? 'free';
+
+        if (self::TIER_RANK[$tierRole] <= self::TIER_RANK[$currentRole]) {
+            return $this->error(
+                null,
+                "You are already on the {$currentRole} tier. Please choose a higher tier to upgrade.",
+                422
+            );
         }
 
         $durations = [

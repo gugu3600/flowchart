@@ -4,6 +4,8 @@
 
 ## 2026-06-10
 
+- `ecfc504` Merge dev into test: connection validation, FK save fix, onConnect validation
+- `18169fc` docs: fix Commit.md with 51e3b5b entry
 - `51e3b5b` docs: add feature commit entry to Commit.md
 - `3edf7bb` docs: fix commit hash in Commit.md after amend
 - `03d0c13` feat: backend connection validation endpoint (`POST /api/flows/{flow}/validate-connection`); fix FK crash in save() (filter unmappable edges); frontend onConnect validates before adding edge; update Architecture.md, Todo.md, logs.md, Review.md

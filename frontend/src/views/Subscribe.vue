@@ -8,8 +8,7 @@ const router = useRouter()
 const store = useUserStore()
 
 const queryTier = router.currentRoute.value.query.tier
-const validTiers = ['silver', 'gold', 'platinum']
-const selectedTier = ref(validTiers.includes(queryTier) ? queryTier : 'silver')
+const selectedTier = ref('')
 const selectedMethod = ref('')
 const paymentMethods = ref([])
 const loading = ref(false)
@@ -17,10 +16,12 @@ const paymentLoading = ref(false)
 const error = ref('')
 const successMsg = ref('')
 
-const tiers = [
-  { id: 'silver', label: 'Silver', price: 3000, color: '#94a3b8', desc: 'Unlimited saves + color customization' },
-  { id: 'gold', label: 'Gold', price: 6000, color: '#eab308', desc: 'Schema compiler + all Silver features' },
-  { id: 'platinum', label: 'Platinum', price: 7500, color: '#a855f7', desc: 'Visual folder mapping + all features' },
+const tierRank = { free: 0, silver: 1, gold: 2, platinum: 3 }
+
+const allTiers = [
+  { id: 'silver', label: 'Silver', price: 3000, color: '#94a3b8', desc: 'Unlimited saves + color customization', rank: 1 },
+  { id: 'gold', label: 'Gold', price: 6000, color: '#eab308', desc: 'Schema compiler + all Silver features', rank: 2 },
+  { id: 'platinum', label: 'Platinum', price: 7500, color: '#a855f7', desc: 'Visual folder mapping + all features', rank: 3 },
 ]
 
 const currentTier = computed(() => {
@@ -29,7 +30,21 @@ const currentTier = computed(() => {
   return tierRole?.name ?? 'free'
 })
 
-const needsPayment = computed(() => selectedTier.value !== 'free')
+const validTiers = computed(() => {
+  const currentRank = tierRank[currentTier.value] ?? 0
+  return allTiers.filter(t => t.rank > currentRank)
+})
+
+watch(validTiers, (tiers) => {
+  if (tiers.length === 0) {
+    selectedTier.value = ''
+    return
+  }
+  const preferred = tiers.find(t => t.id === queryTier)
+  selectedTier.value = preferred?.id ?? tiers[0].id
+}, { immediate: true })
+
+const needsPayment = computed(() => selectedTier.value && selectedTier.value !== 'free')
 
 async function fetchPaymentMethods() {
   paymentLoading.value = true
@@ -89,26 +104,26 @@ async function handleSubscribe() {
       <div v-if="error" class="error-msg">{{ error }}</div>
       <div v-if="successMsg" class="success-msg">{{ successMsg }}</div>
 
-      <div class="tier-grid">
-        <button
-          v-for="tier in tiers"
-          :key="tier.id"
-          type="button"
-          class="tier-card"
-          :class="{
-            'tier-active': selectedTier === tier.id,
-            'tier-card-disabled': tier.id === currentTier,
-          }"
-          :style="selectedTier === tier.id ? { borderColor: tier.color } : {}"
-          :disabled="tier.id === currentTier"
-          @click="selectedTier = tier.id"
-        >
-          <span class="tier-badge" :style="{ background: tier.color }">{{ tier.label }}</span>
-          <span class="tier-price">{{ tier.price.toLocaleString() }} MMK</span>
-          <span class="tier-desc">{{ tier.desc }}</span>
-          <span v-if="tier.id === currentTier" class="tier-current-label">Current</span>
-        </button>
+      <div v-if="validTiers.length === 0" class="no-upgrade-msg">
+        You are already on the <strong>{{ currentTier }}</strong> tier, the highest available plan.
       </div>
+
+      <template v-else>
+        <div class="tier-grid">
+          <button
+            v-for="tier in validTiers"
+            :key="tier.id"
+            type="button"
+            class="tier-card"
+            :class="{ 'tier-active': selectedTier === tier.id }"
+            :style="selectedTier === tier.id ? { borderColor: tier.color } : {}"
+            @click="selectedTier = tier.id"
+          >
+            <span class="tier-badge" :style="{ background: tier.color }">{{ tier.label }}</span>
+            <span class="tier-price">{{ tier.price.toLocaleString() }} MMK</span>
+            <span class="tier-desc">{{ tier.desc }}</span>
+          </button>
+        </div>
 
       <div v-if="needsPayment" class="payment-section">
         <p class="payment-label">Select Payment Method</p>
@@ -131,13 +146,14 @@ async function handleSubscribe() {
       <div class="subscribe-actions">
         <button
           class="btn-primary subscribe-btn"
-          :disabled="loading || !selectedMethod || selectedTier === currentTier"
+          :disabled="loading || !selectedTier || (needsPayment && !selectedMethod)"
           @click="handleSubscribe"
         >
           {{ loading ? 'Processing...' : 'Subscribe' }}
         </button>
         <button class="btn-secondary" @click="router.push('/canvas')">Cancel</button>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -161,6 +177,19 @@ async function handleSubscribe() {
   padding: 2px 8px;
   border-radius: 4px;
   margin-top: 6px;
+}
+
+.no-upgrade-msg {
+  text-align: center;
+  padding: 24px 16px;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.no-upgrade-msg strong {
+  text-transform: capitalize;
+  color: #eab308;
 }
 
 .payment-section {

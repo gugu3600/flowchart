@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -10,24 +11,36 @@ defineEmits(['close'])
 
 const router = useRouter()
 
+const tierRank = { Free: 0, Silver: 1, Gold: 2, Platinum: 3 }
+
 const tiers = [
   {
     name: 'Free',
     features: ['Browse & edit canvas', 'Drag & drop nodes', 'Connect nodes'],
+    rank: 0,
   },
   {
     name: 'Silver',
     features: ['Everything in Free', 'Unlimited save slots', 'Persist flowcharts'],
+    rank: 1,
   },
   {
     name: 'Gold',
     features: ['Everything in Silver', 'SQL DDL generation', 'Export schemas'],
+    rank: 2,
   },
   {
     name: 'Platinum',
     features: ['Everything in Gold', 'Visual folder mapping', 'Workspace architecture'],
+    rank: 3,
   },
 ]
+
+const currentRank = computed(() => tierRank[props.currentTier] ?? 0)
+
+function isUpgrade(tierName) {
+  return (tierRank[tierName] ?? 0) > currentRank.value
+}
 
 function goToSubscribe(tierName) {
   router.push(`/subscribe?tier=${tierName.toLowerCase()}`)
@@ -60,7 +73,7 @@ function goToSubscribe(tierName) {
               <li v-for="feat in tier.features" :key="feat" class="tier-card-feat">{{ feat }}</li>
             </ul>
             <button
-              v-if="tier.name !== currentTier && tier.name !== 'Free'"
+              v-if="isUpgrade(tier.name)"
               class="btn-sm btn-primary subscribe-btn"
               @click="goToSubscribe(tier.name)"
             >
