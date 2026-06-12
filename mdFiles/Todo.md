@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-10 16:30 UTC
+> Last updated: 2026-06-11 14:00 UTC
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
@@ -102,6 +102,9 @@
 - [x] **FEAT: onConnect backend-first validation** — frontend validates with backend before adding edge, blocks transient edges for free-tier
 - [x] **FIX: FK crash in save()** — filter out unmappable edges instead of `?? 0` fallback
 - [x] **FIX: Duplicate-edge guard moved to onConnect** — removed from isValidConnection, added local check in onConnect + backend exists() check
+- [x] **FIX: Prevent tier downgrade** — `TIER_RANK` constant in `AuthController::subscribe()` rejects if new tier ≤ current tier; Subscribe.vue and UpgradeModal.vue filter out non-upgrade tiers
+- [x] **REFACTOR: JWT cookie config moved to env+config** — `config/jwt.php` `cookie` section with env-driven name, path, domain, secure, http_only, same_site; `jwtCookie()` helper extracted in AuthController
+- [x] **TIER ACCESS AUDIT (2026-06-11)** — Tested all 4 tiers against every endpoint with correct payloads. No leaks found. All permissions correctly enforced.
 - [ ] Build layout state saving mechanisms triggered via `/flows/save` wrapped in Silver middleware checks.
 - [ ] Implement reactive canvas customizations allowing real-time edge colors and node background modifications for Silver tier users.
 

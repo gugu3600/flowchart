@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-10 16:30 UTC
+> Last updated: 2026-06-11 14:00 UTC
 
 ## 2026-06-10 — Security Fixes & Canvas Refactoring
 
@@ -54,6 +54,33 @@
 - **FK constraint crash in `FlowService::save()` fixed:** The `$nodeIdMap[$e['source']] ?? 0` fallback inserted `source_node_id=0` which violated the FK constraint to `flow_nodes.id`, causing a silent 500 error. Fixed by filtering out edges with unmappable source/target instead of defaulting to 0.
 - **Duplicate-edge guard moved to `onConnect`:** Prevents adding duplicate edges locally. Backend also protects against duplicates for saved nodes via `FlowEdgeRepository::exists()`.
 - **`FlowEdgeRepositoryInterface` / `FlowEdgeRepository`:** Added `exists(int $flowId, int $sourceNodeId, int $targetNodeId): bool` method for duplicate detection.
+
+### Tier Downgrade Protection (2026-06-11)
+- **`AuthController::subscribe()`** now rejects requests where the requested tier's rank is ≤ current tier's rank via `TIER_RANK` constant (free=0, silver=1, gold=2, platinum=3). Returns 422 with message "You are already on the {tier} tier. Please choose a higher tier to upgrade."
+- **Subscribe.vue** filters `allTiers` via `validTiers` computed — only shows tiers strictly higher than the user's current tier. If no upgrade is available (already platinum), shows a "highest available plan" message.
+- **UpgradeModal.vue** uses `isUpgrade()` function to only render Subscribe buttons for tiers with rank > current rank.
+
+### JWT Cookie Config Refactor (2026-06-11)
+- **`config/jwt.php`** added `cookie` section with env-driven keys: `name` (`JWT_COOKIE_NAME`), `path` (`JWT_COOKIE_PATH`), `domain` (`JWT_COOKIE_DOMAIN`), `secure` (`JWT_COOKIE_SECURE`), `http_only` (`JWT_COOKIE_HTTP_ONLY`), `same_site` (`JWT_COOKIE_SAME_SITE`), `raw` (false).
+- **`AuthController.php`** extracted `jwtCookie()` private helper — eliminates 4 duplicated `->cookie('jwt_token', ...)` calls with hardcoded args. Cookie reads updated to `config('jwt.cookie.name')`.
+- **`JwtCookieMiddleware.php`** updated to read cookie name from config instead of hardcoded `'jwt_token'`.
+- **`.env.example`** added `JWT_COOKIE_*` vars.
+
+### Tier Access Audit (2026-06-11)
+Tested all 4 tier accounts (free, silver, gold, platinum) against every protected endpoint with correct payloads. **No leaks found.**
+
+| Test | free | silver | gold | platinum |
+|------|------|--------|------|----------|
+| GET /flows (read) | 200 ✅ | 200 ✅ | 200 ✅ | 200 ✅ |
+| POST /flows (create) | 403 ✅ | 201 ✅ | 201 ✅ | 201 ✅ |
+| GET /tables (read) | 200 ✅ | 200 ✅ | 200 ✅ | 200 ✅ |
+| POST /tables (create) | 403 ✅ | 403 ✅ | 201 ✅ | 201 ✅ |
+| POST /logics (create) | 201 ✅ | 201 ✅ | 201 ✅ | 201 ✅ |
+| POST /subscribe (downgrade) | 200 (upgrade ✅) | 422 ✅ | 422 ✅ | 422 ✅ |
+| GET /admin/tiers | 403 ✅ | 403 ✅ | 403 ✅ | 403 ✅ |
+
+### Logic Node UI
+Confirmed node shows title = logic name, body = description + inputs + output — matches requirements.
 
 ### Remaining Items
 - Fix 1.1: Replace mock payment with real gateway

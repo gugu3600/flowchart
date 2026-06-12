@@ -1,6 +1,6 @@
 # Database Schema — `flowchart`
 
-> Last updated: 2026-06-10 11:30 UTC
+> Last updated: 2026-06-11 12:00 UTC
 
 ## Overview
 

@@ -1,12 +1,12 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-10 16:30 UTC
+> Last updated: 2026-06-11 14:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
 - **API:** axios client configured via `VITE_API_BASE_URL` in `frontend/.env` (no fallback — must be set). Base URL points to Laravel backend (`http://localhost:8000/api`).
 - **Backend:** Laravel 13 running RESTful APIs, MySQL Database.
-- **Authentication:** JWT-based authentication using tymon/jwt-auth. Token stored in HTTP-only Secure SameSite=Strict cookie via `JwtCookieMiddleware`.
+- **Authentication:** JWT-based authentication using tymon/jwt-auth. Token stored in HTTP-only Secure SameSite=Strict cookie via `JwtCookieMiddleware`. Cookie params (name, path, domain, secure, http_only, same_site) are env-driven via `config('jwt.cookie.*')`.
 - **Role-Based Access Control:** Spatie Laravel Permissions (free/silver/gold/platinum tiers + super-admin).
 - **Caching:** Laravel's built-in caching system.
 - **Design Patterns:** Repository Pattern, Service Pattern, Form Request validation, API Resources.
@@ -101,6 +101,15 @@ src/
 7. Backend creates user, assigns selected tier role, returns JWT in HTTP-only cookie
 8. Free tier users can register without selecting any payment method
 9. Payment processing and mail system will be implemented later via Laravel Queue
+
+## Subscribe / Upgrade Flow
+1. User navigates to `/subscribe` (or via UpgradeModal from `/canvas` or `/logics`)
+2. Subscribe.vue filters available tiers to only those strictly higher than the user's current tier
+3. User selects a tier and payment method
+4. POST to `/api/subscribe` with `{tier, payment_method}`
+5. Backend checks `TIER_RANK` (free=0, silver=1, gold=2, platinum=3) — rejects if new tier rank ≤ current tier rank with 422
+6. If valid, wraps in `DB::transaction` with `lockForUpdate()`, calls `syncRoles()`, extends `subscription_expires_at`
+7. Frontend refreshes user store and redirects to `/canvas`
 
 ## Subscription Durations
 | Tier | Duration |

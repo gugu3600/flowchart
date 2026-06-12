@@ -478,7 +478,7 @@ function refresh() {
       <span v-if="slotsRemaining <= 1" class="slot-warning">{{ slotsRemaining }} slot remaining</span>
     </div>
 
-    <div v-if="!isFree && (selectedNode || selectedEdge)" class="color-bar">
+    <div v-if="!isFree" class="color-bar">
       <template v-if="selectedNode">
         <ColorSwatchPalette
           label="Node Color:"
@@ -489,6 +489,11 @@ function refresh() {
           @select="setNodeColor"
         />
       </template>
+      <template v-else>
+        <span class="color-label">Node Color:</span>
+        <span class="color-hint">Select a node to customize</span>
+      </template>
+      <span class="color-divider" />
       <template v-if="selectedEdge">
         <ColorSwatchPalette
           label="Edge Color:"
@@ -499,6 +504,10 @@ function refresh() {
           :is-active="isEdgeActive"
           @select="setEdgeColor"
         />
+      </template>
+      <template v-else>
+        <span class="color-label">Edge Color:</span>
+        <span class="color-hint">Select an edge to customize</span>
       </template>
     </div>
 

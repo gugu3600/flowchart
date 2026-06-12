@@ -1,6 +1,13 @@
 # Git Commits
 
-> Last updated: 2026-06-10 16:30 UTC
+> Last updated: 2026-06-11 12:00 UTC
+
+## 2026-06-11
+
+- `be10038` Merge dev into test: cookie config refactor
+- `d20a7b7` Merge dev into test: prevent tier downgrade
+- `5988ce6` refactor: move JWT cookie config from controller to env+config — add `cookie` section to `config/jwt.php`, extract `jwtCookie()` helper in AuthController, update middleware
+- `b1c64b9` fix: prevent higher-tier users from subscribing to lower tiers — add `TIER_RANK` check in `subscribe()`, filter upgrade options in Subscribe.vue and UpgradeModal.vue
 
 ## 2026-06-10
 

@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-10 16:30 UTC
+> Last updated: 2026-06-11 14:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -52,6 +52,10 @@
 - [x] **FK crash in save() fixed:** Unmappable edges filtered instead of `?? 0` fallback.
 - [x] **onConnect backend-first validation:** Frontend calls validateConnection before adding edge; free-tier rejected at validation step.
 - [x] **Duplicate-edge guard moved to onConnect:** Removed from isValidConnection prop; local check in onConnect + backend exists().
+- [x] **Tier downgrade protection:** `AuthController::subscribe()` uses `TIER_RANK` to reject downgrade attempts (422). Subscribe.vue filters out non-upgrade tiers. UpgradeModal.vue only shows Subscribe buttons for higher tiers.
+- [x] **JWT cookie config moved to env+config:** `config/jwt.php` `cookie` section replaces hardcoded `->cookie()` params in AuthController. `jwtCookie()` helper eliminates duplication. Middleware reads config.
+- [x] **Tier access audit (2026-06-11):** Tested all 4 tiers against every endpoint — no leaks. free=403 on flows/tables write, silver=201 on flows+403 on tables, gold/platinum=201 on all, all tiers=403 on admin.
+- [x] **LogicNode UI confirmed:** Title shows logic name, body shows description + inputs + output.
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
 

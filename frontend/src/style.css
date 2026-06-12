@@ -1446,3 +1446,16 @@ body {
   color: #f1f5f9;
   border-color: #64748b;
 }
+
+.color-hint {
+  font-size: 0.75rem;
+  color: #475569;
+  font-style: italic;
+}
+
+.color-divider {
+  width: 1px;
+  height: 20px;
+  background: #334155;
+  margin: 0 6px;
+}
