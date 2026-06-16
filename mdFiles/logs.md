@@ -1,11 +1,11 @@
 # Change Log
 
-> Last updated: 2026-06-16 18:00 UTC
+> Last updated: 2026-06-16 19:00 UTC
 
-## 2026-06-16 — Admin Resource Pages
+## 2026-06-16 — Admin Resource Pages & Nav Links
 - **FEAT: Admin resource endpoints** — Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` endpoints to `AdminController`, each returning all records with owner name/email. Routes gated by `role:super-admin`.
 - **FEAT: AdminResourceTable component** — Reusable `AdminResourceTable.vue` accepts `items`, `columns`, `loading` props, renders owner badge and date/count formatting.
-- **FEAT: Admin resource pages** — Separate `AdminLogics.vue`, `AdminTables.vue`, `AdminFlows.vue` pages at `/admin/logics`, `/admin/tables`, `/admin/flows`, each with header nav back to dashboard and canvas.
+- **FEAT: Admin resource pages** — Separate `AdminLogics.vue`, `AdminTables.vue`, `AdminFlows.vue` pages at `/admin/logics`, `/admin/tables`, `/admin/flows`, each with header nav back to dashboard, canvas, and sibling admin resource pages.
 - **FEAT: Admin dashboard resource nav** — `AdminDashboard.vue` now has navigation cards (Logics, Tables, Flows) linking to each resource page, replacing inline resource tables.
 - **FIX: Login 409 conflict** — Admin test requires logout before switching users to avoid JWT cookie conflict.
 - **TEST: Admin resource pages** — Playwright test (`admin-resources.spec.js`) creates resources as a gold user, then logs in as admin and verifies all three resource pages show the data with correct owner names.
@@ -41,9 +41,9 @@
 | `backend/routes/api.php` | Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` in super-admin group |
 | `frontend/src/api/admin.js` | Added `getAdminLogics()`, `getAdminTables()`, `getAdminFlows()` |
 | `frontend/src/components/AdminResourceTable.vue` | **NEW** — reusable admin resource table component |
-| `frontend/src/views/AdminLogics.vue` | **NEW** — admin logics page |
-| `frontend/src/views/AdminTables.vue` | **NEW** — admin tables page |
-| `frontend/src/views/AdminFlows.vue` | **NEW** — admin flows page |
+| `frontend/src/views/AdminLogics.vue` | **NEW** — admin logics page; header nav links to Dashboard, Tables, Flows, Canvas |
+| `frontend/src/views/AdminTables.vue` | **NEW** — admin tables page; header nav links to Dashboard, Logics, Flows, Canvas |
+| `frontend/src/views/AdminFlows.vue` | **NEW** — admin flows page; header nav links to Dashboard, Logics, Tables, Canvas |
 | `frontend/src/views/AdminDashboard.vue` | Removed inline resource tables, added resource nav cards |
 | `frontend/src/router/index.js` | Added `/admin/logics`, `/admin/tables`, `/admin/flows` routes |
 | `frontend/src/style.css` | Added `.admin-resource-nav`, `.admin-resource-card` styles |

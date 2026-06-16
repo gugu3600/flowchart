@@ -32,6 +32,8 @@ onMounted(async () => {
     <AppHeader title="Admin — Flows">
       <template #right>
         <a href="/admin" class="nav-link">Dashboard</a>
+        <a href="/admin/logics" class="nav-link">Logics</a>
+        <a href="/admin/tables" class="nav-link">Tables</a>
         <a href="/canvas" class="nav-link">Canvas</a>
       </template>
     </AppHeader>
