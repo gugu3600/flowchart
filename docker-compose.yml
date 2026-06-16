@@ -1,0 +1,79 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: flowchart-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: backend
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: flowchart-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: backend
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      FRONTEND_URL: http://localhost:3000
+      JWT_TTL: 60
+      JWT_COOKIE_NAME: jwt_token
+      JWT_COOKIE_PATH: /
+      JWT_COOKIE_DOMAIN: localhost
+      JWT_COOKIE_SECURE: false
+      JWT_COOKIE_HTTP_ONLY: true
+      JWT_COOKIE_SAME_SITE: lax
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/backend
+
+  frontend:
+    image: node:20
+    container_name: flowchart-frontend
+    restart: unless-stopped
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: flowchart-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8080:80"
+
+volumes:
+  mysql_data:
