@@ -8,6 +8,8 @@
 - `dbb4e95` docs: fix commit hash in Commit.md after amend
 - `998b9ec` feat: add cross-page nav links between admin resource pages; update all .md files
 - `8f4a2b3` feat: refactor admin backend — extract AdminService, FormRequest validation, add all() to repos, no direct model calls in controller
+- `12ddbc7` docs: fix commit hash in Commit.md after amend
+- `519a85e` feat: add styled nav buttons to admin resource views (Logics, Tables, Flows) with active state indicator
 
 - `f703d55` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
 
