@@ -231,6 +231,27 @@ async function confirmUpgrade() {
           </tbody>
         </table>
       </section>
+
+      <section class="admin-section">
+        <h3 class="admin-section-title">Resources</h3>
+        <div class="admin-resource-nav">
+          <a href="/admin/logics" class="admin-resource-card">
+            <span class="admin-resource-icon">&#9881;</span>
+            <span class="admin-resource-label">Logics</span>
+            <span class="admin-resource-arrow">&rarr;</span>
+          </a>
+          <a href="/admin/tables" class="admin-resource-card">
+            <span class="admin-resource-icon">&#128202;</span>
+            <span class="admin-resource-label">Tables</span>
+            <span class="admin-resource-arrow">&rarr;</span>
+          </a>
+          <a href="/admin/flows" class="admin-resource-card">
+            <span class="admin-resource-icon">&#128196;</span>
+            <span class="admin-resource-label">Flows</span>
+            <span class="admin-resource-arrow">&rarr;</span>
+          </a>
+        </div>
+      </section>
     </div>
 
       <section class="admin-section">

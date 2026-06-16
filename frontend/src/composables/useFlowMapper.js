@@ -4,6 +4,7 @@ export function useFlowMapper() {
     return {
       id: String(n.id),
       type: n.type,
+      label: n.label || (n.data?.label) || '',
       position: { x: n.position_x, y: n.position_y },
       data: { label: n.label, ...(n.data || {}) },
       style: nc.backgroundColor ? { background: nc.backgroundColor } : {},

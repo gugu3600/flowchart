@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-11 14:00 UTC
+> Last updated: 2026-06-16 18:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -11,7 +11,7 @@
 - **Caching:** Laravel's built-in caching system.
 - **Design Patterns:** Repository Pattern, Service Pattern, Form Request validation, API Resources.
 - **Database Schema:** 3NF normalized MySQL schema for `flows`, `flow_nodes`, `flow_edges`, `table_definitions`, `logic_definitions`.
-- **Testing:** Playwright (E2E) for frontend — 26 tests passing (12 tier-gated color/permission + subscribe tests), PHPUnit for backend API tests.
+- **Testing:** Playwright (E2E) for frontend — 15 tests passing (12 tier-gated color/permission + subscribe tests, 1 color-ui, 1 admin-resources, 1 debug-cleaned-up), PHPUnit for backend API tests.
 
 ## Frontend Pages
 | Route | Page | Purpose |
@@ -23,6 +23,10 @@
 | `/subscribe` | Subscribe.vue | Self-service subscription page — tier cards, payment method picker, subscribe button. Authenticated users only. |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ). Gold+ (`generate-schema` permission) can create/edit/delete. Free/Silver read-only. ColumnBuilder component for column rows. |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output). Free: max 4 logics with upgrade modal. Silver+: unlimited. |
+| `/admin` | AdminDashboard.vue | Admin overview with stats, user management (roles, upgrade, delete), tier definitions. Super-admin only. |
+| `/admin/logics` | AdminLogics.vue | All logic definitions across all users with owner info. Super-admin only. |
+| `/admin/tables` | AdminTables.vue | All table definitions across all users with owner info. Super-admin only. |
+| `/admin/flows` | AdminFlows.vue | All flows across all users with owner info. Super-admin only. |
 
 ## Canvas Modes (Tab-Separated)
 
@@ -65,6 +69,7 @@ src/
 │   ├── SchemaSidebar.vue     — Drag-and-drop palette (Schema mode: Table only)
 │   ├── ModeTabs.vue          — Flow/Schema mode toggle buttons (props: mode, emits: update:mode)
 │   ├── ColorSwatchPalette.vue — Color picker swatches (props: label, colors, selectedColor, isActive fn)
+│   ├── AdminResourceTable.vue — Reusable admin table with owner badges, date/count formatting
 │   ├── index.js              — Barrel exports
 │   └── nodes/
 │       ├── BaseNode.vue       — Shared node wrapper (Handle ports, color themes, selected ring)
@@ -81,9 +86,13 @@ src/
 │   ├── Register.vue          — Registration form (name, email, password, confirm)
 │   ├── Subscribe.vue         — Self-service subscription with tier cards, payment method picker
 │   ├── TableDesigner.vue     — Table schema CRUD with modal form, column builder
-│   └── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
+│   ├── LogicDesigner.vue     — Logic definition CRUD with modal form, inputs/output builder
+│   ├── AdminDashboard.vue    — Admin overview with stats, user management, resource nav cards
+│   ├── AdminLogics.vue       — All logics across all users (super-admin only)
+│   ├── AdminTables.vue       — All tables across all users (super-admin only)
+│   ├── AdminFlows.vue        — All flows across all users (super-admin only)
 ├── router/
-│   ├── index.js              — Vue Router (/login, /register, /subscribe, /canvas, /help, /tables, /logics routes) with requiresAuth meta on protected routes
+│   ├── index.js              — Vue Router (/login, /register, /subscribe, /canvas, /help, /tables, /logics, /admin, /admin/logics, /admin/tables, /admin/flows routes) with requiresAuth/requiresAdmin meta
 │   └── routeGuard.js          — authGuard() + adminGuard() route navigation guards
 ├── stores/
 │   └── useUserStore.js        — Singleton reactive store (no Pinia) with tier/role/computed permissions
@@ -161,6 +170,9 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 | GET/PUT/DELETE | `/api/tables/{table}` | TableDefinitionController@show/update/destroy |
 | GET/POST | `/api/logics` | LogicDefinitionController@index/store (free: max 4) |
 | GET/PUT/DELETE | `/api/logics/{logic}` | LogicDefinitionController@show/update/destroy |
+| GET | `/api/admin/logics` | AdminController@logics (super-admin, all users' logic definitions) |
+| GET | `/api/admin/tables` | AdminController@tables (super-admin, all users' table definitions) |
+| GET | `/api/admin/flows` | AdminController@flows (super-admin, all users' flows) |
 
 ## Strategic Monetization Matrix (Value-Based Hierarchy)
 1. **Free Tier:**
@@ -189,6 +201,7 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 | `PaymentMethodPicker` | Register.vue | 2×2 payment method button grid with loading state (v-model, methods, loading props) |
 | `ModeTabs` | Canvas.vue | Flow/Schema mode toggle buttons (props: mode, emits: update:mode) |
 | `ColorSwatchPalette` | Canvas.vue | Color picker swatches for node background / edge stroke (props: label, colors, selectedColor, isActive fn) |
+| `AdminResourceTable` | AdminLogics.vue, AdminTables.vue, AdminFlows.vue | Reusable admin table with owner badges, date/count formatting (props: items, columns, loading) |
 | `AppButton` | Multiple views | Styled action button with loading state |
 | `AppCard` | Multiple views | Card container with optional title/subtitle |
 

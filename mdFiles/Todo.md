@@ -1,6 +1,11 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-11 14:00 UTC
+> Last updated: 2026-06-16 18:00 UTC
+
+## Completed
+- [x] **FEAT: Admin resource pages** — Separate `/admin/logics`, `/admin/tables`, `/admin/flows` pages with `AdminResourceTable` reusable component, navigation cards on dashboard
+- [x] **BACKEND: Admin resource endpoints** — `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` returning all records with owner info, gated by super-admin role
+- [x] **TEST: Admin resource pages** — Playwright test creating resources as gold user, verifying admin can see them with correct owners on all three pages
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.

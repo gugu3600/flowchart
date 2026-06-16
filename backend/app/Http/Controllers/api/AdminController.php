@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Resources\UserResource;
+use App\Models\Flow;
+use App\Models\LogicDefinition;
+use App\Models\TableDefinition;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +30,72 @@ class AdminController extends BaseController
                 ['label' => 'Logics', 'value' => (string) $logicCount, 'icon' => '&#9881;', 'color' => '#f59e0b'],
             ],
         ], 'Stats retrieved');
+    }
+
+    public function logics(): JsonResponse
+    {
+        $logics = LogicDefinition::with('user:id,name,email')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($logic) {
+                return [
+                    'id' => $logic->id,
+                    'name' => $logic->name,
+                    'description' => $logic->description,
+                    'inputs' => $logic->inputs,
+                    'output' => $logic->output,
+                    'user_id' => $logic->user_id,
+                    'owner_name' => $logic->user?->name,
+                    'owner_email' => $logic->user?->email,
+                    'created_at' => $logic->created_at,
+                    'updated_at' => $logic->updated_at,
+                ];
+            });
+
+        return $this->success(['logics' => $logics], 'Logics retrieved');
+    }
+
+    public function tables(): JsonResponse
+    {
+        $tables = TableDefinition::with('user:id,name,email')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($table) {
+                return [
+                    'id' => $table->id,
+                    'name' => $table->name,
+                    'columns' => $table->columns,
+                    'user_id' => $table->user_id,
+                    'owner_name' => $table->user?->name,
+                    'owner_email' => $table->user?->email,
+                    'created_at' => $table->created_at,
+                    'updated_at' => $table->updated_at,
+                ];
+            });
+
+        return $this->success(['tables' => $tables], 'Tables retrieved');
+    }
+
+    public function flows(): JsonResponse
+    {
+        $flows = Flow::with('user:id,name,email')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($flow) {
+                return [
+                    'id' => $flow->id,
+                    'name' => $flow->name,
+                    'description' => $flow->description,
+                    'config' => $flow->config,
+                    'user_id' => $flow->user_id,
+                    'owner_name' => $flow->user?->name,
+                    'owner_email' => $flow->user?->email,
+                    'created_at' => $flow->created_at,
+                    'updated_at' => $flow->updated_at,
+                ];
+            });
+
+        return $this->success(['flows' => $flows], 'Flows retrieved');
     }
 
     public function users(): JsonResponse

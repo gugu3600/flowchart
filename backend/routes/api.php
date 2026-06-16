@@ -61,5 +61,8 @@ Route::middleware('auth:api')->group(function () {
         Route::put('users/{user}/roles', [AdminController::class, 'updateRoles']);
         Route::put('users/{user}/upgrade', [AdminController::class, 'upgrade']);
         Route::delete('users/{user}', [AdminController::class, 'destroy']);
+        Route::get('logics', [AdminController::class, 'logics']);
+        Route::get('tables', [AdminController::class, 'tables']);
+        Route::get('flows', [AdminController::class, 'flows']);
     });
 });

@@ -953,6 +953,55 @@ body {
   white-space: nowrap;
 }
 
+.admin-table-desc {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-resource-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-resource-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #e2e8f0;
+  transition: border-color 0.2s, background 0.2s;
+  min-width: 180px;
+}
+
+.admin-resource-card:hover {
+  border-color: #3b82f6;
+  background: #1e3a5f;
+}
+
+.admin-resource-icon {
+  font-size: 1.4rem;
+}
+
+.admin-resource-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.admin-resource-arrow {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
 .admin-role-option {
   display: flex;
   align-items: center;

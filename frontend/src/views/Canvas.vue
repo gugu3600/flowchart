@@ -150,6 +150,7 @@ async function loadFlowData(flowId) {
           defNodes.push({
             id: `def_logic_${l.id}`,
             type: 'logic',
+            label: l.name,
             position: { x: 50 + defIndex++ * 350, y: 50 },
             data: {
               label: l.name,
@@ -172,6 +173,7 @@ async function loadFlowData(flowId) {
           defNodes.push({
             id: `def_table_${t.id}`,
             type: 'table',
+            label: t.name,
             position: { x: 50 + defIndex++ * 350, y: 50 },
             data: {
               label: t.name,
@@ -255,12 +257,14 @@ async function handleSave() {
 function setNodeColor(color) {
   const sel = selectedNode.value
   if (!sel) return
-  const idx = nodes.value.findIndex(n => n.id === sel.id)
-  if (idx === -1) return
-  const node = { ...nodes.value[idx] }
-  node.config = { ...(node.config || {}), backgroundColor: color }
-  node.style = color ? { background: color } : {}
-  nodes.value[idx] = node
+  nodes.value = nodes.value.map(n => {
+    if (n.id !== sel.id) return n
+    return {
+      ...n,
+      config: { ...(n.config || {}), backgroundColor: color },
+      style: color ? { background: color } : {},
+    }
+  })
   if (currentFlowId.value) {
     handleSave()
   }
@@ -269,12 +273,14 @@ function setNodeColor(color) {
 function setEdgeColor(color) {
   const sel = selectedEdge.value
   if (!sel) return
-  const idx = edges.value.findIndex(e => e.id === sel.id)
-  if (idx === -1) return
-  const edge = { ...edges.value[idx] }
-  edge.config = { ...(edge.config || {}), strokeColor: color }
-  edge.style = { ...(edge.style || {}), stroke: color || '#64748b' }
-  edges.value[idx] = edge
+  edges.value = edges.value.map(e => {
+    if (e.id !== sel.id) return e
+    return {
+      ...e,
+      config: { ...(e.config || {}), strokeColor: color },
+      style: { ...(e.style || {}), stroke: color || '#64748b' },
+    }
+  })
   if (currentFlowId.value) {
     handleSave()
   }
@@ -335,14 +341,13 @@ async function onConnect(params) {
   ]
 }
 
-function onNodeClick(event, node) {
-  selectedNode.value = node
+function onNodeClick(evt) {
+  selectedNode.value = evt?.node || null
   selectedEdge.value = null
 }
 
-function onEdgeClick(event, edge) {
-  edge.selected = true
-  selectedEdge.value = edge
+function onEdgeClick(evt) {
+  selectedEdge.value = evt?.edge || null
   selectedNode.value = null
 }
 
@@ -387,15 +392,17 @@ function onDrop(event) {
     x: event.clientX,
     y: event.clientY,
   })
+  const label = nodeDef.defaultData?.label || nodeDef.label
   const id = `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
   nodes.value = [
     ...nodes.value,
     {
       id,
       type: nodeDef.type,
+      label,
       position,
       data: {
-        label: nodeDef.defaultData?.label || nodeDef.label,
+        label,
         columns: nodeDef.defaultData?.columns,
         description: nodeDef.defaultData?.description,
         inputs: nodeDef.defaultData?.inputs,

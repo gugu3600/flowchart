@@ -27,3 +27,15 @@ export function deleteUser(id) {
 export function getTiers() {
   return apiClient.get('/admin/tiers')
 }
+
+export function getAdminLogics() {
+  return apiClient.get('/admin/logics')
+}
+
+export function getAdminTables() {
+  return apiClient.get('/admin/tables')
+}
+
+export function getAdminFlows() {
+  return apiClient.get('/admin/flows')
+}

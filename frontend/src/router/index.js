@@ -7,6 +7,9 @@ import HelpGuide from '../views/HelpGuide.vue'
 import TableDesigner from '../views/TableDesigner.vue'
 import LogicDesigner from '../views/LogicDesigner.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
+import AdminLogics from '../views/AdminLogics.vue'
+import AdminTables from '../views/AdminTables.vue'
+import AdminFlows from '../views/AdminFlows.vue'
 import { authGuard, adminGuard } from './routeGuard.js'
 
 const routes = [
@@ -56,6 +59,24 @@ const routes = [
     meta: { requiresAdmin: true },
   },
   {
+    path: '/admin/logics',
+    name: 'AdminLogics',
+    component: AdminLogics,
+    meta: { requiresAdmin: true },
+  },
+  {
+    path: '/admin/tables',
+    name: 'AdminTables',
+    component: AdminTables,
+    meta: { requiresAdmin: true },
+  },
+  {
+    path: '/admin/flows',
+    name: 'AdminFlows',
+    component: AdminFlows,
+    meta: { requiresAdmin: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/login',
   },
@@ -70,7 +91,8 @@ router.beforeEach(async (to) => {
   const { useUserStore } = await import('../stores/useUserStore.js')
   const store = useUserStore()
 
-  if (!store.state.user) {
+  const needsAuth = to.meta.requiresAuth || to.meta.requiresAdmin
+  if (needsAuth && !store.state.user) {
     try {
       await store.fetchUser()
     } catch {

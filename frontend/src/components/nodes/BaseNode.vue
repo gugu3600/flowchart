@@ -12,6 +12,7 @@ const props = defineProps({
   color: { type: String, default: 'blue' },
   showSource: { type: Boolean, default: true },
   showTarget: { type: Boolean, default: true },
+  style: { type: Object, default: () => ({}) },
 })
 </script>
 
@@ -22,6 +23,7 @@ const props = defineProps({
       `node-${color}`,
       selected ? 'selected' : '',
     ]"
+    :style="style"
   >
     <NodeResizer
       :is-visible="selected"
