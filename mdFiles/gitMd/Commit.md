@@ -1,8 +1,13 @@
 # Git Commits
 
-> Last updated: 2026-06-16 19:00 UTC
+> Last updated: 2026-06-16 20:00 UTC
 
 ## 2026-06-16
+
+- `f703d55` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
+- `dbb4e95` docs: fix commit hash in Commit.md after amend
+- `998b9ec` feat: add cross-page nav links between admin resource pages; update all .md files
+- `19ff664` feat: refactor admin backend — extract AdminService, FormRequest validation, add all() to repos, no direct model calls in controller
 
 - `f703d55` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
 

@@ -4,6 +4,7 @@ namespace App\Repositories\flow;
 
 interface FlowRepositoryInterface
 {
+    public function all();
     public function allForUser(int $userId);
     public function find(int $id);
     public function findForUser(int $id, int $userId);

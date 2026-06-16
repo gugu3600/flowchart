@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-16 19:00 UTC
+> Last updated: 2026-06-16 20:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -145,7 +145,7 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 5. `isValidConnection` enforces domain boundaries — table nodes cannot connect to logic nodes
 6. User can reposition, connect, save; clicking refresh (⟳) reloads definitions
 
-## API Routes (32 total)
+## API Routes (42 total)
 
 ### Public (throttled 20/min)
 | Method | Route | Handler |
@@ -170,6 +170,13 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 | GET/PUT/DELETE | `/api/tables/{table}` | TableDefinitionController@show/update/destroy |
 | GET/POST | `/api/logics` | LogicDefinitionController@index/store (free: max 4) |
 | GET/PUT/DELETE | `/api/logics/{logic}` | LogicDefinitionController@show/update/destroy |
+| GET | `/api/admin/tiers` | AdminController@tiers (super-admin, list tier roles/permissions) |
+| GET | `/api/admin/users` | AdminController@users (super-admin, paginated user list with roles) |
+| GET | `/api/admin/users/{user}` | AdminController@show (super-admin, single user with available roles) |
+| PUT | `/api/admin/users/{user}` | AdminController@update (super-admin, update name/email/password) |
+| PUT | `/api/admin/users/{user}/roles` | AdminController@updateRoles (super-admin, sync user roles) |
+| PUT | `/api/admin/users/{user}/upgrade` | AdminController@upgrade (super-admin, upgrade tier with subscription duration) |
+| DELETE | `/api/admin/users/{user}` | AdminController@destroy (super-admin, delete user) |
 | GET | `/api/admin/logics` | AdminController@logics (super-admin, all users' logic definitions) |
 | GET | `/api/admin/tables` | AdminController@tables (super-admin, all users' table definitions) |
 | GET | `/api/admin/flows` | AdminController@flows (super-admin, all users' flows) |

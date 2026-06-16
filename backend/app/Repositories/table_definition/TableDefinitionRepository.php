@@ -6,6 +6,11 @@ use App\Models\TableDefinition;
 
 class TableDefinitionRepository implements TableDefinitionRepositoryInterface
 {
+    public function all()
+    {
+        return TableDefinition::with(['user:id,name,email'])->orderBy('created_at', 'desc')->get();
+    }
+
     public function allForUser(int $userId)
     {
         return TableDefinition::where('user_id', $userId)->get();

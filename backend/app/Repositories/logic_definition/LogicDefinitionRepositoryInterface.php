@@ -4,6 +4,7 @@ namespace App\Repositories\logic_definition;
 
 interface LogicDefinitionRepositoryInterface
 {
+    public function all();
     public function allForUser(int $userId);
     public function findForUser(int $id, int $userId);
     public function create(array $data);

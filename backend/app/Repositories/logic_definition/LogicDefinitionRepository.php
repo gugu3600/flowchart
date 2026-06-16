@@ -6,6 +6,11 @@ use App\Models\LogicDefinition;
 
 class LogicDefinitionRepository implements LogicDefinitionRepositoryInterface
 {
+    public function all()
+    {
+        return LogicDefinition::with(['user:id,name,email'])->orderBy('created_at', 'desc')->get();
+    }
+
     public function allForUser(int $userId)
     {
         return LogicDefinition::where('user_id', $userId)->get();

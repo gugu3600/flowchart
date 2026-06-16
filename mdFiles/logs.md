@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-16 19:00 UTC
+> Last updated: 2026-06-16 20:00 UTC
 
 ## 2026-06-16 — Admin Resource Pages & Nav Links
 - **FEAT: Admin resource endpoints** — Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` endpoints to `AdminController`, each returning all records with owner name/email. Routes gated by `role:super-admin`.
@@ -9,6 +9,22 @@
 - **FEAT: Admin dashboard resource nav** — `AdminDashboard.vue` now has navigation cards (Logics, Tables, Flows) linking to each resource page, replacing inline resource tables.
 - **FIX: Login 409 conflict** — Admin test requires logout before switching users to avoid JWT cookie conflict.
 - **TEST: Admin resource pages** — Playwright test (`admin-resources.spec.js`) creates resources as a gold user, then logs in as admin and verifies all three resource pages show the data with correct owner names.
+- **FEAT: AdminService + FormRequest refactor** — Extracted business logic into `AdminService` (injects Flow/Logic/Table repos) and validation into FormRequest classes (`UpdateUserRequest`, `UpdateRolesRequest`, `UpgradeUserRequest`). `AdminController` no longer calls models directly. Added `all()` (unscoped with user eager-loading) to `FlowRepository`, `LogicDefinitionRepository`, `TableDefinitionRepository`.
+
+### Files Modified (session 3)
+| File | Change |
+|------|--------|
+| `backend/app/Services/Admin/AdminService.php` | **NEW** — injects all three repos, provides `getAllLogics/Tables/Flows`, `getStats`, `getUsers`, `updateUser/Roles`, `deleteUser`, `getTiers`, `upgradeUser` |
+| `backend/app/Http/Requests/Admin/UpdateUserRequest.php` | **NEW** — validates name/email/password on admin user update |
+| `backend/app/Http/Requests/Admin/UpdateRolesRequest.php` | **NEW** — validates roles array against available API roles |
+| `backend/app/Http/Requests/Admin/UpgradeUserRequest.php` | **NEW** — validates tier against non-super-admin roles |
+| `backend/app/Http/Controllers/api/AdminController.php` | Refactored: injects `AdminService`, uses FormRequest classes, no direct model calls |
+| `backend/app/Repositories/flow/FlowRepository.php` | Added `all()` — returns all flows with `user:id,name,email`, ordered by `created_at desc` |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepository.php` | Added `all()` — returns all logics with user, ordered by `created_at desc` |
+| `backend/app/Repositories/table_definition/TableDefinitionRepository.php` | Added `all()` — returns all tables with user, ordered by `created_at desc` |
+| `backend/app/Repositories/flow/FlowRepositoryInterface.php` | Added `all()` method signature |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepositoryInterface.php` | Added `all()` method signature |
+| `backend/app/Repositories/table_definition/TableDefinitionRepositoryInterface.php` | Added `all()` method signature |
 
 ## 2026-06-10 — Security Fixes & Canvas Refactoring
 
