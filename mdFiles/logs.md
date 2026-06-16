@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-16 20:00 UTC
+> Last updated: 2026-06-16 21:00 UTC
 
 ## 2026-06-16 — Admin Resource Pages & Nav Links
 - **FEAT: Admin resource endpoints** — Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` endpoints to `AdminController`, each returning all records with owner name/email. Routes gated by `role:super-admin`.
@@ -11,8 +11,9 @@
 - **TEST: Admin resource pages** — Playwright test (`admin-resources.spec.js`) creates resources as a gold user, then logs in as admin and verifies all three resource pages show the data with correct owner names.
 - **FEAT: AdminService + FormRequest refactor** — Extracted business logic into `AdminService` (injects Flow/Logic/Table repos) and validation into FormRequest classes (`UpdateUserRequest`, `UpdateRolesRequest`, `UpgradeUserRequest`). `AdminController` no longer calls models directly. Added `all()` (unscoped with user eager-loading) to `FlowRepository`, `LogicDefinitionRepository`, `TableDefinitionRepository`.
 
+- **FEAT: Admin nav cards** — Admin resource views (Logics/Tables/Flows) now have styled resource cards matching the dashboard style, with icons and active-state highlighting.
+
 ### Files Modified (session 3)
-| File | Change |
 |------|--------|
 | `backend/app/Services/Admin/AdminService.php` | **NEW** — injects all three repos, provides `getAllLogics/Tables/Flows`, `getStats`, `getUsers`, `updateUser/Roles`, `deleteUser`, `getTiers`, `upgradeUser` |
 | `backend/app/Http/Requests/Admin/UpdateUserRequest.php` | **NEW** — validates name/email/password on admin user update |

@@ -1,6 +1,6 @@
 # Git Commits
 
-> Last updated: 2026-06-16 20:00 UTC
+> Last updated: 2026-06-16 21:00 UTC
 
 ## 2026-06-16
 
@@ -10,8 +10,8 @@
 - `8f4a2b3` feat: refactor admin backend — extract AdminService, FormRequest validation, add all() to repos, no direct model calls in controller
 - `12ddbc7` docs: fix commit hash in Commit.md after amend
 - `519a85e` feat: add styled nav buttons to admin resource views (Logics, Tables, Flows) with active state indicator
-
-- `f703d55` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
+- `85c79e3` docs: add 519a85e entry to Commit.md
+- `73247ff` feat: make admin nav buttons match dashboard resource card style with icons
 
 ## 2026-06-11
 

@@ -1,11 +1,12 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-16 20:00 UTC
+> Last updated: 2026-06-16 21:00 UTC
 
 ## Completed
 - [x] **FEAT: Admin resource pages** — Separate `/admin/logics`, `/admin/tables`, `/admin/flows` pages with `AdminResourceTable` reusable component, navigation cards on dashboard
 - [x] **BACKEND: Admin resource endpoints** — `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` returning all records with owner info, gated by super-admin role
 - [x] **REFACTOR: AdminService + FormRequest validation** — `AdminController` now delegates to `AdminService` (repos injected), validation in FormRequest classes, `all()` method added to Flow/Logic/Table repos
+- [x] **FEAT: Admin nav cards** — Each admin resource view now has styled resource-card nav buttons matching the dashboard design, with active state indicator
 - [x] **TEST: Admin resource pages** — Playwright test creating resources as gold user, verifying admin can see them with correct owners on all three pages
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
