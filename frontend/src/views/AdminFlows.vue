@@ -38,6 +38,12 @@ onMounted(async () => {
       </template>
     </AppHeader>
     <div class="page-body">
+      <nav class="admin-resource-nav">
+        <router-link to="/admin" class="admin-resource-nav-btn">Dashboard</router-link>
+        <router-link to="/admin/logics" class="admin-resource-nav-btn">Logics</router-link>
+        <router-link to="/admin/tables" class="admin-resource-nav-btn">Tables</router-link>
+        <router-link to="/admin/flows" class="admin-resource-nav-btn admin-resource-nav-btn--active">Flows</router-link>
+      </nav>
       <div v-if="error" class="error-msg page-error">{{ error }}</div>
       <section class="admin-section">
         <h3 class="admin-section-title">All Flows ({{ flows.length }})</h3>
