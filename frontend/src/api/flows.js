@@ -23,3 +23,7 @@ export function deleteFlow(id) {
 export function saveFlow(flowId, payload) {
   return apiClient.post(`/flows/${flowId}/save`, payload)
 }
+
+export function validateConnection(flowId, params) {
+  return apiClient.post(`/flows/${flowId}/validate-connection`, params)
+}

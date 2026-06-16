@@ -19,6 +19,10 @@ class RegisterService
             'password' => Hash::make($data['password']),
         ]);
 
+        // assign selected tier role (defaults to free)
+        $tier = $data['tier'] ?? 'free';
+        $user->assignRole($tier);
+
         $token = auth()->attempt([
             'email' => $data['email'],
             'password' => $data['password'],

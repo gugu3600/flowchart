@@ -11,16 +11,34 @@ class FlowEdgeRepository implements FlowEdgeRepositoryInterface
         FlowEdge::where('flow_id', $flowId)->delete();
     }
 
+    public function deleteByNodeIds(int $flowId, array $nodeIds): void
+    {
+        FlowEdge::where('flow_id', $flowId)
+            ->where(function ($q) use ($nodeIds) {
+                $q->whereIn('source_node_id', $nodeIds)
+                  ->orWhereIn('target_node_id', $nodeIds);
+            })
+            ->delete();
+    }
+
     public function bulkCreate(int $flowId, array $edges)
     {
-        $instances = collect($edges)->map(fn ($e) => new FlowEdge([
+        $rows = collect($edges)->map(fn ($e) => [
             'flow_id' => $flowId,
             'source_node_id' => $e['source_node_id'],
             'target_node_id' => $e['target_node_id'],
             'label' => $e['label'] ?? null,
-            'config' => $e['config'] ?? null,
-        ]));
+            'config' => isset($e['config']) ? json_encode($e['config']) : null,
+        ])->toArray();
 
-        return FlowEdge::insert($instances->toArray());
+        return FlowEdge::insert($rows);
+    }
+
+    public function exists(int $flowId, int $sourceNodeId, int $targetNodeId): bool
+    {
+        return FlowEdge::where('flow_id', $flowId)
+            ->where('source_node_id', $sourceNodeId)
+            ->where('target_node_id', $targetNodeId)
+            ->exists();
     }
 }

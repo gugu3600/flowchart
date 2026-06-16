@@ -3,9 +3,12 @@
 namespace App\Services\LogicDefinition;
 
 use App\Repositories\logic_definition\LogicDefinitionRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class LogicDefinitionService
 {
+    private const FREE_MAX_LOGICS = 4;
+
     public function __construct(
         private readonly LogicDefinitionRepositoryInterface $repo,
     ) {}
@@ -22,6 +25,7 @@ class LogicDefinitionService
 
     public function create(int $userId, array $data)
     {
+        $this->checkLogicLimit($userId);
         return $this->repo->create([
             'user_id' => $userId,
             'name' => $data['name'],
@@ -41,5 +45,29 @@ class LogicDefinitionService
     {
         $this->repo->findForUser($id, $userId);
         $this->repo->delete($id);
+    }
+
+    public function logicCount(int $userId): int
+    {
+        return $this->repo->countForUser($userId);
+    }
+
+    public function maxLogicSlots(int $userId): int
+    {
+        $user = Auth::user();
+        if (!$user) return 0;
+        if ($user->hasAnyRole(['silver', 'gold', 'platinum', 'super-admin'])) return 999;
+        return self::FREE_MAX_LOGICS;
+    }
+
+    private function checkLogicLimit(int $userId): void
+    {
+        $user = Auth::user();
+        if (!$user) return;
+        if ($user->hasAnyRole(['silver', 'gold', 'platinum', 'super-admin'])) return;
+        $count = $this->repo->countForUser($userId);
+        if ($count >= self::FREE_MAX_LOGICS) {
+            abort(403, 'You have reached the maximum of ' . self::FREE_MAX_LOGICS . ' logics. Upgrade to Silver or higher for unlimited logics.');
+        }
     }
 }

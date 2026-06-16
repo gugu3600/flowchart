@@ -1,18 +1,19 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import apiClient from '../api/apiClient.js'
-import { AppButton, AppInput, AppCard } from '../components'
+import { AppButton, FloatingInput } from '../components'
 
 const form = reactive({ email: '', password: '' })
 const error = ref('')
 const loading = ref(false)
+const remember = ref(false)
 
 async function handleLogin() {
   error.value = ''
   loading.value = true
 
   try {
-    const res = await apiClient.post('/login', form)
+    const res = await apiClient.post('/login', { ...form, remember: remember.value })
     if (res.success) {
       window.location.href = '/canvas'
     }
@@ -25,37 +26,37 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-surface-50 dark:bg-surface-950">
-    <AppCard title="Flowchart Login" class="w-full max-w-md">
-      <form @submit.prevent="handleLogin" class="flex flex-col gap-4">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Sign in to your account</p>
+      </div>
+
+      <form @submit.prevent="handleLogin" class="login-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
 
-        <AppInput
-          id="email"
-          v-model="form.email"
-          label="Email"
-          type="email"
-          placeholder="admin@flowchart.dev"
-        />
-        <AppInput
-          id="password"
-          v-model="form.password"
-          label="Password"
-          type="password"
-          placeholder="••••••••"
-        />
+        <FloatingInput v-model="form.email" id="email" type="email" label="Email" autocomplete="email" />
+
+        <FloatingInput v-model="form.password" id="password" type="password" label="Password" autocomplete="current-password" show-password-toggle />
+
+        <label class="remember-row">
+          <input type="checkbox" v-model="remember" class="remember-checkbox" />
+          <span class="remember-label">Remember me</span>
+        </label>
 
         <AppButton
           type="submit"
-          label="Login"
+          label="Sign In"
           :loading="loading"
-          class="mt-2"
+          class="login-btn"
         />
-        <p class="text-center text-sm text-surface-500 dark:text-surface-400">
-          No account?
-          <a href="/register" class="text-primary-500 hover:underline">Register</a>
+
+        <p class="register-login-link">
+          Don't have an account?
+          <router-link to="/register">Register</router-link>
         </p>
       </form>
-    </AppCard>
+    </div>
   </div>
 </template>

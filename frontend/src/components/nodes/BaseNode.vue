@@ -1,5 +1,7 @@
 <script setup>
 import { Position, Handle } from '@vue-flow/core'
+import { NodeResizer } from '@vue-flow/node-resizer'
+import '@vue-flow/node-resizer/dist/style.css'
 
 const props = defineProps({
   id: { type: String, required: true },
@@ -10,6 +12,7 @@ const props = defineProps({
   color: { type: String, default: 'blue' },
   showSource: { type: Boolean, default: true },
   showTarget: { type: Boolean, default: true },
+  style: { type: Object, default: () => ({}) },
 })
 </script>
 
@@ -20,7 +23,14 @@ const props = defineProps({
       `node-${color}`,
       selected ? 'selected' : '',
     ]"
+    :style="style"
   >
+    <NodeResizer
+      :is-visible="selected"
+      min-width="160"
+      min-height="60"
+      handle-class-name="node-resize-handle"
+    />
     <Handle
       v-if="showTarget"
       type="target"

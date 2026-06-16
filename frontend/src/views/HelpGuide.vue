@@ -1,12 +1,14 @@
 <script setup>
+import AppHeader from '../components/AppHeader.vue'
 </script>
 
 <template>
   <div class="help-page">
-    <header class="help-header">
-      <h1 class="help-title">Flowchart — How to Use</h1>
-      <a href="/canvas" class="help-back">Back to Canvas</a>
-    </header>
+    <AppHeader title="Flowchart — How to Use">
+      <template #right>
+        <a href="/canvas" class="help-back">Back to Canvas</a>
+      </template>
+    </AppHeader>
 
     <main class="help-content">
       <section>
@@ -76,6 +78,18 @@
       </section>
 
       <section>
+        <h2>Subscription Tiers</h2>
+        <p>Your account tier determines which features are available:</p>
+        <ul>
+          <li><strong>Free</strong> — Browse the canvas, drag and drop nodes, create diagrams. <em>Cannot save flows.</em></li>
+          <li><strong>Silver</strong> — Everything in Free, plus <strong>unlimited save slots</strong> for your flowcharts.</li>
+          <li><strong>Gold</strong> — Everything in Silver, plus <strong>database schema generation</strong> (SQL DDL compilation).</li>
+          <li><strong>Platinum</strong> — Everything in Gold, plus <strong>visual folder mapping</strong> for workspace architecture.</li>
+        </ul>
+        <p>Your current tier is displayed in the header next to your name.</p>
+      </section>
+
+      <section>
         <h2>Keyboard Shortcuts</h2>
         <table class="shortcuts">
           <thead>
@@ -91,115 +105,4 @@
 </template>
 
 <style scoped>
-.help-page {
-  min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
-}
-
-.help-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-}
-
-.help-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #f1f5f9;
-}
-
-.help-back {
-  font-size: 0.875rem;
-  color: #60a5fa;
-  text-decoration: none;
-}
-
-.help-back:hover {
-  text-decoration: underline;
-}
-
-.help-content {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-}
-
-section {
-  margin-bottom: 2.5rem;
-}
-
-h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #f1f5f9;
-  margin: 0 0 0.75rem;
-}
-
-h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #cbd5e1;
-  margin: 1rem 0 0.5rem;
-}
-
-p {
-  line-height: 1.6;
-  margin: 0 0 0.5rem;
-}
-
-ul {
-  padding-left: 1.25rem;
-}
-
-li {
-  margin-bottom: 0.35rem;
-  line-height: 1.5;
-}
-
-a {
-  color: #60a5fa;
-}
-
-code {
-  background: #1e293b;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.85em;
-  color: #f472b6;
-}
-
-kbd {
-  background: #334155;
-  border: 1px solid #475569;
-  border-radius: 4px;
-  padding: 0.1rem 0.35rem;
-  font-size: 0.85em;
-  font-family: inherit;
-  color: #f1f5f9;
-}
-
-.shortcuts {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.shortcuts th,
-.shortcuts td {
-  text-align: left;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #334155;
-}
-
-.shortcuts th {
-  color: #94a3b8;
-  font-weight: 500;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
 </style>

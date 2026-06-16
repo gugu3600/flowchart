@@ -6,9 +6,18 @@ import '@vue-flow/core/dist/theme-default.css'
 import { TableNode, LogicNode, FolderFileNode } from '../components/nodes'
 import Sidebar from '../components/Sidebar.vue'
 import SchemaSidebar from '../components/SchemaSidebar.vue'
-import { getFlows, getFlow, createFlow, saveFlow } from '../api/flows.js'
+import ModeTabs from '../components/ModeTabs.vue'
+import ColorSwatchPalette from '../components/ColorSwatchPalette.vue'
+import { getFlows, getFlow, createFlow, saveFlow, validateConnection } from '../api/flows.js'
 import { getTables } from '../api/tables.js'
 import { getLogics } from '../api/logics.js'
+import { useUserStore } from '../stores/useUserStore.js'
+import { useFlowMapper } from '../composables/useFlowMapper.js'
+import UserProfile from '../components/UserProfile.vue'
+import AppHeader from '../components/AppHeader.vue'
+
+const { fetchUser, isAdmin, isSilver, isFree, canSave, tierLabel, tierColor } = useUserStore()
+const { toClientNode, toClientEdge, toServerNode, toServerEdge, filterByMode } = useFlowMapper()
 
 const mode = ref('flow')
 
@@ -33,13 +42,42 @@ const creating = ref(false)
 const error = ref('')
 const newFlowName = ref('')
 const showNewFlowInput = ref(false)
+const flowCount = ref(0)
+const maxSlots = ref(0)
+
+const selectedNode = ref(null)
+const selectedEdge = ref(null)
 
 const nodeTypes = computed(() =>
   mode.value === 'schema' ? schemaNodeTypes : flowNodeTypes
 )
 
+const slotsUsed = computed(() => flowCount.value)
+const slotsTotal = computed(() => maxSlots.value)
+const slotsRemaining = computed(() => Math.max(0, maxSlots.value - flowCount.value))
+
+const nodeColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
+const edgeColors = ['#64748b', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+
+const selectedNodeColor = computed(() => selectedNode.value?.style?.background || '')
+const selectedEdgeColor = computed(() => selectedEdge.value?.style?.stroke || '#64748b')
+
+function isNodeActive(c, selected) {
+  return selected === c
+}
+
+function isEdgeActive(c, selected) {
+  return c === '#64748b' ? selected === c || !selected : selected === c
+}
+
 onMounted(async () => {
-  await loadFlows()
+  await fetchUser()
+  if (canSave.value) {
+    await loadFlows()
+  }
+  if (!currentFlowId.value) {
+    await loadFlowData(null)
+  }
 })
 
 async function loadFlows() {
@@ -49,6 +87,8 @@ async function loadFlows() {
     const res = await getFlows()
     if (res.success) {
       flows.value = res.data.flows || []
+      flowCount.value = res.data.flow_count ?? 0
+      maxSlots.value = res.data.max_slots ?? 0
       if (flows.value.length > 0 && !currentFlowId.value) {
         await selectFlow(flows.value[0].id)
       }
@@ -62,6 +102,8 @@ async function loadFlows() {
 
 async function selectFlow(flowId) {
   currentFlowId.value = flowId
+  selectedNode.value = null
+  selectedEdge.value = null
   await loadFlowData(flowId)
 }
 
@@ -69,32 +111,24 @@ async function loadFlowData(flowId) {
   loading.value = true
   error.value = ''
   try {
-    const flowRes = await getFlow(flowId)
     const savedNodes = []
     const savedEdges = []
 
-    if (flowRes.success) {
-      const flow = flowRes.data.flow
-      for (const n of flow.nodes || []) {
-        const isFlowType = n.type === 'logic' || n.type === 'folderFile'
-        const isSchemaType = n.type === 'table'
-        if (mode.value === 'flow' && !isFlowType) continue
-        if (mode.value === 'schema' && !isSchemaType) continue
-        savedNodes.push({
-          id: String(n.id),
-          type: n.type,
-          position: { x: n.position_x, y: n.position_y },
-          data: { label: n.label, ...(n.data || {}) },
-        })
+    if (flowId) {
+      const flowRes = await getFlow(flowId)
+      if (flowRes.success) {
+        const flow = flowRes.data.flow
+        for (const n of flow.nodes || []) {
+          const isFlowType = n.type === 'logic' || n.type === 'folderFile'
+          const isSchemaType = n.type === 'table'
+          if (mode.value === 'flow' && !isFlowType) continue
+          if (mode.value === 'schema' && !isSchemaType) continue
+          savedNodes.push(toClientNode(n))
+        }
+        savedEdges.push(
+          ...(flow.edges || []).map(toClientEdge)
+        )
       }
-      savedEdges.push(
-        ...(flow.edges || []).map((e) => ({
-          id: `e-${e.id}`,
-          source: String(e.source_node_id),
-          target: String(e.target_node_id),
-          label: e.label || '',
-        }))
-      )
     }
 
     const existingDefIds = new Set()
@@ -116,16 +150,17 @@ async function loadFlowData(flowId) {
           defNodes.push({
             id: `def_logic_${l.id}`,
             type: 'logic',
+            label: l.name,
             position: { x: 50 + defIndex++ * 350, y: 50 },
-              data: {
-                label: l.name,
-                definitionId: l.id,
-                definitionType: 'logic',
-                description: l.description,
-                inputs: l.inputs,
-                output: l.output,
-                typeField: l.type,
-              },
+            data: {
+              label: l.name,
+              definitionId: l.id,
+              definitionType: 'logic',
+              description: l.description,
+              inputs: l.inputs,
+              output: l.output,
+              typeField: l.type,
+            },
           })
         }
       }
@@ -138,6 +173,7 @@ async function loadFlowData(flowId) {
           defNodes.push({
             id: `def_table_${t.id}`,
             type: 'table',
+            label: t.name,
             position: { x: 50 + defIndex++ * 350, y: 50 },
             data: {
               label: t.name,
@@ -161,12 +197,17 @@ async function loadFlowData(flowId) {
 
 async function handleCreateFlow() {
   if (!newFlowName.value.trim()) return
+  if (!canSave.value) {
+    error.value = 'Upgrade to Silver to create saved flows.'
+    return
+  }
   creating.value = true
   error.value = ''
   try {
     const res = await createFlow({ name: newFlowName.value.trim() })
     if (res.success) {
       flows.value.push(res.data.flow)
+      flowCount.value++
       currentFlowId.value = res.data.flow.id
       nodes.value = []
       edges.value = []
@@ -182,43 +223,66 @@ async function handleCreateFlow() {
 
 async function handleSave() {
   if (!currentFlowId.value) return
+  if (!canSave.value) {
+    error.value = 'Saving requires a Silver or higher subscription. Upgrade to unlock.'
+    return
+  }
+  if (saving.value) return
   saving.value = true
   error.value = ''
   try {
     const payload = {
-      nodes: nodes.value.map((n) => ({
-        id: n.id,
-        type: n.type,
-        label: n.data?.label || '',
-        position_x: n.position.x,
-        position_y: n.position.y,
-        data: n.data || {},
-      })),
-      edges: edges.value.map((e) => ({
-        source: e.source,
-        target: e.target,
-        label: e.label || '',
-      })),
+      nodes: nodes.value.map(toServerNode),
+      edges: edges.value.map(toServerEdge),
     }
     const res = await saveFlow(currentFlowId.value, payload)
     if (res.success) {
-      nodes.value = (res.data.flow?.nodes || []).map((n) => ({
-        id: String(n.id),
-        type: n.type,
-        position: { x: n.position_x, y: n.position_y },
-        data: { label: n.label, ...(n.data || {}) },
-      }))
-      edges.value = (res.data.flow?.edges || []).map((e) => ({
-        id: `e-${e.id}`,
-        source: String(e.source_node_id),
-        target: String(e.target_node_id),
-        label: e.label || '',
-      }))
+      nodes.value = filterByMode(res.data.flow?.nodes || [], mode.value).map(toClientNode)
+      edges.value = (res.data.flow?.edges || []).map(toClientEdge)
+
+      if (selectedNode.value) {
+        selectedNode.value = nodes.value.find(n => n.id === selectedNode.value.id) || null
+      }
+      if (selectedEdge.value) {
+        selectedEdge.value = edges.value.find(e => e.id === selectedEdge.value.id) || null
+      }
     }
   } catch (err) {
     error.value = err.message || 'Failed to save flow'
   } finally {
     saving.value = false
+  }
+}
+
+function setNodeColor(color) {
+  const sel = selectedNode.value
+  if (!sel) return
+  nodes.value = nodes.value.map(n => {
+    if (n.id !== sel.id) return n
+    return {
+      ...n,
+      config: { ...(n.config || {}), backgroundColor: color },
+      style: color ? { background: color } : {},
+    }
+  })
+  if (currentFlowId.value) {
+    handleSave()
+  }
+}
+
+function setEdgeColor(color) {
+  const sel = selectedEdge.value
+  if (!sel) return
+  edges.value = edges.value.map(e => {
+    if (e.id !== sel.id) return e
+    return {
+      ...e,
+      config: { ...(e.config || {}), strokeColor: color },
+      style: { ...(e.style || {}), stroke: color || '#64748b' },
+    }
+  })
+  if (currentFlowId.value) {
+    handleSave()
   }
 }
 
@@ -230,14 +294,41 @@ function isValidConnection(connection) {
   const src = findNode(connection.source)
   const tgt = findNode(connection.target)
   if (!src || !tgt) return false
+  if (connection.source === connection.target) return false
   if (mode.value === 'schema') {
     return src.type === 'table' && tgt.type === 'table'
   }
   return src.type !== 'table' && tgt.type !== 'table'
 }
 
-function onConnect(params) {
-  if (!isValidConnection(params)) return
+async function onConnect(params) {
+  const src = findNode(params.source)
+  const tgt = findNode(params.target)
+  if (!src || !tgt) return
+
+  if (edges.value.some(e => e.source === params.source && e.target === params.target)) {
+    error.value = 'These nodes are already connected'
+    return
+  }
+
+  if (currentFlowId.value) {
+    try {
+      const res = await validateConnection(currentFlowId.value, {
+        source_id: params.source,
+        target_id: params.target,
+        source_type: src.type,
+        target_type: tgt.type,
+      })
+      if (!res.success) {
+        error.value = res.message || 'Connection rejected'
+        return
+      }
+    } catch (err) {
+      error.value = err.message || 'Failed to validate connection'
+      return
+    }
+  }
+
   edges.value = [
     ...edges.value,
     {
@@ -245,22 +336,40 @@ function onConnect(params) {
       source: params.source,
       target: params.target,
       animated: true,
+      config: {},
     },
   ]
 }
 
-function onEdgeClick(event, edge) {
-  edge.selected = true
+function onNodeClick(evt) {
+  selectedNode.value = evt?.node || null
+  selectedEdge.value = null
+}
+
+function onEdgeClick(evt) {
+  selectedEdge.value = evt?.edge || null
+  selectedNode.value = null
+}
+
+function onPaneClick() {
+  selectedNode.value = null
+  selectedEdge.value = null
 }
 
 function onEdgesDelete(removedEdges) {
   const removedIds = new Set(removedEdges.map(e => e.id))
   edges.value = edges.value.filter(e => !removedIds.has(e.id))
+  if (selectedEdge.value && removedIds.has(selectedEdge.value.id)) {
+    selectedEdge.value = null
+  }
 }
 
 function onNodesDelete(removedNodes) {
   const removedIds = new Set(removedNodes.map(n => n.id))
   nodes.value = nodes.value.filter(n => !removedIds.has(n.id))
+  if (selectedNode.value && removedIds.has(selectedNode.value.id)) {
+    selectedNode.value = null
+  }
 }
 
 function onDragOver(event) {
@@ -283,15 +392,17 @@ function onDrop(event) {
     x: event.clientX,
     y: event.clientY,
   })
+  const label = nodeDef.defaultData?.label || nodeDef.label
   const id = `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
   nodes.value = [
     ...nodes.value,
     {
       id,
       type: nodeDef.type,
+      label,
       position,
       data: {
-        label: nodeDef.defaultData?.label || nodeDef.label,
+        label,
         columns: nodeDef.defaultData?.columns,
         description: nodeDef.defaultData?.description,
         inputs: nodeDef.defaultData?.inputs,
@@ -300,6 +411,7 @@ function onDrop(event) {
         isFolder: nodeDef.defaultData?.isFolder,
         children: nodeDef.defaultData?.children,
       },
+      config: {},
     },
   ]
 }
@@ -307,9 +419,9 @@ function onDrop(event) {
 function switchMode(newMode) {
   if (newMode === mode.value) return
   mode.value = newMode
-  if (currentFlowId.value) {
-    loadFlowData(currentFlowId.value)
-  }
+  selectedNode.value = null
+  selectedEdge.value = null
+  loadFlowData(currentFlowId.value)
 }
 
 function refresh() {
@@ -321,27 +433,12 @@ function refresh() {
 
 <template>
   <div class="canvas-page">
-    <header class="canvas-header">
-      <div class="canvas-header-left">
-        <h1 class="canvas-title">Flowchart</h1>
-
-        <div class="mode-tabs">
-          <button
-            :class="['mode-tab', { active: mode === 'flow' }]"
-            @click="switchMode('flow')"
-          >
-            Flow
-          </button>
-          <button
-            :class="['mode-tab', { active: mode === 'schema' }]"
-            @click="switchMode('schema')"
-          >
-            Schema
-          </button>
-        </div>
+    <AppHeader title="Flowchart">
+      <template #left>
+        <ModeTabs :mode="mode" @update:mode="switchMode" />
 
         <select
-          v-if="flows.length > 0"
+          v-if="canSave && flows.length > 0"
           class="flow-select"
           :value="currentFlowId"
           @change="selectFlow(Number($event.target.value))"
@@ -349,27 +446,77 @@ function refresh() {
           <option v-for="f in flows" :key="f.id" :value="f.id">{{ f.name }}</option>
         </select>
 
-        <div v-if="showNewFlowInput" class="new-flow-form">
+        <div v-if="canSave && showNewFlowInput" class="new-flow-form">
           <input v-model="newFlowName" type="text" placeholder="Flow name..." class="flow-name-input" @keyup.enter="handleCreateFlow" />
           <button class="btn-sm btn-primary" :disabled="creating || !newFlowName.trim()" @click="handleCreateFlow">
             {{ creating ? 'Creating...' : 'Create' }}
           </button>
           <button class="btn-sm btn-secondary" @click="showNewFlowInput = false; newFlowName = ''">Cancel</button>
         </div>
-        <button v-else class="btn-sm btn-secondary" @click="showNewFlowInput = true">+ New Flow</button>
-      </div>
+        <button v-else-if="canSave" class="btn-sm btn-secondary" @click="showNewFlowInput = true">+ New Flow</button>
+      </template>
 
-      <div class="canvas-header-right">
+      <template #right>
         <a v-if="mode === 'flow'" href="/logics" class="nav-link">Logics</a>
         <a v-if="mode === 'schema'" href="/tables" class="nav-link">Tables</a>
+        <a v-if="isAdmin" href="/admin" class="nav-link">Admin</a>
         <a href="/help" class="nav-link">Help</a>
-        <button class="btn-sm btn-secondary" @click="refresh">⟳</button>
-        <button class="btn-sm btn-primary" :disabled="!currentFlowId || saving" @click="handleSave">
+        <button class="btn-sm btn-secondary" @click="refresh" :disabled="!currentFlowId">⟳</button>
+        <button v-if="canSave" class="btn-sm btn-primary" :disabled="!currentFlowId || saving" @click="handleSave">
           {{ saving ? 'Saving...' : 'Save' }}
         </button>
-        <a href="/login" class="canvas-logout">Logout</a>
+        <UserProfile />
+      </template>
+    </AppHeader>
+
+    <div v-if="isFree" class="free-banner">
+      <span class="free-banner-icon">🔒</span>
+      <span class="free-banner-text">
+        You're on the <strong>Free</strong> plan. Create flowcharts visually, but they won't be saved.
+        <router-link to="/subscribe" class="free-banner-link">Upgrade to Silver</router-link> to save your work.
+      </span>
+    </div>
+
+    <div v-else-if="canSave && maxSlots > 0 && maxSlots < 900" class="slot-bar">
+      <span class="slot-label">Slots: {{ slotsUsed }}/{{ slotsTotal }} used</span>
+      <div class="slot-track">
+        <div class="slot-fill" :style="{ width: (slotsUsed / slotsTotal * 100) + '%' }"></div>
       </div>
-    </header>
+      <span v-if="slotsRemaining <= 1" class="slot-warning">{{ slotsRemaining }} slot remaining</span>
+    </div>
+
+    <div v-if="!isFree" class="color-bar">
+      <template v-if="selectedNode">
+        <ColorSwatchPalette
+          label="Node Color:"
+          :colors="nodeColors"
+          :selected-color="selectedNodeColor"
+          clear-title="Remove custom color"
+          :is-active="isNodeActive"
+          @select="setNodeColor"
+        />
+      </template>
+      <template v-else>
+        <span class="color-label">Node Color:</span>
+        <span class="color-hint">Select a node to customize</span>
+      </template>
+      <span class="color-divider" />
+      <template v-if="selectedEdge">
+        <ColorSwatchPalette
+          label="Edge Color:"
+          :colors="edgeColors"
+          :selected-color="selectedEdgeColor"
+          clear-title="Reset to default"
+          clear-value="#64748b"
+          :is-active="isEdgeActive"
+          @select="setEdgeColor"
+        />
+      </template>
+      <template v-else>
+        <span class="color-label">Edge Color:</span>
+        <span class="color-hint">Select an edge to customize</span>
+      </template>
+    </div>
 
     <div v-if="error" class="canvas-error error-msg">{{ error }}</div>
 
@@ -380,7 +527,7 @@ function refresh() {
       <div class="canvas-flow-wrapper">
         <div v-if="loading" class="canvas-loading">Loading...</div>
         <VueFlow
-          v-else-if="currentFlowId"
+          v-else
           v-model:nodes="nodes"
           v-model:edges="edges"
           :node-types="nodeTypes"
@@ -389,156 +536,18 @@ function refresh() {
           :delete-key-code="['Delete', 'Backspace']"
           fit-view-on-init
           @connect="onConnect"
+          @node-click="onNodeClick"
           @edge-click="onEdgeClick"
+          @pane-click="onPaneClick"
           @edges-delete="onEdgesDelete"
           @nodes-delete="onNodesDelete"
           @dragover="onDragOver"
           @drop="onDrop"
         />
-        <div v-else class="canvas-empty"><p>Select or create a flow to get started</p></div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.canvas-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #0f172a;
-}
-
-.canvas-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.canvas-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-}
-
-.canvas-header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.canvas-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f1f5f9;
-  white-space: nowrap;
-}
-
-.mode-tabs {
-  display: flex;
-  gap: 0;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.mode-tab {
-  background: #334155;
-  color: #94a3b8;
-  border: none;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s, color 0.15s;
-}
-
-.mode-tab.active {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.mode-tab:not(.active):hover {
-  background: #475569;
-  color: #f1f5f9;
-}
-
-.nav-link {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-decoration: none;
-}
-
-.nav-link:hover { color: #3b82f6; }
-
-.flow-select {
-  background: #334155;
-  color: #f1f5f9;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-width: 140px;
-}
-
-.flow-select:focus { outline: none; border-color: #3b82f6; }
-
-.new-flow-form { display: flex; align-items: center; gap: 0.4rem; }
-
-.flow-name-input {
-  background: #334155;
-  color: #f1f5f9;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.875rem;
-  width: 140px;
-}
-
-.flow-name-input:focus { outline: none; border-color: #3b82f6; }
-
-.btn-sm {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  font-weight: 500;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.canvas-logout {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.canvas-logout:hover { color: #f87171; }
-
-.canvas-error { margin: 0.5rem 1rem 0; flex-shrink: 0; }
-
-.canvas-body { display: flex; flex: 1; overflow: hidden; }
-
-.canvas-flow-wrapper { flex: 1; position: relative; }
-
-.canvas-loading,
-.canvas-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #64748b;
-  font-size: 0.9rem;
-}
 </style>

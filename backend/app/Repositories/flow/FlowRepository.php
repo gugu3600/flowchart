@@ -6,6 +6,11 @@ use App\Models\Flow;
 
 class FlowRepository implements FlowRepositoryInterface
 {
+    public function all()
+    {
+        return Flow::with(['user:id,name,email'])->orderBy('created_at', 'desc')->get();
+    }
+
     public function allForUser(int $userId)
     {
         return Flow::where('user_id', $userId)->get();
@@ -36,5 +41,10 @@ class FlowRepository implements FlowRepositoryInterface
     public function delete(int $id)
     {
         return Flow::destroy($id);
+    }
+
+    public function countForUser(int $userId): int
+    {
+        return Flow::where('user_id', $userId)->count();
     }
 }
