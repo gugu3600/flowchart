@@ -4,7 +4,7 @@
 
 ## 2026-06-16
 
-- `3421ccb` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
+- `f703d55` feat: admin resource pages — three admin endpoints, three frontend pages, AdminResourceTable component, dashboard nav cards, fix VueFlow 1.x event object pattern for node/edge click
 
 ## 2026-06-11
 
