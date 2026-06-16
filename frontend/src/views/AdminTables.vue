@@ -39,10 +39,26 @@ onMounted(async () => {
     </AppHeader>
     <div class="page-body">
       <nav class="admin-resource-nav">
-        <router-link to="/admin" class="admin-resource-nav-btn">Dashboard</router-link>
-        <router-link to="/admin/logics" class="admin-resource-nav-btn">Logics</router-link>
-        <router-link to="/admin/tables" class="admin-resource-nav-btn admin-resource-nav-btn--active">Tables</router-link>
-        <router-link to="/admin/flows" class="admin-resource-nav-btn">Flows</router-link>
+        <router-link to="/admin" class="admin-resource-card">
+          <span class="admin-resource-icon">&#128202;</span>
+          <span class="admin-resource-label">Dashboard</span>
+          <span class="admin-resource-arrow">&rarr;</span>
+        </router-link>
+        <router-link to="/admin/logics" class="admin-resource-card">
+          <span class="admin-resource-icon">&#9881;</span>
+          <span class="admin-resource-label">Logics</span>
+          <span class="admin-resource-arrow">&rarr;</span>
+        </router-link>
+        <router-link to="/admin/tables" class="admin-resource-card admin-resource-card--active">
+          <span class="admin-resource-icon">&#128202;</span>
+          <span class="admin-resource-label">Tables</span>
+          <span class="admin-resource-arrow">&rarr;</span>
+        </router-link>
+        <router-link to="/admin/flows" class="admin-resource-card">
+          <span class="admin-resource-icon">&#128196;</span>
+          <span class="admin-resource-label">Flows</span>
+          <span class="admin-resource-arrow">&rarr;</span>
+        </router-link>
       </nav>
       <div v-if="error" class="error-msg page-error">{{ error }}</div>
       <section class="admin-section">

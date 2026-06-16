@@ -968,35 +968,6 @@ body {
   flex-wrap: wrap;
 }
 
-.admin-resource-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #e2e8f0;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.admin-resource-nav-btn:hover {
-  border-color: #3b82f6;
-  background: #1e3a5f;
-}
-
-.admin-resource-nav-btn--active {
-  background: #1e3a5f;
-  border-color: #3b82f6;
-  color: #60a5fa;
-  cursor: default;
-  pointer-events: none;
-}
-
 .admin-resource-card {
   display: flex;
   align-items: center;
@@ -1014,6 +985,13 @@ body {
 .admin-resource-card:hover {
   border-color: #3b82f6;
   background: #1e3a5f;
+}
+
+.admin-resource-card--active {
+  border-color: #3b82f6;
+  background: #1e3a5f;
+  cursor: default;
+  pointer-events: none;
 }
 
 .admin-resource-icon {
