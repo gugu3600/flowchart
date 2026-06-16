@@ -12,6 +12,7 @@
 - `519a85e` feat: add styled nav buttons to admin resource views (Logics, Tables, Flows) with active state indicator
 - `85c79e3` docs: add 519a85e entry to Commit.md
 - `73247ff` feat: make admin nav buttons match dashboard resource card style with icons
+- `087680a` docs: update all .md files for admin nav card styling
 
 ## 2026-06-11
 
