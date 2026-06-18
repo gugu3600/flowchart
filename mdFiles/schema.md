@@ -1,6 +1,6 @@
 # Database Schema — `flowchart`
 
-> Last updated: 2026-06-11 12:00 UTC
+> Last updated: 2026-06-18 16:00 UTC
 
 ## Overview
 
@@ -15,6 +15,8 @@
 users (1) ──< flows (1) ──< flow_nodes
                       └──< flow_edges (source_node_id ──> flow_nodes)
                                        (target_node_id ──> flow_nodes)
+                      └──< table_definitions (via flow_id)
+                      └──< logic_definitions (via flow_id)
 ```
 
 ---
@@ -27,12 +29,13 @@ users (1) ──< flows (1) ──< flow_nodes
 |--------|------|-------|
 | id | BIGINT PK | Auto-increment |
 | user_id | BIGINT FK | → `users.id` ON DELETE CASCADE |
+| flow_id | BIGINT FK | → `flows.id` ON DELETE CASCADE, nullable |
 | name | VARCHAR(255) | Table name |
 | columns | JSON | Array of `{name, type, pk, fk, unique}` |
 | created_at | TIMESTAMP | |
 | updated_at | TIMESTAMP | |
 
-- **Relations:** Belongs to `user`.
+- **Relations:** Belongs to `user`. Belongs to `flow`.
 - **Canvas Integration:** Each definition can be dragged from the sidebar onto the canvas (tracked via `data.definitionId`).
 
 ---
@@ -43,6 +46,7 @@ users (1) ──< flows (1) ──< flow_nodes
 |--------|------|-------|
 | id | BIGINT PK | Auto-increment |
 | user_id | BIGINT FK | → `users.id` ON DELETE CASCADE |
+| flow_id | BIGINT FK | → `flows.id` ON DELETE CASCADE, nullable |
 | name | VARCHAR(255) | Logic/function name |
 | description | TEXT | Nullable |
 | inputs | JSON | Array of input parameter names |
@@ -50,7 +54,7 @@ users (1) ──< flows (1) ──< flow_nodes
 | created_at | TIMESTAMP | |
 | updated_at | TIMESTAMP | |
 
-- **Relations:** Belongs to `user`.
+- **Relations:** Belongs to `user`. Belongs to `flow`.
 - **Canvas Integration:** Each definition can be dragged from the sidebar onto the canvas (tracked via `data.definitionId`).
 
 ---

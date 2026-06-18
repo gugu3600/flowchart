@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-18 14:00 UTC
+> Last updated: 2026-06-18 16:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -59,6 +59,9 @@
 - [x] **ColumnBuilder data type dropdown:** Type field is now a grouped `<select>` with all MySQL types (5 categories), plus custom text fallback. ENUM and SET included in String group.
 - [x] **Canvas per-flow node isolation:** `loadFlowData()` no longer auto-populates definition nodes. Each flow only shows saved nodes — tables/logics from one flow no longer leak into others.
 - [x] **Docker setup verified:** MySQL port changed 3307→3308, PHP 8.3→8.4 (composer require), node:20-alpine→node:20 (glibc). All 4 services start, migrations run, seeder seeded.
+- [x] **Login redirect for authenticated users:** Router fetches user on `/login`/`/register` routes; redirects to `/canvas` (latest flow) if already authenticated.
+- [x] **Per-flow definition scoping:** `flow_id` FK added to both `table_definitions` and `logic_definitions`. Backend filters by `?flow_id=` on index. Frontend designer pages have flow selector. Canvas sidebar shows per-flow definitions as draggable items.
+- [x] **Delete persistence:** `onEdgesDelete` and `onNodesDelete` call `handleSave()` to persist deletions to backend immediately.
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
 

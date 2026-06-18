@@ -1,11 +1,15 @@
 # Git Commits
 
-> Last updated: 2026-06-18 14:00 UTC
+> Last updated: 2026-06-18 16:00 UTC
 
 ## 2026-06-18
 
 - `7dc732d` feat: Docker Compose setup — PHP 8.4-FPM + Nginx, Node 20, MySQL 8.0 (:3308), phpMyAdmin
 - `56b932d` feat: ColumnBuilder data type dropdown + Canvas per-flow scoping + update all .md files
+- `9e68ad2` docs: update commit hash in Commit.md after amend
+- `70af5da` fix: redirect authenticated users from /login to latest canvas
+- `a9dd08e` feat: scope table/logic definitions per-flow with flow_id
+- `52e18a3` fix: persist node/edge deletions to backend on Delete/Backspace
 
 ## 2026-06-16
 

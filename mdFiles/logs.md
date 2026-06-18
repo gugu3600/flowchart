@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-18 14:00 UTC
+> Last updated: 2026-06-18 16:00 UTC
 
 ## 2026-06-16 — Admin Resource Pages & Nav Links
 - **FEAT: Admin resource endpoints** — Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` endpoints to `AdminController`, each returning all records with owner name/email. Routes gated by `role:super-admin`.
@@ -43,6 +43,37 @@
 | `docker/frontend/nginx.conf` | **NEW** — Nginx config for Vite SPA |
 | `frontend/src/components/ColumnBuilder.vue` | Type field changed from text input to grouped `<select>` with `DATA_TYPE_GROUPS` (5 groups, all MySQL types), custom text fallback |
 | `frontend/src/views/Canvas.vue` | Removed `getTables`/`getLogics` imports and auto-population block; `loadFlowData` now only uses `savedNodes`/`savedEdges` |
+
+## 2026-06-18 — Login Redirect, Per-Flow Definitions, Delete Persistence
+- **FIX: Login redirect for authenticated users** — Router now fetches user on `/login`/`/register` routes; if already authenticated, redirects to `/canvas` which auto-selects the latest flow (flows now ordered `created_at desc`).
+- **FEAT: Per-flow definition scoping** — Added `flow_id` FK to `table_definitions` and `logic_definitions`. Backend scopes CRUD by `flow_id` query param. Frontend TableDesigner/LogicDesigner have flow selectors. Canvas sidebar shows definitions for the current flow as draggable items.
+- **FIX: Delete persistence** — `onEdgesDelete` and `onNodesDelete` now call `handleSave()` to persist deletions to backend immediately.
+
+### Files Modified (session 5)
+| File | Change |
+|------|--------|
+| `backend/database/migrations/2026_06_18_070406_add_flow_id_to_table_and_logic_definitions.php` | **NEW** — adds nullable `flow_id` FK to both `table_definitions` and `logic_definitions` |
+| `backend/app/Models/TableDefinition.php` | Added `flow_id` to fillable, added `flow()` BelongsTo relationship |
+| `backend/app/Models/LogicDefinition.php` | Added `flow_id` to fillable, added `flow()` BelongsTo relationship |
+| `backend/app/Repositories/table_definition/TableDefinitionRepository.php` | Added `allForUserAndFlow()` |
+| `backend/app/Repositories/table_definition/TableDefinitionRepositoryInterface.php` | Added `allForUserAndFlow()` signature |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepository.php` | Added `allForUserAndFlow()`, `countForUserAndFlow()` |
+| `backend/app/Repositories/logic_definition/LogicDefinitionRepositoryInterface.php` | Added `allForUserAndFlow()`, `countForUserAndFlow()` signatures |
+| `backend/app/Repositories/flow/FlowRepository.php` | Added `orderBy('created_at', 'desc')` to `allForUser()` |
+| `backend/app/Services/TableDefinition/TableDefinitionService.php` | Added `allForUserAndFlow()`, passes `flow_id` on create |
+| `backend/app/Services/LogicDefinition/LogicDefinitionService.php` | Added `allForUserAndFlow()`, passes `flow_id` on create, limit check scoped by flow |
+| `backend/app/Http/Controllers/api/TableDefinitionController.php` | `index()` accepts `?flow_id` query param |
+| `backend/app/Http/Controllers/api/LogicDefinitionController.php` | `index()` accepts `?flow_id` query param |
+| `backend/app/Http/Requests/TableDefinition/StoreTableDefinitionRequest.php` | Added `flow_id` validation rule |
+| `backend/app/Http/Requests/LogicDefinition/StoreLogicDefinitionRequest.php` | Added `flow_id` validation rule |
+| `frontend/src/router/index.js` | Fetches user on `/login`/`/register` to detect existing session |
+| `frontend/src/api/tables.js` | `getTables(flowId)` passes optional query param |
+| `frontend/src/api/logics.js` | `getLogics(flowId)` passes optional query param |
+| `frontend/src/components/Sidebar.vue` | Accepts `definitions` prop, shows per-flow logics as draggable items |
+| `frontend/src/components/SchemaSidebar.vue` | Accepts `definitions` prop, shows per-flow tables as draggable items |
+| `frontend/src/views/Canvas.vue` | Restored `getTables`/`getLogics` imports scoped by `currentFlowId`; calls `loadFlowDefinitions` on flow select; passes definitions to sidebars; `onEdgesDelete`/`onNodesDelete` call `handleSave()` |
+| `frontend/src/views/TableDesigner.vue` | Added flow selector dropdown, `loadTables(flowId)`, passes `flow_id` on create |
+| `frontend/src/views/LogicDesigner.vue` | Added flow selector dropdown, `loadLogics(flowId)`, passes `flow_id` on create |
 
 ## 2026-06-10 — Security Fixes & Canvas Refactoring
 

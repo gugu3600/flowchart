@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap (Value-Tier Focus)
 
-> Last updated: 2026-06-18 14:00 UTC
+> Last updated: 2026-06-18 16:00 UTC
 
 ## Completed
 - [x] **FEAT: Admin resource pages** — Separate `/admin/logics`, `/admin/tables`, `/admin/flows` pages with `AdminResourceTable` reusable component, navigation cards on dashboard
@@ -11,6 +11,9 @@
 - [x] **FEAT: ColumnBuilder data type dropdown** — Type field changed from text `<input>` to grouped `<select>` with all MySQL data types (Numeric, String, Date/Time, JSON, Spatial), with text input fallback for custom types. Added ENUM and SET to String group.
 - [x] **FIX: Canvas per-flow node isolation** — Removed auto-population of definition nodes from `loadFlowData()`. Each flow now only shows nodes explicitly saved to it, fixing cross-flow table/logic leaking.
 - [x] **DEVOPS: Docker Compose setup** — 4 services (mysql:3308, backend:8000, frontend:3000, phpmyadmin:8080). Fixed: MySQL port conflict, PHP 8.3→8.4 upgrade, node:20-alpine→node:20. Migrations and seeder run.
+- [x] **FIX: Login redirect for authenticated users** — Router fetches user on `/login`/`/register` to detect existing JWT session; redirects to `/canvas` (latest flow). Added `orderBy('created_at', 'desc')` to `FlowRepository::allForUser()`.
+- [x] **FEAT: Per-flow definition scoping** — Added `flow_id` FK to `table_definitions` and `logic_definitions`. Backend filters by `flow_id` on index, passes through on create. Frontend designer pages have flow selector dropdown. Canvas shows per-flow definitions in sidebar as draggable items.
+- [x] **FIX: Delete persistence** — `onEdgesDelete`/`onNodesDelete` call `handleSave()` to persist node/edge deletions to backend immediately.
 
 ## [Phase 1: Core Canvas & Silver Tier Feature]
 - [x] Initialize Vue 3 layout with `@vue-flow/core` integration and Tailwind styling elements.
