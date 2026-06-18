@@ -6,9 +6,11 @@ interface LogicDefinitionRepositoryInterface
 {
     public function all();
     public function allForUser(int $userId);
+    public function allForUserAndFlow(int $userId, int $flowId);
     public function findForUser(int $id, int $userId);
     public function create(array $data);
     public function update(int $id, array $data);
     public function delete(int $id);
     public function countForUser(int $userId): int;
+    public function countForUserAndFlow(int $userId, int $flowId): int;
 }

@@ -33,3 +33,4 @@ test-results/
 
 # Misc
 *.deb
+frontend/dist-root-owned/

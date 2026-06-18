@@ -18,14 +18,16 @@ class LogicDefinitionController extends BaseController
 
     public function index(): JsonResponse
     {
-        $definitions = $this->service->allForUser(Auth::id());
+        $flowId = request()->query('flow_id');
+        $definitions = $flowId
+            ? $this->service->allForUserAndFlow(Auth::id(), (int) $flowId)
+            : $this->service->allForUser(Auth::id());
         $count = $this->service->logicCount(Auth::id());
-        $max = $this->service->maxLogicSlots(Auth::id());
 
         return $this->success([
             'logics' => LogicDefinitionResource::collection($definitions),
             'logic_count' => $count,
-            'max_slots' => $max,
+            'max_slots' => $this->service->maxLogicSlots(Auth::id()),
         ], 'Logic definitions retrieved');
     }
 

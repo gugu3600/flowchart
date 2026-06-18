@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getLogics, createLogic, updateLogic, deleteLogic } from '../api/logics.js'
+import { getFlows } from '../api/flows.js'
 import AppHeader from '../components/AppHeader.vue'
 import { useUserStore } from '../stores/useUserStore.js'
 
-const { isFree, fetchUser } = useUserStore()
+const { isFree, fetchUser, canSave } = useUserStore()
 
 const logics = ref([])
+const flows = ref([])
+const selectedFlowId = ref('')
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -25,8 +28,14 @@ const emptyForm = () => ({
   output: '',
 })
 
+const currentFlowId = computed(() => selectedFlowId.value ? Number(selectedFlowId.value) : null)
+
 onMounted(async () => {
   await fetchUser()
+  if (canSave.value) {
+    const res = await getFlows()
+    if (res.success) flows.value = res.data.flows || []
+  }
   await loadLogics()
 })
 
@@ -34,7 +43,7 @@ async function loadLogics() {
   loading.value = true
   error.value = ''
   try {
-    const res = await getLogics()
+    const res = await getLogics(currentFlowId.value)
     if (res.success) {
       logics.value = res.data.logics || []
       logicCount.value = res.data.logic_count ?? 0
@@ -45,6 +54,10 @@ async function loadLogics() {
   } finally {
     loading.value = false
   }
+}
+
+function onFlowChange() {
+  loadLogics()
 }
 
 function openNew() {
@@ -92,6 +105,7 @@ async function handleSave() {
       ...form.value,
       inputs: form.value.inputs.filter((i) => i.name.trim() && i.type.trim()),
     }
+    if (currentFlowId.value) payload.flow_id = currentFlowId.value
     if (editing.value) {
       const res = await updateLogic(editing.value, payload)
       if (res.success) {
@@ -167,6 +181,10 @@ function closeUpgradeModal() {
 
       <template v-else>
         <div class="designer-toolbar">
+          <select v-model="selectedFlowId" class="form-input flow-select" @change="onFlowChange">
+            <option value="">All flows</option>
+            <option v-for="f in flows" :key="f.id" :value="f.id">{{ f.name }}</option>
+          </select>
           <button class="btn-primary" @click="openNew">+ New Logic</button>
           <span v-if="maxLogicSlots > 0 && maxLogicSlots < 900" class="logic-slot-info">
             {{ logicCount }}/{{ maxLogicSlots }} used

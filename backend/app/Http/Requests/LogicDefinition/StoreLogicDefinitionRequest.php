@@ -15,6 +15,7 @@ class StoreLogicDefinitionRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'flow_id' => 'nullable|integer|exists:flows,id',
             'description' => 'nullable|string',
             'inputs' => 'nullable|array',
             'inputs.*.name' => 'required_with:inputs|string|max:255',

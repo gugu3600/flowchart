@@ -1,7 +1,8 @@
 import apiClient from './apiClient'
 
-export function getTables() {
-  return apiClient.get('/tables')
+export function getTables(flowId) {
+  const params = flowId ? { flow_id: flowId } : {}
+  return apiClient.get('/tables', { params })
 }
 
 export function getTable(id) {

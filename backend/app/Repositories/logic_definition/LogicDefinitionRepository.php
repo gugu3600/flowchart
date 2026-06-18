@@ -16,6 +16,11 @@ class LogicDefinitionRepository implements LogicDefinitionRepositoryInterface
         return LogicDefinition::where('user_id', $userId)->get();
     }
 
+    public function allForUserAndFlow(int $userId, int $flowId)
+    {
+        return LogicDefinition::where('user_id', $userId)->where('flow_id', $flowId)->get();
+    }
+
     public function findForUser(int $id, int $userId)
     {
         return LogicDefinition::where('user_id', $userId)->findOrFail($id);
@@ -41,5 +46,10 @@ class LogicDefinitionRepository implements LogicDefinitionRepositoryInterface
     public function countForUser(int $userId): int
     {
         return LogicDefinition::where('user_id', $userId)->count();
+    }
+
+    public function countForUserAndFlow(int $userId, int $flowId): int
+    {
+        return LogicDefinition::where('user_id', $userId)->where('flow_id', $flowId)->count();
     }
 }

@@ -9,6 +9,8 @@ import SchemaSidebar from '../components/SchemaSidebar.vue'
 import ModeTabs from '../components/ModeTabs.vue'
 import ColorSwatchPalette from '../components/ColorSwatchPalette.vue'
 import { getFlows, getFlow, createFlow, saveFlow, validateConnection } from '../api/flows.js'
+import { getTables } from '../api/tables.js'
+import { getLogics } from '../api/logics.js'
 
 import { useUserStore } from '../stores/useUserStore.js'
 import { useFlowMapper } from '../composables/useFlowMapper.js'
@@ -33,6 +35,8 @@ const { screenToFlowCoordinate } = useVueFlow()
 
 const flows = ref([])
 const currentFlowId = ref(null)
+const flowTables = ref([])
+const flowLogics = ref([])
 const nodes = ref([])
 const edges = ref([])
 const loading = ref(false)
@@ -103,7 +107,24 @@ async function selectFlow(flowId) {
   currentFlowId.value = flowId
   selectedNode.value = null
   selectedEdge.value = null
-  await loadFlowData(flowId)
+  await Promise.all([
+    loadFlowData(flowId),
+    loadFlowDefinitions(flowId),
+  ])
+}
+
+async function loadFlowDefinitions(flowId) {
+  try {
+    const [tablesRes, logicsRes] = await Promise.all([
+      getTables(flowId),
+      getLogics(flowId),
+    ])
+    if (tablesRes.success) flowTables.value = tablesRes.data.tables || []
+    if (logicsRes.success) flowLogics.value = logicsRes.data.logics || []
+  } catch {
+    flowTables.value = []
+    flowLogics.value = []
+  }
 }
 
 async function loadFlowData(flowId) {
@@ -347,6 +368,8 @@ function onDrop(event) {
       position,
       data: {
         label,
+        definitionId: nodeDef.defaultData?.definitionId,
+        definitionType: nodeDef.defaultData?.definitionType,
         columns: nodeDef.defaultData?.columns,
         description: nodeDef.defaultData?.description,
         inputs: nodeDef.defaultData?.inputs,
@@ -465,8 +488,8 @@ function refresh() {
     <div v-if="error" class="canvas-error error-msg">{{ error }}</div>
 
     <div class="canvas-body">
-      <SchemaSidebar v-if="mode === 'schema'" />
-      <Sidebar v-else />
+      <SchemaSidebar v-if="mode === 'schema'" :definitions="flowTables" />
+      <Sidebar v-else :definitions="flowLogics" />
 
       <div class="canvas-flow-wrapper">
         <div v-if="loading" class="canvas-loading">Loading...</div>

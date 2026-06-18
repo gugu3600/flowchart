@@ -18,7 +18,10 @@ class TableDefinitionController extends BaseController
 
     public function index(): JsonResponse
     {
-        $definitions = $this->service->allForUser(Auth::id());
+        $flowId = request()->query('flow_id');
+        $definitions = $flowId
+            ? $this->service->allForUserAndFlow(Auth::id(), (int) $flowId)
+            : $this->service->allForUser(Auth::id());
 
         return $this->success(
             ['tables' => TableDefinitionResource::collection($definitions)],

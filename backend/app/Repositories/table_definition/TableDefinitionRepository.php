@@ -16,6 +16,11 @@ class TableDefinitionRepository implements TableDefinitionRepositoryInterface
         return TableDefinition::where('user_id', $userId)->get();
     }
 
+    public function allForUserAndFlow(int $userId, int $flowId)
+    {
+        return TableDefinition::where('user_id', $userId)->where('flow_id', $flowId)->get();
+    }
+
     public function findForUser(int $id, int $userId)
     {
         return TableDefinition::where('user_id', $userId)->findOrFail($id);

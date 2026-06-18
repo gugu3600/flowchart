@@ -15,6 +15,7 @@ class StoreTableDefinitionRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'flow_id' => 'nullable|integer|exists:flows,id',
             'columns' => 'required|array|min:1',
             'columns.*.name' => 'required|string|max:255',
             'columns.*.type' => 'required|string|max:255',

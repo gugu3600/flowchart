@@ -9,6 +9,7 @@ class TableDefinition extends Model
 {
     protected $fillable = [
         'user_id',
+        'flow_id',
         'name',
         'columns',
     ];
@@ -23,5 +24,10 @@ class TableDefinition extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function flow(): BelongsTo
+    {
+        return $this->belongsTo(Flow::class);
     }
 }

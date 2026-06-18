@@ -1,7 +1,8 @@
 import apiClient from './apiClient'
 
-export function getLogics() {
-  return apiClient.get('/logics')
+export function getLogics(flowId) {
+  const params = flowId ? { flow_id: flowId } : {}
+  return apiClient.get('/logics', { params })
 }
 
 export function getLogic(id) {

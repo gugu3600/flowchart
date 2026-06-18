@@ -15,6 +15,11 @@ class TableDefinitionService
         return $this->repo->allForUser($userId);
     }
 
+    public function allForUserAndFlow(int $userId, int $flowId)
+    {
+        return $this->repo->allForUserAndFlow($userId, $flowId);
+    }
+
     public function findForUser(int $id, int $userId)
     {
         return $this->repo->findForUser($id, $userId);
@@ -24,6 +29,7 @@ class TableDefinitionService
     {
         return $this->repo->create([
             'user_id' => $userId,
+            'flow_id' => $data['flow_id'] ?? null,
             'name' => $data['name'],
             'columns' => $data['columns'],
         ]);

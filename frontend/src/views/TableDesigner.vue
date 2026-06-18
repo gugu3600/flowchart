@@ -1,13 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getTables, createTable, updateTable, deleteTable } from '../api/tables.js'
+import { getFlows } from '../api/flows.js'
 import AppHeader from '../components/AppHeader.vue'
 import { useUserStore } from '../stores/useUserStore.js'
 import ColumnBuilder from '../components/ColumnBuilder.vue'
 
-const { isAdmin, fetchUser, canGenerateSchema } = useUserStore()
+const { isAdmin, fetchUser, canSave, canGenerateSchema } = useUserStore()
 
 const tables = ref([])
+const flows = ref([])
+const selectedFlowId = ref('')
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -21,8 +24,14 @@ const emptyForm = () => ({
   columns: [{ name: '', type: 'VARCHAR(255)', pk: false, fk: false, unique: false }],
 })
 
+const currentFlowId = computed(() => selectedFlowId.value ? Number(selectedFlowId.value) : null)
+
 onMounted(async () => {
   await fetchUser()
+  if (canSave.value) {
+    const res = await getFlows()
+    if (res.success) flows.value = res.data.flows || []
+  }
   await loadTables()
 })
 
@@ -30,13 +39,17 @@ async function loadTables() {
   loading.value = true
   error.value = ''
   try {
-    const res = await getTables()
+    const res = await getTables(currentFlowId.value)
     if (res.success) tables.value = res.data.tables || []
   } catch (err) {
     error.value = err.message || 'Failed to load tables'
   } finally {
     loading.value = false
   }
+}
+
+function onFlowChange() {
+  loadTables()
 }
 
 function openNew() {
@@ -66,14 +79,16 @@ async function handleSave() {
   saving.value = true
   error.value = ''
   try {
+    const payload = { ...form.value }
+    if (currentFlowId.value) payload.flow_id = currentFlowId.value
     if (editing.value) {
-      const res = await updateTable(editing.value, form.value)
+      const res = await updateTable(editing.value, payload)
       if (res.success) {
         const idx = tables.value.findIndex((t) => t.id === editing.value)
         if (idx >= 0) tables.value[idx] = res.data.table
       }
     } else {
-      const res = await createTable(form.value)
+      const res = await createTable(payload)
       if (res.success) tables.value.push(res.data.table)
     }
     showForm.value = false
@@ -133,6 +148,10 @@ function updateColumns(val) {
 
       <template v-else>
         <div class="designer-toolbar">
+          <select v-model="selectedFlowId" class="form-input flow-select" @change="onFlowChange">
+            <option value="">All flows</option>
+            <option v-for="f in flows" :key="f.id" :value="f.id">{{ f.name }}</option>
+          </select>
           <button v-if="canGenerateSchema" class="btn-primary" @click="openNew">+ New Table</button>
         </div>
 
