@@ -327,6 +327,7 @@ function onEdgesDelete(removedEdges) {
   if (selectedEdge.value && removedIds.has(selectedEdge.value.id)) {
     selectedEdge.value = null
   }
+  if (currentFlowId.value) handleSave()
 }
 
 function onNodesDelete(removedNodes) {
@@ -335,6 +336,7 @@ function onNodesDelete(removedNodes) {
   if (selectedNode.value && removedIds.has(selectedNode.value.id)) {
     selectedNode.value = null
   }
+  if (currentFlowId.value) handleSave()
 }
 
 function onDragOver(event) {
