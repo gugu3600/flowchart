@@ -9,8 +9,7 @@ import SchemaSidebar from '../components/SchemaSidebar.vue'
 import ModeTabs from '../components/ModeTabs.vue'
 import ColorSwatchPalette from '../components/ColorSwatchPalette.vue'
 import { getFlows, getFlow, createFlow, saveFlow, validateConnection } from '../api/flows.js'
-import { getTables } from '../api/tables.js'
-import { getLogics } from '../api/logics.js'
+
 import { useUserStore } from '../stores/useUserStore.js'
 import { useFlowMapper } from '../composables/useFlowMapper.js'
 import UserProfile from '../components/UserProfile.vue'
@@ -131,62 +130,7 @@ async function loadFlowData(flowId) {
       }
     }
 
-    const existingDefIds = new Set()
-    for (const n of savedNodes) {
-      if (n.data?.definitionId) {
-        existingDefIds.add(`${n.data.definitionType}:${n.data.definitionId}`)
-      }
-    }
-
-    const defNodes = []
-    let defIndex = 0
-
-    if (mode.value === 'flow') {
-      const logicsRes = await getLogics()
-      if (logicsRes.success) {
-        for (const l of logicsRes.data.logics || []) {
-          const key = `logic:${l.id}`
-          if (existingDefIds.has(key)) continue
-          defNodes.push({
-            id: `def_logic_${l.id}`,
-            type: 'logic',
-            label: l.name,
-            position: { x: 50 + defIndex++ * 350, y: 50 },
-            data: {
-              label: l.name,
-              definitionId: l.id,
-              definitionType: 'logic',
-              description: l.description,
-              inputs: l.inputs,
-              output: l.output,
-              typeField: l.type,
-            },
-          })
-        }
-      }
-    } else {
-      const tablesRes = await getTables()
-      if (tablesRes.success) {
-        for (const t of tablesRes.data.tables || []) {
-          const key = `table:${t.id}`
-          if (existingDefIds.has(key)) continue
-          defNodes.push({
-            id: `def_table_${t.id}`,
-            type: 'table',
-            label: t.name,
-            position: { x: 50 + defIndex++ * 350, y: 50 },
-            data: {
-              label: t.name,
-              definitionId: t.id,
-              definitionType: 'table',
-              columns: t.columns,
-            },
-          })
-        }
-      }
-    }
-
-    nodes.value = [...defNodes, ...savedNodes]
+    nodes.value = savedNodes
     edges.value = savedEdges
   } catch (err) {
     error.value = err.message || 'Failed to load data'

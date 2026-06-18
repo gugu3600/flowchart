@@ -1,6 +1,11 @@
 # Git Commits
 
-> Last updated: 2026-06-16 21:00 UTC
+> Last updated: 2026-06-18 14:00 UTC
+
+## 2026-06-18
+
+- `7dc732d` feat: Docker Compose setup — PHP 8.4-FPM + Nginx, Node 20, MySQL 8.0 (:3308), phpMyAdmin
+- `488e8f7` feat: ColumnBuilder data type dropdown + Canvas per-flow scoping + update all .md files
 
 ## 2026-06-16
 

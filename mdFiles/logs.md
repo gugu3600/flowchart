@@ -1,6 +1,6 @@
 # Change Log
 
-> Last updated: 2026-06-16 21:00 UTC
+> Last updated: 2026-06-18 14:00 UTC
 
 ## 2026-06-16 — Admin Resource Pages & Nav Links
 - **FEAT: Admin resource endpoints** — Added `GET /admin/logics`, `GET /admin/tables`, `GET /admin/flows` endpoints to `AdminController`, each returning all records with owner name/email. Routes gated by `role:super-admin`.
@@ -26,6 +26,23 @@
 | `backend/app/Repositories/flow/FlowRepositoryInterface.php` | Added `all()` method signature |
 | `backend/app/Repositories/logic_definition/LogicDefinitionRepositoryInterface.php` | Added `all()` method signature |
 | `backend/app/Repositories/table_definition/TableDefinitionRepositoryInterface.php` | Added `all()` method signature |
+
+## 2026-06-18 — Docker Setup, ColumnBuilder Dropdown, Canvas Scoping
+- **FEAT: Docker Compose setup** — 4 services (mysql:3308, backend:8000, frontend:3000, phpmyadmin:8080). Fixes: MySQL 3307→3308 (system conflict), PHP 8.3→8.4-fpm (composer >=8.4.1), node:20-alpine→node:20 (rolldown glibc/musl binding mismatch). Migrations run, seeder seeded.
+- **FEAT: ColumnBuilder data type dropdown** — Type field changed from text `<input>` to grouped `<select>` with 5 groups (Numeric, String, Date/Time, JSON, Spatial) covering all common MySQL types including ENUM and SET. Custom text input fallback for non-standard types.
+- **FIX: Canvas per-flow node isolation** — Removed auto-population of definition nodes in `loadFlowData()`. Each flow now only shows nodes explicitly saved to it, fixing cross-flow table/logic leaking.
+
+### Files Modified (session 4)
+| File | Change |
+|------|--------|
+| `docker-compose.yml` | **NEW** — 4 services: mysql, backend (PHP-FPM + Nginx), frontend (Node 20), phpmyadmin |
+| `docker/php/Dockerfile` | **NEW** — PHP 8.4-FPM with extensions, Nginx, Composer |
+| `docker/php/nginx.conf` | **NEW** — Nginx config for Laravel |
+| `docker/php/www.conf` | **NEW** — PHP-FPM pool config |
+| `docker/frontend/Dockerfile` | **NEW** — Node 20 build + serve |
+| `docker/frontend/nginx.conf` | **NEW** — Nginx config for Vite SPA |
+| `frontend/src/components/ColumnBuilder.vue` | Type field changed from text input to grouped `<select>` with `DATA_TYPE_GROUPS` (5 groups, all MySQL types), custom text fallback |
+| `frontend/src/views/Canvas.vue` | Removed `getTables`/`getLogics` imports and auto-population block; `loadFlowData` now only uses `savedNodes`/`savedEdges` |
 
 ## 2026-06-10 — Security Fixes & Canvas Refactoring
 

@@ -1,6 +1,6 @@
 # Autonomous Code Review & Validation Checklist
 
-> Last updated: 2026-06-11 14:00 UTC
+> Last updated: 2026-06-18 14:00 UTC
 
 ## [Phase 1: Security & Route Protection]
 - [x] Ownership verified: all CRUD controllers (`Flow`, `TableDefinition`, `LogicDefinition`) check `user_id` via `findForUser()`.
@@ -56,6 +56,9 @@
 - [x] **JWT cookie config moved to env+config:** `config/jwt.php` `cookie` section replaces hardcoded `->cookie()` params in AuthController. `jwtCookie()` helper eliminates duplication. Middleware reads config.
 - [x] **Tier access audit (2026-06-11):** Tested all 4 tiers against every endpoint — no leaks. free=403 on flows/tables write, silver=201 on flows+403 on tables, gold/platinum=201 on all, all tiers=403 on admin.
 - [x] **LogicNode UI confirmed:** Title shows logic name, body shows description + inputs + output.
+- [x] **ColumnBuilder data type dropdown:** Type field is now a grouped `<select>` with all MySQL types (5 categories), plus custom text fallback. ENUM and SET included in String group.
+- [x] **Canvas per-flow node isolation:** `loadFlowData()` no longer auto-populates definition nodes. Each flow only shows saved nodes — tables/logics from one flow no longer leak into others.
+- [x] **Docker setup verified:** MySQL port changed 3307→3308, PHP 8.3→8.4 (composer require), node:20-alpine→node:20 (glibc). All 4 services start, migrations run, seeder seeded.
 - [ ] **Tier Middleware Verification:** Inspect `routes/api.php` and verify that all routes accessing or compiling outputs are strictly wrapped inside respective tier stacks.
 - [ ] **Client-Side Separation:** Verify zero DB/SQL in frontend bundle.
 

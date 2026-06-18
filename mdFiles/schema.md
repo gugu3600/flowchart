@@ -33,7 +33,7 @@ users (1) ──< flows (1) ──< flow_nodes
 | updated_at | TIMESTAMP | |
 
 - **Relations:** Belongs to `user`.
-- **Canvas Integration:** Each definition auto-creates a `table`-type node on the canvas (tracked via `data.definitionId`).
+- **Canvas Integration:** Each definition can be dragged from the sidebar onto the canvas (tracked via `data.definitionId`).
 
 ---
 
@@ -51,7 +51,7 @@ users (1) ──< flows (1) ──< flow_nodes
 | updated_at | TIMESTAMP | |
 
 - **Relations:** Belongs to `user`.
-- **Canvas Integration:** Each definition auto-creates a `logic`-type node on the canvas (tracked via `data.definitionId`).
+- **Canvas Integration:** Each definition can be dragged from the sidebar onto the canvas (tracked via `data.definitionId`).
 
 ---
 

@@ -1,6 +1,6 @@
 # Application Architecture & Strategic Tier Matrix (Current MVP Stage)
 
-> Last updated: 2026-06-16 21:00 UTC
+> Last updated: 2026-06-18 14:00 UTC
 
 ## Core System Stack
 - **Frontend:** Vue 3 (Composition API) + Vite 8 + Tailwind CSS v4 + PrimeVue 4 + axios.
@@ -19,7 +19,7 @@
 | `/help` | HelpGuide.vue | How-to guide and documentation for the web app |
 | `/login` | Login.vue | JWT login form with floating-label inputs, show/hide password toggle, "Remember me" checkbox, link to register |
 | `/register` | Register.vue | User registration with tier selection (Free/Silver/Gold/Platinum), pricing display, floating-label inputs with password toggle, payment method picker (KBZ Pay / AYA Pay / CB Pay / MMQR) for paid tiers |
-| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, live definitions, edge/node deletion via Delete/Backspace. Free tier: sandbox only (no save). Silver+: color picker for node backgrounds and edge strokes, save up to 5 flows. Gold+: unlimited flows. |
+| `/canvas` | Canvas.vue | Tabbed Vue Flow canvas (Flow mode + Schema mode), drag-drop, save/load, edge/node deletion via Delete/Backspace. Definitions from sidebar, not auto-populated. Free tier: sandbox only (no save). Silver+: color picker for node backgrounds and edge strokes, save up to 5 flows. Gold+: unlimited flows. |
 | `/subscribe` | Subscribe.vue | Self-service subscription page — tier cards, payment method picker, subscribe button. Authenticated users only. |
 | `/tables` | TableDesigner.vue | CRUD for database table schemas (columns, types, PK/FK/UQ). Gold+ (`generate-schema` permission) can create/edit/delete. Free/Silver read-only. ColumnBuilder component for column rows. |
 | `/logics` | LogicDesigner.vue | CRUD for logic/function definitions (structured name/type inputs, output). Free: max 4 logics with upgrade modal. Silver+: unlimited. |
@@ -37,7 +37,7 @@
 
 ### Mode Separation Rules (Enforced)
 
-1. **Definition loading:** `loadFlowData` only loads definitions matching the current mode — logics for flow, tables for schema. The `if/else` branch in `loadFlowData` ensures only the correct API is called.
+1. **Definition loading:** Definitions are not auto-populated — users drag them from the sidebar per-flow. `loadFlowData` only loads saved nodes for the selected flow.
 2. **Saved node filtering:** When loading saved flow data, nodes are filtered by `n.type` — flow mode keeps only `logic`/`folderFile`, schema mode keeps only `table`. All others are silently dropped.
 3. **Drop validation:** `onDrop` calls `isAllowedType()` which rejects items whose type doesn't match the active mode. A logic item cannot be dropped on schema canvas and vice versa.
 4. **Connection validation:** `isValidConnection` checks type compatibility (table↔table, logic↔logic/folderFile). Backend `POST /api/flows/{flow}/validate-connection` (gated by `permission:save-flows`) additionally checks tier eligibility, self-connection, type compatibility, and duplicate edges (when nodes have DB IDs). `onConnect` validates with backend before adding edge async.
@@ -61,7 +61,7 @@ src/
 │   ├── AppInput.vue          — PrimeVue InputText wrapper with label
 │   ├── AppCard.vue           — PrimeVue Card wrapper with title/subtitle/slot
 │   ├── AppNavbar.vue         — PrimeVue Menubar wrapper
-│   ├── ColumnBuilder.vue     — v-model column row builder (name, type, PK/FK/UQ checkboxes, add/remove)
+│   ├── ColumnBuilder.vue     — v-model column row builder (name, type dropdown with all MySQL types grouped by category, PK/FK/UQ checkboxes, add/remove; custom text input fallback for non-standard types)
 │   ├── FloatingInput.vue     — Floating-label input with bottom-border underline, password toggle, error state
 │   ├── TierSelector.vue      — 2×2 tier card grid for registration
 │   ├── PaymentMethodPicker.vue — 2×2 payment method grid with loading state
@@ -140,10 +140,10 @@ Paid tiers have `subscription_expires_at` set on upgrade; auto-downgraded to fre
 ## Definition-to-Node Flow
 1. User creates Table definitions on `/tables` or Logic definitions on `/logics`
 2. On `/canvas`, switch to **Flow** tab for logic/folder flowcharts or **Schema** tab for table relationship diagrams
-3. Canvas loads the relevant definitions for the active mode and creates nodes (with `definitionId` tracking)
-4. Existing saved nodes in the active mode keep their positions; new definitions appear in a grid
+3. Definitions appear in the sidebar; user drags them onto the canvas to create nodes (with `definitionId` tracking)
+4. Canvas loads only saved nodes for the selected flow — definitions from other flows do not appear
 5. `isValidConnection` enforces domain boundaries — table nodes cannot connect to logic nodes
-6. User can reposition, connect, save; clicking refresh (⟳) reloads definitions
+6. User can reposition, connect, save; clicking refresh (⟳) reloads the current flow
 
 ## API Routes (42 total)
 
