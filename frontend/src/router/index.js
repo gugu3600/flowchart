@@ -92,7 +92,8 @@ router.beforeEach(async (to) => {
   const store = useUserStore()
 
   const needsAuth = to.meta.requiresAuth || to.meta.requiresAdmin
-  if (needsAuth && !store.state.user) {
+  const isPublicAuthPage = to.name === 'Login' || to.name === 'Register'
+  if ((needsAuth || isPublicAuthPage) && !store.state.user) {
     try {
       await store.fetchUser()
     } catch {

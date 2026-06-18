@@ -13,7 +13,7 @@ class FlowRepository implements FlowRepositoryInterface
 
     public function allForUser(int $userId)
     {
-        return Flow::where('user_id', $userId)->get();
+        return Flow::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
     }
 
     public function find(int $id)
